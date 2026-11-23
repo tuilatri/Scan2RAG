@@ -1,0 +1,63 @@
+{
+  "project": {
+    "name": "Scan2RAG",
+    "chatLanguage": "vi"
+  },
+  "apps": [
+    {
+      "id": "backend",
+      "path": "backend",
+      "srcPath": "backend/app",
+      "verify": "python -m pytest tests/ -q",
+      "expectedTests": null
+    },
+    {
+      "id": "frontend",
+      "path": "frontend",
+      "srcPath": "frontend/src",
+      "verify": "npm test",
+      "expectedTests": null
+    }
+  ],
+  "docPaths": {
+    "aiContext": "docs/ai-context",
+    "agents": "AGENTS.md",
+    "agentsConfig": "docs/agents"
+  },
+  "skillPaths": [
+    ".claude/skills"
+  ],
+  "claims": [],
+  "gates": [
+    {
+      "id": "doc-truth",
+      "cmd": "node",
+      "args": ["scripts/doc-truth.mjs"],
+      "cwd": ".",
+      "tags": ["docs"],
+      "requires": [],
+      "env": {},
+      "optional": false
+    },
+    {
+      "id": "backend-tests",
+      "cmd": "python",
+      "args": ["-m", "pytest", "tests/", "-q"],
+      "cwd": "backend",
+      "tags": ["slow", "backend"],
+      "requires": [],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": true
+    },
+    {
+      "id": "frontend-tests",
+      "cmd": "npm",
+      "args": ["test"],
+      "cwd": "frontend",
+      "tags": ["frontend"],
+      "requires": [],
+      "env": {},
+      "optional": true
+    }
+  ]
+}
