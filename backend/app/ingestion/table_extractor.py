@@ -39,9 +39,56 @@ class TableExtractor:
         "Điểm 6",
     ]
 
+    TABLE_KEYWORDS = [
+        "tt",
+        "stt",
+        "bệnh tật",
+        "bnh tt",
+        "chỉ tiêu",
+        "chi tiêu",
+        "điểm",
+        "đim",
+        "phụ lục",
+        "phu lc",
+        "tiêu chuẩn",
+        "tật khúc xạ",
+        "thị lực",
+        "th lón hon",
+    ]
+
     def __init__(self, y_threshold: float = 18.0, x_threshold: float = 40.0):
         self.y_threshold = y_threshold
         self.x_threshold = x_threshold
+
+    def is_table_page(self, blocks: list[TextBlock]) -> bool:
+        """Determines if a page contains medical / classification table structures."""
+        if not blocks:
+            return False
+
+        # First, group blocks into rows and check if there are multi-column rows
+        grouped_rows = self.group_blocks_into_rows(blocks)
+        max_cols = max(len(r) for r in grouped_rows) if grouped_rows else 0
+        if max_cols < 2:
+            # Single-column text flow is never a table
+            return False
+
+        texts_lower = [b.text.strip().lower() for b in blocks if b.text.strip()]
+        joined_text = " ".join(texts_lower)
+
+        # Keyword match for tabular headers
+        has_table_header = any(
+            h in joined_text
+            for h in ["chỉ tiêu", "chi tiêu", "bệnh tật", "bnh tt", "thị lực", "tật khúc xạ"]
+        ) and any(d in joined_text for d in ["điểm", "đim", "loại"])
+
+        # Check for numeric score columns: multiple single digits between 1-6 or 1T-6T
+        score_like_blocks = sum(
+            1
+            for t in texts_lower
+            if t in {"1", "2", "3", "4", "5", "6", "1t", "2t", "3t", "4t", "5t", "6t"}
+        )
+
+        return (has_table_header and score_like_blocks >= 1) or score_like_blocks >= 4
 
     def _get_box_y_center(self, box: list[list[float]]) -> float:
         """Calculates center Y coordinate of a 4-point bounding box."""
@@ -121,11 +168,12 @@ class TableExtractor:
         text_rows = [[b.text for b in row] for row in grouped_rows]
 
         header = []
-        # Check if first row looks like a header (e.g. contains 'STT' or 'Điểm' or 'Chỉ tiêu')
         has_detected_header = False
         if text_rows:
             first_row_joined = " ".join(text_rows[0]).lower()
-            if any(k in first_row_joined for k in ["stt", "chỉ tiêu", "điểm", "loại"]):
+            if any(
+                k in first_row_joined for k in ["stt", "tt", "chỉ tiêu", "bệnh tật", "điểm", "loại"]
+            ):
                 has_detected_header = True
                 header = text_rows[0]
 

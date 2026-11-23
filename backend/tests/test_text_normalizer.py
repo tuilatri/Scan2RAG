@@ -5,7 +5,6 @@ from app.ingestion.text_normalizer import TextNormalizer
 
 def test_unicode_nfc_normalization():
     normalizer = TextNormalizer()
-    # NFD: 'Bộ' with decomposed diacritics
     nfd_text = unicodedata.normalize("NFD", "Bộ Quốc phòng")
     assert unicodedata.is_normalized("NFD", nfd_text)
 
@@ -14,11 +13,19 @@ def test_unicode_nfc_normalization():
     assert normalized == "Bộ Quốc phòng"
 
 
-def test_legal_typo_correction():
+def test_legal_and_medical_typo_correction():
     normalizer = TextNormalizer()
-    corrupted = "Hà Ni, ngày 10 tháng 10. ca B trưng B Quc phòng ban hành Thng tư."
-    expected = "Hà Nội, ngày 10 tháng 10. của Bộ trưởng Bộ Quốc phòng ban hành Thông tư."
+    corrupted = "Chính ph quy đnh chc năng, nhim v, quyn hn và co cáu t chc ca B Quc phòng."
+    expected = (
+        "Chính phủ quy định chức năng, nhiệm vụ, quyền hạn và cơ cấu tổ chức của Bộ Quốc phòng."
+    )
     assert normalizer.normalize(corrupted) == expected
+
+    corrupted_med = "Bnh tt: Đuc thê thúy tinh, Lch th thy tinh, đái tháo đuòng và tăng huyt áp."
+    expected_med = (
+        "Bệnh tật: Đục thể thủy tinh, Lệch thể thủy tinh, đái tháo đường và tăng huyết áp."
+    )
+    assert normalizer.normalize(corrupted_med) == expected_med
 
 
 def test_roman_numeral_header_preservation():

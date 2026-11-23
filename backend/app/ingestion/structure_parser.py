@@ -1,6 +1,6 @@
 """Legal Structure Parser module for extracting hierarchical Vietnamese statutory units.
 
-Parses text into Chapter (Chương), Article (Điều), Clause (Khoản), and Point (Điểm).
+Parses text into Chapter (Chương), Section (Mục/Phần), Article (Điều), Clause (Khoản), and Point (Điểm).
 """
 
 import re
@@ -9,9 +9,12 @@ from app.models.document_schema import DocumentNode, HierarchyLevel
 
 
 class LegalStructureParser:
-    """Regex-based parser for Vietnamese legal statutes (Chương, Điều, Khoản, Điểm)."""
+    """Regex-based parser for Vietnamese legal statutes (Chương, Mục, Điều, Khoản, Điểm)."""
 
     CHAPTER_PATTERN = re.compile(r"^(Chương\s+[IVXLCDM0-9]+)\.?\s*(.*)$", re.IGNORECASE)
+    SECTION_PATTERN = re.compile(
+        r"^([IVXLCDM]+|[1-9])\.\s+([A-ZÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÈÉẺẼẸÊẾỀỂỄỆÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ\s]{4,})$"
+    )
     ARTICLE_PATTERN = re.compile(r"^(Điều\s+[0-9]+)\.\s*(.*)$", re.IGNORECASE)
     CLAUSE_PATTERN = re.compile(r"^([0-9]+)\.\s*(.*)$")
     POINT_PATTERN = re.compile(r"^([a-zđ])\)\s*(.*)$", re.IGNORECASE)
@@ -24,6 +27,7 @@ class LegalStructureParser:
         """Parses a sequence of text lines into hierarchical DocumentNode structures."""
         nodes: list[DocumentNode] = []
         current_chapter: DocumentNode | None = None
+        current_section: DocumentNode | None = None
         current_article: DocumentNode | None = None
         current_clause: DocumentNode | None = None
 
@@ -50,6 +54,28 @@ class LegalStructureParser:
                     order=node_counter,
                 )
                 nodes.append(current_chapter)
+                current_section = None
+                current_article = None
+                current_clause = None
+                continue
+
+            # Check Section (Mục I, II... in administrative guidelines)
+            sec_match = self.SECTION_PATTERN.match(line_str)
+            if sec_match and not self.ARTICLE_PATTERN.match(line_str):
+                node_counter += 1
+                parent = current_chapter.id if current_chapter else None
+                current_section = DocumentNode(
+                    id=f"{self.document_id}_sec_{node_counter}",
+                    document_id=self.document_id,
+                    document_name=self.document_name,
+                    level=HierarchyLevel.SECTION,
+                    title=f"Mục {sec_match.group(1)}",
+                    content=sec_match.group(2),
+                    page_number=page_number,
+                    parent_id=parent,
+                    order=node_counter,
+                )
+                nodes.append(current_section)
                 current_article = None
                 current_clause = None
                 continue
@@ -58,7 +84,11 @@ class LegalStructureParser:
             art_match = self.ARTICLE_PATTERN.match(line_str)
             if art_match:
                 node_counter += 1
-                parent_id = current_chapter.id if current_chapter else None
+                parent = (
+                    current_section.id
+                    if current_section
+                    else (current_chapter.id if current_chapter else None)
+                )
                 current_article = DocumentNode(
                     id=f"{self.document_id}_art_{node_counter}",
                     document_id=self.document_id,
@@ -67,14 +97,14 @@ class LegalStructureParser:
                     title=art_match.group(1),
                     content=art_match.group(2),
                     page_number=page_number,
-                    parent_id=parent_id,
+                    parent_id=parent,
                     order=node_counter,
                 )
                 nodes.append(current_article)
                 current_clause = None
                 continue
 
-            # Check Clause
+            # Check Clause (numbered: "1. Content")
             clause_match = self.CLAUSE_PATTERN.match(line_str)
             if clause_match and current_article:
                 node_counter += 1
@@ -92,7 +122,7 @@ class LegalStructureParser:
                 nodes.append(current_clause)
                 continue
 
-            # Check Point
+            # Check Point (lettered: "a) Content")
             point_match = self.POINT_PATTERN.match(line_str)
             if point_match and (current_clause or current_article):
                 node_counter += 1
@@ -111,17 +141,20 @@ class LegalStructureParser:
                 nodes.append(point_node)
                 continue
 
-            # General body text - append to current active node
+            # Standard narrative text block
+            node_counter += 1
+            parent_id = None
             if current_clause:
-                current_clause.content += f" {line_str}"
+                parent_id = current_clause.id
             elif current_article:
-                current_article.content += f" {line_str}"
+                parent_id = current_article.id
+            elif current_section:
+                parent_id = current_section.id
             elif current_chapter:
-                current_chapter.content += f" {line_str}"
-            else:
-                # Top level document preamble
-                node_counter += 1
-                preamble_node = DocumentNode(
+                parent_id = current_chapter.id
+
+            nodes.append(
+                DocumentNode(
                     id=f"{self.document_id}_text_{node_counter}",
                     document_id=self.document_id,
                     document_name=self.document_name,
@@ -129,9 +162,9 @@ class LegalStructureParser:
                     title="",
                     content=line_str,
                     page_number=page_number,
-                    parent_id=None,
+                    parent_id=parent_id,
                     order=node_counter,
                 )
-                nodes.append(preamble_node)
+            )
 
         return nodes
