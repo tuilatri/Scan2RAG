@@ -47,13 +47,15 @@ class LegalStructureParser:
             chap_match = self.CHAPTER_PATTERN.match(line_str)
             if chap_match:
                 self.node_counter += 1
+                content_text = chap_match.group(2).strip()
+                title_text = f"Chương {chap_match.group(1)}"
                 self.current_chapter = DocumentNode(
                     id=f"{self.document_id}_chap_{self.node_counter}",
                     document_id=self.document_id,
                     document_name=self.document_name,
                     level=HierarchyLevel.CHAPTER,
-                    title=f"Chương {chap_match.group(1)}",
-                    content=chap_match.group(2).strip(),
+                    title=title_text,
+                    content=content_text if content_text else title_text,
                     page_number=page_number,
                     parent_id=None,
                     order=self.node_counter,
@@ -69,13 +71,15 @@ class LegalStructureParser:
             if sec_match and not self.ARTICLE_PATTERN.match(line_str):
                 self.node_counter += 1
                 parent = self.current_chapter.id if self.current_chapter else None
+                content_text = sec_match.group(2).strip()
+                title_text = f"Mục {sec_match.group(1)}"
                 self.current_section = DocumentNode(
                     id=f"{self.document_id}_sec_{self.node_counter}",
                     document_id=self.document_id,
                     document_name=self.document_name,
                     level=HierarchyLevel.SECTION,
-                    title=f"Mục {sec_match.group(1)}",
-                    content=sec_match.group(2).strip(),
+                    title=title_text,
+                    content=content_text if content_text else title_text,
                     page_number=page_number,
                     parent_id=parent,
                     order=self.node_counter,
@@ -113,13 +117,15 @@ class LegalStructureParser:
             clause_match = self.CLAUSE_PATTERN.match(line_str)
             if clause_match and self.current_article:
                 self.node_counter += 1
+                content_text = clause_match.group(2).strip()
+                title_text = f"Khoản {clause_match.group(1)}"
                 self.current_clause = DocumentNode(
                     id=f"{self.document_id}_clause_{self.node_counter}",
                     document_id=self.document_id,
                     document_name=self.document_name,
                     level=HierarchyLevel.CLAUSE,
-                    title=f"Khoản {clause_match.group(1)}",
-                    content=clause_match.group(2).strip(),
+                    title=title_text,
+                    content=content_text if content_text else title_text,
                     page_number=page_number,
                     parent_id=self.current_article.id,
                     order=self.node_counter,

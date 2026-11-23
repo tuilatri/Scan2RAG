@@ -30,7 +30,7 @@ from app.models.document_schema import HierarchyLevel, ParsedDocument  # noqa: E
 
 
 def extract_numbers(text: str) -> list[str]:
-    return re.findall(r"\b\d+(?:\.\d+)?(?:[Tt]|%)?", text)
+    return [n.upper() for n in re.findall(r"\b\d+(?:\.\d+)?(?:[Tt]|%)?", text) if n.strip()]
 
 
 def audit_corpus():

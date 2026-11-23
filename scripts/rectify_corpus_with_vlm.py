@@ -72,10 +72,13 @@ def rectify_document_tables(
         start_t = time.time()
 
         page = doc[page_num - 1]
-        pix = page.get_pixmap(dpi=150)
+        raw_content = t_node["content"]
+        # Adaptive DPI to prevent token overflow (>4096 tokens) on dense table pages
+        row_count = len([line for line in raw_content.split("\n") if line.strip().startswith("|")])
+        dpi = 96 if (row_count > 30 or len(raw_content) > 1200) else 144
+        pix = page.get_pixmap(dpi=dpi)
         img_bytes = pix.tobytes("jpeg")
 
-        raw_content = t_node["content"]
         res = verifier.rectify_page_content(
             image_bytes=img_bytes,
             raw_content=raw_content,

@@ -127,11 +127,13 @@ class VLMVerifier:
 
         base64_img = base64.b64encode(image_bytes).decode("utf-8")
 
+        raw_lines = raw_content.split("\n")
+        truncated_raw = "\n".join(raw_lines[:80])
         prompt_instruction = (
             f"Dưới đây là nội dung OCR thô dạng {content_type} của trang văn bản:\n\n"
-            f"```markdown\n{raw_content[:2000]}\n```\n\n"
+            f"```markdown\n{truncated_raw}\n```\n\n"
             "Hãy nhìn vào ảnh và xuất lại nội dung này với đầy đủ dấu tiếng Việt chuẩn xác 100%, "
-            "giữ nguyên cấu trúc Markdown và BẮT BUỘC giữ nguyên 100% tất cả các con số, điểm số:"
+            "giữ nguyên cấu trúc Markdown (đảm bảo mọi hàng đều có cùng số cột |) và BẮT BUỘC giữ nguyên 100% tất cả các con số, điểm số:"
         )
 
         messages: list[dict[str, Any]] = [
