@@ -4,9 +4,10 @@ opencv-python>=4.9.0.80
 pillow>=10.2.0
 numpy>=1.26.0
 
-# Vietnamese OCR Engine
-paddlepaddle==2.6.2
-paddleocr>=2.7.3
+# Vietnamese OCR Engine (GPU accelerated with CUDA 11.8)
+--find-links https://www.paddlepaddle.org.cn/packages/stable/cu118/
+paddlepaddle-gpu==3.3.1
+paddleocr>=3.7.0
 
 # Data Validation & Utilities
 pydantic>=2.6.0

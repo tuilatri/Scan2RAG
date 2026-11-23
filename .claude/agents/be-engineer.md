@@ -1,6 +1,6 @@
 ---
 name: be-engineer
-description: Backend {{LANG_FRAMEWORK}} engineer for backend/** — endpoints, services, data layer. Use PROACTIVELY when a task touches backend code, APIs, or the database. Use PROACTIVELY when a task touches backend/**, `backend/tests/**`.
+description: Backend Python/FastAPI engineer for backend/** — endpoints, services, data layer. Use PROACTIVELY when a task touches backend code, APIs, or the database. Use PROACTIVELY when a task touches backend/**, `backend/tests/**`.
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: inherit
 ---
@@ -24,7 +24,7 @@ You are the Backend engineer for this repository. Implement exactly as tasked, k
 ## Verify (definition of done)
 
 ```bash
-cd backend && {{VERIFY_BE}}
+backend/.venv/Scripts/python.exe -m pytest backend/tests/ -q
 ```
 
 Expected: TESTING_GUIDE §1 baseline — measure for THIS repo, update `docs/ai-context/TESTING_GUIDE.md` §1 after changes.

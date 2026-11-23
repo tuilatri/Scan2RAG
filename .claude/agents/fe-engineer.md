@@ -24,7 +24,7 @@ You are the Frontend engineer for this repository. Implement exactly as tasked, 
 ## Verify (definition of done)
 
 ```bash
-cd frontend && {{VERIFY_FE}}
+cd frontend && npm test --if-present && npm run build --if-present
 ```
 
 Expected: TESTING_GUIDE §1 baseline — measure for THIS repo, update `docs/ai-context/TESTING_GUIDE.md` §1 after changes.

@@ -138,6 +138,21 @@ When a task involves **>=3 files**, **>=5 distinct changes**, or **spans multipl
 
 ---
 
+## 🛡️ Mandatory Plan Grilling & Evaluation Angles Gate
+
+Mỗi khi tạo plan mới trong `drafts/plans/<MMDDYY>_<n>_draft/implementation_plan.md`, **BẮT BUỘC** phải có 2 phần kiểm định sau đây trước khi dừng chờ Owner duyệt:
+
+1. **Multi-Persona Evaluation Angles (3 Góc nhìn Chuyên môn Độc lập):**
+   - **Data / Pipeline Angle (`data-pipeline-engineer`):** Đánh giá giới hạn RAM/VRAM (chống OOM 4GB), batching streaming, giải phóng buffer OpenCV/PyMuPDF, checkpoint resumable.
+   - **OCR & Computer Vision Angle (`ocr-vision-specialist`):** Đánh giá độ nghiêng (deskew), denoise bảo toàn dấu tiếng Việt, PaddleOCR BGR shape, gom cụm bảng biểu (table structure) không làm gãy hàng/cột.
+   - **Legal & Health Domain Angle (`legal-domain-specialist`):** Đánh giá bảo toàn cấu trúc Chương/Điều/Khoản/Điểm, chuẩn hóa Unicode NFC, metadata văn bản bãi bỏ/thay thế (`is_superseded`) và bảng điểm khám NVQS (Thông tư 105).
+
+2. **Grilling Self-Check (Tự phản biện khắc nghiệt):**
+   - Tự kích hoạt tư duy của skill `grilling` / `grill-with-docs` để chỉ ra ít nhất **3 Blindspots / Edge Cases** hóc búa nhất mà plan có thể gặp phải khi chạy thật.
+   - Trả lời rõ ràng cách thức đối phó (Mitigation Strategy) cho từng blindspot ngay trong plan.
+
+---
+
 # Standing Rules (auto-applied every session — no need to repeat in prompts)
 
 1. Read `drafts/WORKSPACE.md` for the familiar scope folders (read-only, do not modify/delete).
@@ -165,7 +180,10 @@ For every **non-trivial** request (code/config/docs/skill changes, or ≥3 files
 2. **Plan first** — before any edit, create `implementation_plan.md` + `task.md` in `drafts/plans/<MMDDYY>_<n>_<status>/` with immutable IDs, exact files/interfaces and verification steps. Then **STOP** in the same turn — wait for owner approval.
 3. **Execute after approval** — implement exactly the approved plan; surface any deviation first. When executing a ticket in `docs/tickets/`, rename `open-… → doing-…` at start and `doing-… → done-…` only after green verification. **State lives in the filename — never change it by editing the body.**
 4. **Verify & repair** — run the gates relevant to scope; on failure, fix until all green; quote real command output — never claim success from memory.
-5. **Stop clean** — when verification is green, stop. **Do NOT commit or push unless the owner explicitly asks in that same turn.** A push/PR/merge request does **NOT** imply commit permission — ask first when changes are uncommitted.
+5. **Sync Task & Plan Status (MANDATORY)** — ngay khi task và verify hoàn tất:
+   - Đánh dấu `[x]` tất cả các task đã làm trong `drafts/plans/<MMDDYY>_<n>_<status>/task.md`.
+   - Nếu toàn bộ sub-task trong plan đã xong, **BẮT BUỘC RENAME folder plan** từ `<MMDDYY>_<n>_draft` thành `<MMDDYY>_<n>_done`. Không được để tình trạng code xong mà plan vẫn gắn mác `_draft`.
+6. **Stop clean** — when verification is green, stop. **Do NOT commit or push unless the owner explicitly asks in that same turn.** A push/PR/merge request does **NOT** imply commit permission — ask first when changes are uncommitted.
 
 ---
 
