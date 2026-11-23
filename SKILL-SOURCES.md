@@ -27,7 +27,11 @@ care about with `doc-truth` claims (`exists:<skill-dir>`) in `kit.config.json`.
 
 ### Group members
 
-- *(list the member skill dirs per group — this is what makes the manifest auditable)*
+- `unslop`: <https://github.com/heydamir/unslop> · CC-BY-4.0 · commit `main` (2026-11-23) · Anti-slop frontend refinement, quiet chrome, redline pass for AI-generated UIs.
+- `ocr-processing`: Local custom skill · Apache-2.0 · PDF inspection, OpenCV, PaddleOCR, CER/WER evaluation.
+- `document-intelligence`: Local custom skill · Apache-2.0 · Vietnamese legal document hierarchy & temporal versioning.
+- `rag-advanced`: Local custom skill · Apache-2.0 · Hybrid Search, Reranking, LM Studio / Cloud routing, LangGraph.
+
 
 ## Refresh / add skills
 

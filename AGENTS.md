@@ -90,12 +90,22 @@ Before executing any implementation, display a brief **Activation Report** to th
 | RAG, Vector Search, Qdrant, Rerank | `rag-advanced`, `api-patterns`, `database-design` |
 | Local/Cloud LLM Routing, LangGraph | `rag-advanced`, `api-patterns`, `python-patterns` |
 | FastAPI / Backend API | `api-patterns`, `python-patterns`, `clean-code` |
-| Frontend / React UI / OCR Review | `ui-ux-pro-max`, `react-patterns`, `typescript-expert`, `clean-code` |
+| Frontend / React UI / OCR Review | **MANDATORY:** `impeccable`, `unslop` · (Optional / Reference: `ui-ux-pro-max`, `react-patterns`, `typescript-expert`, `clean-code`) |
 | Database / PostgreSQL / Migrations | `database-design`, `clean-code` |
 | Testing / RAGAS / OCR Benchmarks | `testing-patterns`, `pytest`, `tdd` |
 | Debugging / Diagnostics | `diagnosing-bugs`, `systematic-debugging`, `clean-code` |
 | Planning / Architecture | `writing-plans`, `architecture`, `to-spec` |
 | GitNexus / Code Exploration | `gitnexus/gitnexus-exploring`, `gitnexus/gitnexus-impact-analysis` |
+
+---
+
+## 🎨 Mandatory Frontend Architecture & Design Rules
+
+Mọi tác vụ chạm vào `frontend/` (React, UI components, styling, CSS, layout) **BẮT BUỘC** phải tuân thủ nghiêm ngặt:
+1. **Load cặp đôi kỹ năng bắt buộc**: `impeccable` (kiến trúc layout, tokens, accessibility, components) và `unslop` (loại bỏ gradient tím/neon, bỏ hiệu ứng phát sáng lòe loẹt, chuẩn hóa quiet chrome, redline pass).
+2. **Không tự ý code theo phong cách AI-Slop**: Tuyệt đối không dùng gradient lòe loẹt, emoji tràn lan ở tiêu đề, nút bấm pulsing, hoặc viền glow không cần thiết.
+3. **Tra cứu quy chuẩn nếu cần**: Dùng `python .agent/skills/ui-ux-pro-max/scripts/search.py` để tra cứu nhanh bảng màu, typography hoặc quy tắc accessibility tương ứng.
+
 
 ---
 
