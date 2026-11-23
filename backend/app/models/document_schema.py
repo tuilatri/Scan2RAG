@@ -37,4 +37,4 @@ class ParsedDocument(BaseModel):
     document_name: str
     total_pages: int
     nodes: list[DocumentNode]
-    summary_stats: dict[str, int] = Field(default_factory=dict)
+    summary_stats: dict[str, int | float | str] = Field(default_factory=dict)
