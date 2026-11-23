@@ -73,6 +73,9 @@ data/exports/*
 *.jpeg
 *.tiff
 
+# Plans & Working Drafts
+drafts/
+
 # Node / Frontend
 node_modules/
 npm-debug.log*

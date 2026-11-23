@@ -8,7 +8,7 @@
       "id": "backend",
       "path": "backend",
       "srcPath": "backend/app",
-      "verify": "python -m pytest tests/ -q",
+      "verify": ".venv/Scripts/python.exe -m pytest tests/ -q",
       "expectedTests": null
     },
     {
@@ -40,12 +40,22 @@
       "optional": false
     },
     {
+      "id": "backend-lint",
+      "cmd": ".venv/Scripts/ruff.exe",
+      "args": ["check", "app/"],
+      "cwd": "backend",
+      "tags": ["lint", "backend"],
+      "requires": ["backend/app"],
+      "env": {},
+      "optional": false
+    },
+    {
       "id": "backend-tests",
-      "cmd": "python",
+      "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],
       "cwd": "backend",
       "tags": ["slow", "backend"],
-      "requires": [],
+      "requires": ["backend/tests"],
       "env": { "PYTHONUTF8": "1" },
       "optional": true
     },

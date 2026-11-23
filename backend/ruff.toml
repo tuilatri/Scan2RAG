@@ -1,0 +1,19 @@
+target-version = "py312"
+line-length = 100
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade (modern Python 3.12 syntax)
+]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]
+
+[lint.isort]
+combine-as-imports = true
+known-first-party = ["app"]
