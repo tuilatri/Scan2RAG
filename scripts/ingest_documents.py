@@ -165,13 +165,28 @@ def process_document(
 
         # Check if page contains tabular layout (e.g. medical annexes in TT 105)
         if table_extractor.is_table_page(page_blocks):
+            # Split preamble/title lines from table blocks to prevent noise columns
+            preamble_blocks, table_grid_blocks = table_extractor.split_preamble_and_table(page_blocks)
+
+            # If there is preamble text before the table, parse into statutory/heading nodes
+            if preamble_blocks:
+                preamble_lines = [b.text for b in preamble_blocks if b.text.strip()]
+                pre_nodes = parser.parse_lines(preamble_lines, page_number=page_num)
+                all_nodes.extend(pre_nodes)
+
             extracted_tbl = table_extractor.extract_table(
-                page_blocks,
+                table_grid_blocks,
                 page_number=page_num,
                 context_header=active_table_header,
             )
             if extracted_tbl.header:
                 active_table_header = extracted_tbl.header
+
+            parent_id = None
+            if parser.current_section:
+                parent_id = parser.current_section.id
+            elif parser.current_chapter:
+                parent_id = parser.current_chapter.id
 
             table_node = DocumentNode(
                 id=f"{doc_id}_table_p{page_num}",
@@ -181,7 +196,7 @@ def process_document(
                 title=f"Bảng phụ lục tiêu chuẩn sức khỏe (Trang {page_num})",
                 content=extracted_tbl.markdown_table,
                 page_number=page_num,
-                parent_id=None,
+                parent_id=parent_id,
                 order=len(all_nodes) + 1,
                 metadata={
                     "rows_count": extracted_tbl.rows_count,
@@ -191,6 +206,8 @@ def process_document(
             all_nodes.append(table_node)
             tables_count += 1
             node_desc = f"1 TABLE ({extracted_tbl.rows_count} rows, {extracted_tbl.cols_count} cols)"
+            if preamble_blocks:
+                node_desc += f" + {len(preamble_blocks)} preamble lines"
         else:
             # Narrative statutory text lines
             active_table_header = (

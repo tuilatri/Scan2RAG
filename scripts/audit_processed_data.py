@@ -2,22 +2,35 @@
 
 Checks:
 1. Completion rate (processed pages vs original PDF pages)
-2. Structural extraction (Articles, Clauses, Points count)
-3. Table extraction (Table nodes count with markdown formatting)
-4. Schema compliance with ParsedDocument & DocumentNode
-5. Lexical cleanliness (verifies presence of cleaned legal & medical vocabulary)
+2. Structural extraction (Articles, Clauses, Points, Chapters count)
+3. Structural hierarchy health:
+   - Root & orphan node ratio: >= 75% of nodes must have parent_id or be top-level ROOT (PART/CHAPTER)
+   - Chapter nodes must exist (> 0)
+   - Noise line filtering: Nodes with < 5 chars should be near 0
+4. Table extraction & health:
+   - Table nodes count with markdown formatting
+   - Table cell quality: ratio of empty cells must be <= 50%
+5. Schema compliance with ParsedDocument & DocumentNode
+6. Safeguard inspection: VLM rectified tables must preserve 100% numerical data
 """
 
 import json
+import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 # Add backend directory to path
 backend_dir = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_dir))
 
-import pymupdf
-from app.models.document_schema import ParsedDocument
+import pymupdf  # noqa: E402
+
+from app.models.document_schema import HierarchyLevel, ParsedDocument  # noqa: E402
+
+
+def extract_numbers(text: str) -> list[str]:
+    return re.findall(r"\b\d+(?:\.\d+)?(?:[Tt]|%)?", text)
 
 
 def audit_corpus():
@@ -29,7 +42,7 @@ def audit_corpus():
         "========================================================================================="
     )
     print(
-        "                  SCAN2RAG DEEP QUALITY AUDIT REPORT (PHASE 4)                           "
+        "                  SCAN2RAG DEEP QUALITY AUDIT REPORT (MILESTONE 1)                       "
     )
     print(
         "========================================================================================="
@@ -39,9 +52,16 @@ def audit_corpus():
     total_processed_pages = 0
     total_nodes = 0
     total_tables = 0
+    total_chapters = 0
     total_articles = 0
     total_clauses = 0
     total_points = 0
+    total_orphans = 0
+    total_short_nodes = 0
+    total_table_cells = 0
+    total_empty_cells = 0
+    rectified_tables_checked = 0
+    rectified_tables_safeguard_failures = 0
     errors = []
 
     for raw_pdf in raw_files:
@@ -73,23 +93,62 @@ def audit_corpus():
         node_count = len(parsed.nodes)
         total_nodes += node_count
 
-        tables = sum(1 for n in parsed.nodes if n.level == "TABLE")
-        articles = sum(1 for n in parsed.nodes if n.level == "ARTICLE")
-        clauses = sum(1 for n in parsed.nodes if n.level == "CLAUSE")
-        points = sum(1 for n in parsed.nodes if n.level == "POINT")
+        chapters = sum(1 for n in parsed.nodes if n.level == HierarchyLevel.CHAPTER)
+        articles = sum(1 for n in parsed.nodes if n.level == HierarchyLevel.ARTICLE)
+        clauses = sum(1 for n in parsed.nodes if n.level == HierarchyLevel.CLAUSE)
+        points = sum(1 for n in parsed.nodes if n.level == HierarchyLevel.POINT)
+        tables = sum(1 for n in parsed.nodes if n.level == HierarchyLevel.TABLE)
 
-        total_tables += tables
+        # Count orphans (nodes that have no parent_id and are not root-level DOCUMENT/CHAPTER)
+        doc_orphans = 0
+        doc_short_nodes = 0
+        for n in parsed.nodes:
+            if n.level not in (HierarchyLevel.DOCUMENT, HierarchyLevel.CHAPTER):
+                if not n.parent_id:
+                    doc_orphans += 1
+            if len((n.content or "").strip()) < 5 and len((n.title or "").strip()) < 5:
+                doc_short_nodes += 1
+
+            if n.level == HierarchyLevel.TABLE and n.content:
+                # Inspect table cells
+                lines = [line.strip() for line in n.content.split("\n") if line.strip().startswith("|")]
+                for line in lines:
+                    if re.match(r"^\|[\s\-:|]+\|$", line):
+                        continue
+                    cells = [c.strip() for c in line.strip("|").split("|")]
+                    total_table_cells += len(cells)
+                    total_empty_cells += sum(1 for c in cells if not c)
+
+                # Inspect safeguard on rectified table
+                if n.metadata and n.metadata.get("rectified_by"):
+                    rectified_tables_checked += 1
+                    raw_backup = n.metadata.get("raw_content_backup")
+                    if not raw_backup:
+                        rectified_tables_safeguard_failures += 1
+                        errors.append(f"{doc_id} node {n.id}: rectified but missing raw_content_backup")
+                    else:
+                        orig_nums = extract_numbers(raw_backup)
+                        rect_nums = extract_numbers(n.content)
+                        if Counter(orig_nums) != Counter(rect_nums):
+                            rectified_tables_safeguard_failures += 1
+                            errors.append(f"{doc_id} node {n.id}: safeguard broken! Orig nums != Rect nums")
+
+        total_chapters += chapters
         total_articles += articles
         total_clauses += clauses
         total_points += points
+        total_tables += tables
+        total_orphans += doc_orphans
+        total_short_nodes += doc_short_nodes
 
         status_icon = "✓" if p_pages == pdf_page_count else "⚠"
         sec_per_page = stats.get("seconds_per_page", 0.0)
         speed_str = f"{sec_per_page:.2f}s/page" if sec_per_page else "N/A"
+        orphan_pct = (doc_orphans / max(node_count, 1)) * 100
 
         print(
             f"{status_icon} {raw_pdf.name:<28} | Pages: {p_pages}/{pdf_page_count} | Nodes: {node_count:<5} | "
-            f"Tables: {tables:<3} | Arts: {articles:<3} | Clauses: {clauses:<3} | Speed: {speed_str}"
+            f"Chap: {chapters:<2} | Arts: {articles:<3} | Tbl: {tables:<2} | Orphan: {orphan_pct:.1f}% | Speed: {speed_str}"
         )
 
     print(
@@ -97,27 +156,44 @@ def audit_corpus():
     )
     print("TOTAL AUDIT SUMMARY:")
     print(
-        f"  • Processed Pages  : {total_processed_pages}/{total_raw_pages} ({total_processed_pages / total_raw_pages * 100:.1f}%)"
+        f"  • Processed Pages     : {total_processed_pages}/{total_raw_pages} ({total_processed_pages / total_raw_pages * 100:.1f}%)"
     )
-    print(f"  • Total Nodes      : {total_nodes}")
-    print(f"  • Tables Extracted : {total_tables} Markdown Tables")
+    print(f"  • Total Nodes         : {total_nodes}")
     print(
-        f"  • Statutory Items  : {total_articles} Articles | {total_clauses} Clauses | {total_points} Points"
+        f"  • Hierarchy Elements  : {total_chapters} Chapters | {total_articles} Articles | {total_clauses} Clauses | {total_points} Points"
     )
-    print(f"  • Audit Errors     : {len(errors)}")
+    print(f"  • Tables Extracted    : {total_tables} Markdown Tables")
+    orphan_rate = (total_orphans / max(total_nodes, 1)) * 100
+    print(f"  • Orphan Node Ratio   : {total_orphans}/{total_nodes} ({orphan_rate:.1f}%) [Threshold <= 25%]")
+    print(f"  • Short Noise Nodes   : {total_short_nodes} (< 5 chars)")
 
-    # Specific assertions for Phase 4 quality gate
+    empty_cell_rate = (total_empty_cells / max(total_table_cells, 1)) * 100 if total_table_cells else 0.0
+    print(f"  • Table Empty Cell %  : {total_empty_cells}/{total_table_cells} ({empty_cell_rate:.1f}%) [Threshold <= 50%]")
+    print(f"  • Rectified Checks    : {rectified_tables_checked} checked | {rectified_tables_safeguard_failures} safeguard breaches")
+    print(f"  • Audit Errors        : {len(errors)}")
+
+    # Specific assertions for Milestone 1 Quality Gate
     if total_tables == 0:
         errors.append("Critical Error: No tables extracted in processed documents!")
+    if total_chapters == 0:
+        errors.append("Critical Error: 0 Chapter nodes found across corpus!")
+    if orphan_rate > 25.0:
+        errors.append(f"Structural Debt Warning: Orphan rate {orphan_rate:.1f}% exceeds 25% limit")
+    if empty_cell_rate > 50.0:
+        errors.append(f"Table Debt Warning: Empty cell rate {empty_cell_rate:.1f}% exceeds 50% limit")
+    if rectified_tables_safeguard_failures > 0:
+        errors.append(f"Safeguard Critical Failure: {rectified_tables_safeguard_failures} rectified tables failed 100% number lock")
 
     if errors:
         print("\nERRORS DETECTED:")
-        for err in errors:
+        for err in errors[:10]:
             print(f"  - {err}")
+        if len(errors) > 10:
+            print(f"  ... and {len(errors) - 10} more errors")
         return False
     else:
         print(
-            "\n🎉 QUALITY AUDIT SIGN-OFF: ALL PASS (Medical Tables & Text Normalized)"
+            "\n🎉 QUALITY AUDIT SIGN-OFF: ALL PASS (Structural, Table & Numerical Safeguards Validated)"
         )
         return True
 

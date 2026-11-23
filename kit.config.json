@@ -27,7 +27,23 @@
   "skillPaths": [
     ".claude/skills"
   ],
-  "claims": [],
+  "claims": [
+    {
+      "doc": "docs/ai-context/ARCHITECTURE.md",
+      "re": "PyMuPDF",
+      "kind": "exists:backend/app/ingestion/pdf_inspector.py"
+    },
+    {
+      "doc": "docs/ai-context/ARCHITECTURE.md",
+      "re": "FastAPI",
+      "kind": "exists:backend/app/models/document_schema.py"
+    },
+    {
+      "doc": "docs/ai-context/ARCHITECTURE.md",
+      "re": "PaddleOCR",
+      "kind": "exists:backend/app/ingestion/ocr_engine.py"
+    }
+  ],
   "gates": [
     {
       "id": "doc-truth",
