@@ -17,3 +17,13 @@
 - **Root cause**: Naive similarity search retrieves both documents without version context.
 - **Fix**: Primary search targets Consolidated Document (VBHN 88); tag chunks with `is_superseded` and `effective_date` metadata.
 
+## 4. Toy Test vs Real Corpus Safeguard Trap
+- **Symptom**: Safeguard pass 100% in unit tests but lets 7/13 tables lose numbers in production corpus.
+- **Root cause**: Mock test used a toy 4-number list `["1", "2", "3", "4"]`. Dropping 1 number is a 25% drop (caught by 10% tolerance). But in real TT 105 tables with 48 numbers, dropping 1-4 numbers is <= 8.3% drop (silently bypassed).
+- **Fix**: Zero tolerance number invariant with `collections.Counter(orig) == Counter(rect)` (0% drop, 0% added). Unit tests MUST include realistic fixtures with >=40 numbers, diopters, `%`, and military grades (`1T-6T`).
+
+## 5. Silent Metadata Contract Drift
+- **Symptom**: Audit script reports "0 safeguard breaches" even when data has errors, or fails to detect rectified tables.
+- **Root cause**: Free-form dictionary keys (`dict.get("key")`) drifted between generator (`vlm_rectified`) and auditor (`rectified_by`), causing silent bypass.
+- **Fix**: Enforce Pydantic schema (`TableMetadata`) with typed models and mandatory `corpus-audit` gate inside `kit.config.json`.
+

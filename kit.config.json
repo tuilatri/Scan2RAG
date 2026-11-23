@@ -66,6 +66,16 @@
       "optional": false
     },
     {
+      "id": "corpus-audit",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_processed_data.py"],
+      "cwd": ".",
+      "tags": ["audit", "data"],
+      "requires": ["data/processed"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-tests",
       "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],
