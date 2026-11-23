@@ -29,14 +29,14 @@
   ],
   "claims": [
     {
-      "doc": "docs/ai-context/ARCHITECTURE.md",
-      "re": "PyMuPDF",
-      "kind": "exists:backend/app/ingestion/pdf_inspector.py"
+      "doc": "docs/ai-context/TESTING_GUIDE.md",
+      "re": "Lines in test_vlm_rectifier\\.py\\s*\\|\\s*(\\d+)",
+      "kind": "lines:backend/tests/test_vlm_rectifier.py"
     },
     {
       "doc": "docs/ai-context/ARCHITECTURE.md",
-      "re": "FastAPI",
-      "kind": "exists:backend/app/models/document_schema.py"
+      "re": "PyMuPDF",
+      "kind": "exists:backend/app/ingestion/pdf_inspector.py"
     },
     {
       "doc": "docs/ai-context/ARCHITECTURE.md",

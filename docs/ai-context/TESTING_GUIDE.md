@@ -8,6 +8,7 @@
 |---|---|
 | Collected pytest items | 17 |
 | Ingestion pipeline test files | 5 |
+| Lines in test_vlm_rectifier.py | 59 |
 
 ## 2. How to run
 

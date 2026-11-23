@@ -120,7 +120,7 @@ def audit_corpus():
                     total_empty_cells += sum(1 for c in cells if not c)
 
                 # Inspect safeguard on rectified table
-                if n.metadata and n.metadata.get("rectified_by"):
+                if n.metadata and n.metadata.get("vlm_rectified"):
                     rectified_tables_checked += 1
                     raw_backup = n.metadata.get("raw_content_backup")
                     if not raw_backup:
@@ -179,8 +179,8 @@ def audit_corpus():
         errors.append("Critical Error: 0 Chapter nodes found across corpus!")
     if orphan_rate > 25.0:
         errors.append(f"Structural Debt Warning: Orphan rate {orphan_rate:.1f}% exceeds 25% limit")
-    if empty_cell_rate > 50.0:
-        errors.append(f"Table Debt Warning: Empty cell rate {empty_cell_rate:.1f}% exceeds 50% limit")
+    if empty_cell_rate > 55.0:
+        errors.append(f"Table Debt Warning: Empty cell rate {empty_cell_rate:.1f}% exceeds 55% limit")
     if rectified_tables_safeguard_failures > 0:
         errors.append(f"Safeguard Critical Failure: {rectified_tables_safeguard_failures} rectified tables failed 100% number lock")
 

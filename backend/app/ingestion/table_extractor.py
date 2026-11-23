@@ -218,10 +218,17 @@ class TableExtractor:
 
         md_str = self.format_as_markdown(text_rows)
 
+        # Count actual pruned columns from markdown table
+        actual_cols = 0
+        if md_str:
+            first_line = md_str.strip().split("\n")[0]
+            if first_line.startswith("|") and first_line.endswith("|"):
+                actual_cols = len([c for c in first_line.strip("|").split("|")])
+
         return ExtractedTable(
             page_number=page_number,
             rows_count=len(text_rows),
-            cols_count=max(len(r) for r in text_rows) if text_rows else 0,
+            cols_count=actual_cols if actual_cols > 0 else (max(len(r) for r in text_rows) if text_rows else 0),
             cells=cells,
             markdown_table=md_str,
             header=header,
