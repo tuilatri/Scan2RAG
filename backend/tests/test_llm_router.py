@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from app.llm.router import ModelRouter
+
 
 def test_classify_complexity_simple():
     router = ModelRouter()
@@ -34,4 +35,4 @@ def test_deterministic_offline_fallback():
             res = router.generate("Câu hỏi kiểm tra", "System prompt", complexity="complex")
             assert res["provider"] == "deterministic_offline"
             assert res["model"] == "rule-based-fallback"
-            assert "Căn cứ vào tài liệu" in res["content"]
+            assert "Hệ thống tạm thời không thể kết nối" in res["content"]

@@ -38,7 +38,7 @@ class SemanticLegalChunker:
         max_tokens: int = 400
     ) -> list[str]:
         """Split a large markdown table into multiple windowed sub-tables.
-        
+
         Preserves header rows (rows 0 and 1) at the top of every sub-table
         so downstream embedding models and LLM never lose column headers.
         """
@@ -123,6 +123,8 @@ class SemanticLegalChunker:
                 or node_id in self.TT105_SUPERSEDED_NODE_IDS
                 or str(node.get("parent_id", "")) in self.TT105_SUPERSEDED_NODE_IDS
             )
+            superseded_by = "thông_tư_106" if is_superseded else None
+            effective_date = "2024-01-01" if doc_id == "thông_tư_105" else ("2025-01-01" if doc_id == "thông_tư_106" else None)
 
             # Case 1: Table Node -> Preserved with Table Windowing to strictly fit embedding limits (<512 tokens)
             if is_table:
@@ -147,6 +149,8 @@ class SemanticLegalChunker:
                         page_numbers=[page_num],
                         article_id=node.get("parent_id") if "article" in str(node.get("parent_id", "")).lower() else None,
                         is_superseded=is_superseded,
+                        superseded_by=superseded_by,
+                        effective_date=effective_date,
                         metadata={**node.get("metadata", {}), "window_index": w_idx, "total_windows": len(table_windows)}
                     )
                     chunks.append(chunk)
@@ -171,6 +175,8 @@ class SemanticLegalChunker:
                 page_numbers=[page_num],
                 article_id=node.get("id") if level == "ARTICLE" else node.get("parent_id"),
                 is_superseded=is_superseded,
+                superseded_by=superseded_by,
+                effective_date=effective_date,
                 metadata=node.get("metadata", {})
             )
             chunks.append(chunk)

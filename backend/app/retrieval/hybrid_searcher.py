@@ -48,7 +48,7 @@ class LegalHybridSearcher:
             payload = p.get("payload", {})
             # Resolve chunk id: prioritize chunk_id/id from payload, fallback to point id
             chunk_id = payload.get("chunk_id") or payload.get("id") or str(p.get("id"))
-            
+
             # Resolve page number: prefer page_number, then first element of page_numbers list
             page_num = payload.get("page_number")
             if page_num is None:

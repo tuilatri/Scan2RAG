@@ -7,7 +7,6 @@ Optimized for low VRAM / CPU execution to adhere to the 4GB VRAM constraint.
 import os
 from typing import Any
 
-import torch
 from sentence_transformers import CrossEncoder
 
 

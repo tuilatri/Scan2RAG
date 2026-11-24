@@ -5,6 +5,7 @@ Produces L2-normalized 384-dimensional dense vectors.
 """
 
 import os
+
 from sentence_transformers import SentenceTransformer
 
 

@@ -63,13 +63,13 @@ def test_hard_constraint_atomic_table_integrity(sample_tt105_data):
     assert len(table_chunks) >= 45, "Must retain all 45 table nodes from TT105"
 
     for tc in table_chunks:
-        lines = [l.strip() for l in tc.content.splitlines() if l.strip().startswith("|")]
+        lines = [line.strip() for line in tc.content.splitlines() if line.strip().startswith("|")]
         assert len(lines) >= 2, f"Table chunk {tc.id} must have at least header + separator"
         col_counts = set()
-        for l in lines:
-            if set(l.replace("|", "").strip()) == {"-"}:
+        for line in lines:
+            if set(line.replace("|", "").strip()) == {"-"}:
                 continue
-            cells = [c.strip() for c in l.strip("|").split("|")]
+            cells = [c.strip() for c in line.strip("|").split("|")]
             col_counts.add(len(cells))
         assert len(col_counts) == 1, f"Table chunk {tc.id} has fractured columns: {col_counts}"
 
