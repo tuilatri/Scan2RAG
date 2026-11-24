@@ -1,0 +1,30 @@
+# Core Document Processing & Vision
+pymupdf>=1.24.0
+opencv-python>=4.9.0.80
+pillow>=10.2.0
+numpy>=1.26.0
+
+# Vietnamese OCR Engine (GPU accelerated with CUDA 11.8)
+--find-links https://www.paddlepaddle.org.cn/packages/stable/cu118/
+paddlepaddle-gpu==3.3.1
+paddleocr>=3.7.0
+
+# Embeddings & Vector Search (Milestone 2)
+sentence-transformers>=2.2.0
+qdrant-client>=1.7.0
+rank-bm25>=0.2.2
+openai>=1.12.0
+groq>=0.4.0
+
+# Data Validation & Utilities
+pydantic>=2.6.0
+python-dotenv>=1.0.1
+
+# Web API & Serving
+fastapi>=0.110.0
+uvicorn>=0.28.0
+
+# Quality Assurance & Testing
+ruff>=0.4.0
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

@@ -25,7 +25,7 @@ You are the DB engineer for this repository. Implement exactly as tasked, keep t
 ## Verify (definition of done)
 
 ```bash
-{{VERIFY_DB}}
+echo "Check PostgreSQL migrations and schema integrity via alembic or pytest"
 ```
 
 Expected: schema diff + data integrity check — measure for THIS repo, update `docs/ai-context/TESTING_GUIDE.md` §1 after changes.

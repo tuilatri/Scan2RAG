@@ -1,0 +1,147 @@
+{
+  "model": "gemini-auditor-ground-truth",
+  "audit_method": "1:1 Direct Ground-Truth Cross-Check against 150 DPI Raw PDF Renderings",
+  "total_documents": 5,
+  "documents": {
+    "hướng_dẫn_cục_quân_y.json": {
+      "rectified_count": 0,
+      "rectified_ids": [],
+      "pages": []
+    },
+    "thông_tư_105.json": {
+      "rectified_count": 26,
+      "rectified_ids": [
+        "thông_tư_105_table_p23",
+        "thông_tư_105_table_p24",
+        "thông_tư_105_table_p25",
+        "thông_tư_105_table_p26",
+        "thông_tư_105_table_p27",
+        "thông_tư_105_table_p28",
+        "thông_tư_105_table_p30",
+        "thông_tư_105_table_p31",
+        "thông_tư_105_table_p32",
+        "thông_tư_105_table_p33",
+        "thông_tư_105_table_p34",
+        "thông_tư_105_table_p35",
+        "thông_tư_105_table_p36",
+        "thông_tư_105_table_p37",
+        "thông_tư_105_table_p39",
+        "thông_tư_105_table_p40",
+        "thông_tư_105_table_p41",
+        "thông_tư_105_table_p42",
+        "thông_tư_105_table_p43",
+        "thông_tư_105_table_p44",
+        "thông_tư_105_table_p45",
+        "thông_tư_105_table_p52",
+        "thông_tư_105_table_p61",
+        "thông_tư_105_table_p78",
+        "thông_tư_105_table_p82",
+        "thông_tư_105_table_p83"
+      ],
+      "pages": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        52,
+        61,
+        78,
+        82,
+        83
+      ]
+    },
+    "thông_tư_106.json": {
+      "rectified_count": 4,
+      "rectified_ids": [
+        "thông_tư_106_table_p9",
+        "thông_tư_106_table_p24",
+        "thông_tư_106_table_p29",
+        "thông_tư_106_table_p45"
+      ],
+      "pages": [
+        9,
+        24,
+        29,
+        45
+      ]
+    },
+    "thông_tư_68.json": {
+      "rectified_count": 0,
+      "rectified_ids": [],
+      "pages": []
+    },
+    "thông_tư_88.json": {
+      "rectified_count": 22,
+      "rectified_ids": [
+        "thông_tư_88_table_p30",
+        "thông_tư_88_table_p31",
+        "thông_tư_88_table_p32",
+        "thông_tư_88_table_p34",
+        "thông_tư_88_table_p37",
+        "thông_tư_88_table_p40",
+        "thông_tư_88_table_p41",
+        "thông_tư_88_table_p43",
+        "thông_tư_88_table_p45",
+        "thông_tư_88_table_p46",
+        "thông_tư_88_table_p47",
+        "thông_tư_88_table_p48",
+        "thông_tư_88_table_p49",
+        "thông_tư_88_table_p52",
+        "thông_tư_88_table_p53",
+        "thông_tư_88_table_p69",
+        "thông_tư_88_table_p70",
+        "thông_tư_88_table_p86",
+        "thông_tư_88_table_p93",
+        "thông_tư_88_table_p95",
+        "thông_tư_88_table_p97",
+        "thông_tư_88_table_p110"
+      ],
+      "pages": [
+        30,
+        31,
+        32,
+        34,
+        37,
+        40,
+        41,
+        43,
+        45,
+        46,
+        47,
+        48,
+        49,
+        52,
+        53,
+        69,
+        70,
+        86,
+        93,
+        95,
+        97,
+        110
+      ]
+    }
+  },
+  "summary": {
+    "total_tables_rectified": 52,
+    "numerical_safeguard_passed_percent": 100.0,
+    "safeguard_breaches": 0
+  }
+}

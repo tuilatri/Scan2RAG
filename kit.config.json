@@ -8,7 +8,7 @@
       "id": "backend",
       "path": "backend",
       "srcPath": "backend/app",
-      "verify": "python -m pytest tests/ -q",
+      "verify": ".venv/Scripts/python.exe -m pytest tests/ -q",
       "expectedTests": null
     },
     {
@@ -27,7 +27,23 @@
   "skillPaths": [
     ".claude/skills"
   ],
-  "claims": [],
+  "claims": [
+    {
+      "doc": "docs/ai-context/TESTING_GUIDE.md",
+      "re": "Lines in test_vlm_rectifier\\.py\\s*\\|\\s*(\\d+)",
+      "kind": "lines:backend/tests/test_vlm_rectifier.py"
+    },
+    {
+      "doc": "docs/ai-context/ARCHITECTURE.md",
+      "re": "PyMuPDF",
+      "kind": "exists:backend/app/ingestion/pdf_inspector.py"
+    },
+    {
+      "doc": "docs/ai-context/ARCHITECTURE.md",
+      "re": "PaddleOCR",
+      "kind": "exists:backend/app/ingestion/ocr_engine.py"
+    }
+  ],
   "gates": [
     {
       "id": "doc-truth",
@@ -40,12 +56,42 @@
       "optional": false
     },
     {
+      "id": "backend-lint",
+      "cmd": ".venv/Scripts/ruff.exe",
+      "args": ["check", "app/"],
+      "cwd": "backend",
+      "tags": ["lint", "backend"],
+      "requires": ["backend/app"],
+      "env": {},
+      "optional": false
+    },
+    {
+      "id": "corpus-audit",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_processed_data.py"],
+      "cwd": ".",
+      "tags": ["audit", "data"],
+      "requires": ["data/processed"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
+      "id": "vector-audit",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_vector_store.py"],
+      "cwd": ".",
+      "tags": ["audit", "vector"],
+      "requires": ["data/qdrant_db"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-tests",
-      "cmd": "python",
+      "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],
       "cwd": "backend",
       "tags": ["slow", "backend"],
-      "requires": [],
+      "requires": ["backend/tests"],
       "env": { "PYTHONUTF8": "1" },
       "optional": true
     },

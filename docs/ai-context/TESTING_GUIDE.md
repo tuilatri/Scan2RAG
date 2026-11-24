@@ -4,9 +4,24 @@
 
 ## 1. Current test counts (doc-truth parses this table — NEVER guess)
 
-| **MEASURE** | **collected pytest items** *(or the equivalent for your framework)* |
+| Metric | Measured Value |
 |---|---|
-| **MEASURE** | **functions** |
+| Collected pytest items | 17 |
+| Ingestion pipeline test files | 5 |
+| Lines in test_vlm_rectifier.py | 59 |
 
 ## 2. How to run
+
+### Unit tests
+```bash
+backend/.venv/Scripts/python.exe -m pytest backend/tests/ -q
+```
+
+### Fast verification gate
+```bash
+node scripts/verify.mjs --fast
+```
+
 ## 3. Test-writing conventions
+- Deterministic numerical tests with `collections.Counter`.
+- No mock of critical invariants (e.g. 100% number retention in medical tables).

@@ -1,0 +1,374 @@
+{
+  "model": "qwen3-vl-4b",
+  "total_documents": 5,
+  "documents": {
+    "hướng_dẫn_cục_quân_y.json": {
+      "total_tables": 0,
+      "rectified_count": 0,
+      "rejected_count": 0,
+      "rectified_ids": [],
+      "rejected_details": []
+    },
+    "thông_tư_105.json": {
+      "total_tables": 45,
+      "rectified_count": 19,
+      "rejected_count": 26,
+      "rectified_ids": [
+        "thông_tư_105_table_p29",
+        "thông_tư_105_table_p38",
+        "thông_tư_105_table_p46",
+        "thông_tư_105_table_p47",
+        "thông_tư_105_table_p48",
+        "thông_tư_105_table_p49",
+        "thông_tư_105_table_p59",
+        "thông_tư_105_table_p63",
+        "thông_tư_105_table_p64",
+        "thông_tư_105_table_p65",
+        "thông_tư_105_table_p66",
+        "thông_tư_105_table_p67",
+        "thông_tư_105_table_p80",
+        "thông_tư_105_table_p81",
+        "thông_tư_105_table_p96",
+        "thông_tư_105_table_p98",
+        "thông_tư_105_table_p100",
+        "thông_tư_105_table_p102",
+        "thông_tư_105_table_p104"
+      ],
+      "rejected_details": [
+        {
+          "id": "thông_tư_105_table_p23",
+          "page": 23,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p24",
+          "page": 24,
+          "error": "Safeguard vi phạm: Tự bịa số lạ: [5 (thêm 6), 1 (thêm 5), 2 (thêm 4), 3 (thêm 3), 4 (thêm 3), 6 (thêm 5), 1.1 (thêm 2), 3T (thêm 2), 4T (thêm 1), 7 (thêm 1), 8 (thêm 2), 2T (thêm 1), 10 (thêm 2), 11 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p25",
+          "page": 25,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 1), 3 (mất 1), 4 (mất 1), 16 (mất 1)]; Tự bịa số lạ: [6 (thêm 2), 5 (thêm 1), 28 (thêm 1), 19 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p26",
+          "page": 26,
+          "error": "Safeguard vi phạm: Mất số: [3 (mất 1), 5 (mất 1), 6 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p27",
+          "page": 27,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 1), 4 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p28",
+          "page": 28,
+          "error": "Safeguard vi phạm: Mất số: [4 (mất 1)]; Tự bịa số lạ: [5 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p30",
+          "page": 30,
+          "error": "Safeguard vi phạm: Mất số: [19 (mất 1)]; Tự bịa số lạ: [2 (thêm 2), 3 (thêm 1), 61 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p31",
+          "page": 31,
+          "error": "Safeguard vi phạm: Mất số: [6 (mất 1), 9 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p32",
+          "page": 32,
+          "error": "Safeguard vi phạm: Mất số: [37 (mất 1), 4 (mất 1)]; Tự bịa số lạ: [3T (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p33",
+          "page": 33,
+          "error": "Safeguard vi phạm: Mất số: [6 (mất 1), 5 (mất 1), 84 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p34",
+          "page": 34,
+          "error": "Safeguard vi phạm: Mất số: [6 (mất 1), 3 (mất 1), 4T (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p35",
+          "page": 35,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 1), 9 (mất 1), 68 (mất 1), 06 (mất 1)]; Tự bịa số lạ: [3 (thêm 1), 5T (thêm 2), 6 (thêm 1), 89 (thêm 1), 90 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p36",
+          "page": 36,
+          "error": "Safeguard vi phạm: Tự bịa số lạ: [5T (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p37",
+          "page": 37,
+          "error": "Safeguard vi phạm: Mất số: [4 (mất 1), 99 (mất 1)]; Tự bịa số lạ: [5T (thêm 1), 6 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p39",
+          "page": 39,
+          "error": "Safeguard vi phạm: Mất số: [9 (mất 1), 5 (mất 1)]; Tự bịa số lạ: [6 (thêm 1), 5T (thêm 3)]"
+        },
+        {
+          "id": "thông_tư_105_table_p40",
+          "page": 40,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 2), 4 (mất 1), 1 (mất 2), 5 (mất 2), 3 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p41",
+          "page": 41,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 1), 5 (mất 2), 1 (mất 1), 6 (mất 1), 5T (mất 1)]; Tự bịa số lạ: [4 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p42",
+          "page": 42,
+          "error": "Safeguard vi phạm: Mất số: [9 (mất 1), 5 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p43",
+          "page": 43,
+          "error": "Safeguard vi phạm: Tự bịa số lạ: [1 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p44",
+          "page": 44,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 1)]; Tự bịa số lạ: [6 (thêm 1), 1 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p45",
+          "page": 45,
+          "error": "Safeguard vi phạm: Tự bịa số lạ: [1 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p52",
+          "page": 52,
+          "error": "Safeguard vi phạm: Mất số: [1 (mất 2), 2 (mất 5), 4 (mất 2), 3 (mất 5), 5 (mất 3)]"
+        },
+        {
+          "id": "thông_tư_105_table_p61",
+          "page": 61,
+          "error": "Safeguard vi phạm: Mất số: [1 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p78",
+          "page": 78,
+          "error": "Safeguard vi phạm: Mất số: [21 (mất 1)]; Tự bịa số lạ: [1 (thêm 1), 2 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p82",
+          "page": 82,
+          "error": "Safeguard vi phạm: Mất số: [1 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_105_table_p83",
+          "page": 83,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 1)]"
+        }
+      ]
+    },
+    "thông_tư_106.json": {
+      "total_tables": 16,
+      "rectified_count": 12,
+      "rejected_count": 4,
+      "rectified_ids": [
+        "thông_tư_106_table_p8",
+        "thông_tư_106_table_p10",
+        "thông_tư_106_table_p11",
+        "thông_tư_106_table_p12",
+        "thông_tư_106_table_p13",
+        "thông_tư_106_table_p26",
+        "thông_tư_106_table_p27",
+        "thông_tư_106_table_p28",
+        "thông_tư_106_table_p35",
+        "thông_tư_106_table_p43",
+        "thông_tư_106_table_p47",
+        "thông_tư_106_table_p49"
+      ],
+      "rejected_details": [
+        {
+          "id": "thông_tư_106_table_p9",
+          "page": 9,
+          "error": "Safeguard vi phạm: Mất số: [1 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_106_table_p24",
+          "page": 24,
+          "error": "Safeguard vi phạm: Tự bịa số lạ: [1 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_106_table_p29",
+          "page": 29,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_106_table_p45",
+          "page": 45,
+          "error": "Safeguard vi phạm: Mất số: [1 (mất 6), 2 (mất 5), 3 (mất 4), 4 (mất 3), 5 (mất 3), 6 (mất 2)]"
+        }
+      ]
+    },
+    "thông_tư_68.json": {
+      "total_tables": 0,
+      "rectified_count": 0,
+      "rejected_count": 0,
+      "rectified_ids": [],
+      "rejected_details": []
+    },
+    "thông_tư_88.json": {
+      "total_tables": 50,
+      "rectified_count": 28,
+      "rejected_count": 22,
+      "rectified_ids": [
+        "thông_tư_88_table_p29",
+        "thông_tư_88_table_p33",
+        "thông_tư_88_table_p35",
+        "thông_tư_88_table_p36",
+        "thông_tư_88_table_p38",
+        "thông_tư_88_table_p39",
+        "thông_tư_88_table_p42",
+        "thông_tư_88_table_p44",
+        "thông_tư_88_table_p50",
+        "thông_tư_88_table_p51",
+        "thông_tư_88_table_p54",
+        "thông_tư_88_table_p55",
+        "thông_tư_88_table_p57",
+        "thông_tư_88_table_p65",
+        "thông_tư_88_table_p67",
+        "thông_tư_88_table_p71",
+        "thông_tư_88_table_p72",
+        "thông_tư_88_table_p73",
+        "thông_tư_88_table_p74",
+        "thông_tư_88_table_p75",
+        "thông_tư_88_table_p88",
+        "thông_tư_88_table_p89",
+        "thông_tư_88_table_p90",
+        "thông_tư_88_table_p92",
+        "thông_tư_88_table_p112",
+        "thông_tư_88_table_p114",
+        "thông_tư_88_table_p116",
+        "thông_tư_88_table_p118"
+      ],
+      "rejected_details": [
+        {
+          "id": "thông_tư_88_table_p30",
+          "page": 30,
+          "error": "Safeguard vi phạm: Mất số: [9 (mất 1)]; Tự bịa số lạ: [3 (thêm 1), 6 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p31",
+          "page": 31,
+          "error": "Safeguard vi phạm: Mất số: [2 (mất 1), 3 (mất 1), 4 (mất 1), 5 (mất 2), 7 (mất 1), 70% (mất 1), 50% (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p32",
+          "page": 32,
+          "error": "Safeguard vi phạm: Mất số: [3 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p34",
+          "page": 34,
+          "error": "Safeguard vi phạm: Mất số: [6 (mất 1), 5 (mất 3), 2 (mất 2), 4 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p37",
+          "page": 37,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 1), 9 (mất 1)]; Tự bịa số lạ: [6 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p40",
+          "page": 40,
+          "error": "Safeguard vi phạm: Mất số: [3 (mất 1), 1 (mất 1), 0 (mất 1), 5 (mất 2)]"
+        },
+        {
+          "id": "thông_tư_88_table_p41",
+          "page": 41,
+          "error": "Safeguard vi phạm: Mất số: [5T (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p43",
+          "page": 43,
+          "error": "Safeguard vi phạm: Mất số: [4 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p45",
+          "page": 45,
+          "error": "Safeguard vi phạm: Mất số: [4 (mất 1), 1 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p46",
+          "page": 46,
+          "error": "Safeguard vi phạm: Mất số: [6 (mất 1), 5 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p47",
+          "page": 47,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p48",
+          "page": 48,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 2), 1 (mất 2)]"
+        },
+        {
+          "id": "thông_tư_88_table_p49",
+          "page": 49,
+          "error": "Safeguard vi phạm: Mất số: [9 (mất 3)]; Tự bịa số lạ: [6 (thêm 3)]"
+        },
+        {
+          "id": "thông_tư_88_table_p52",
+          "page": 52,
+          "error": "Safeguard vi phạm: Mất số: [1 (mất 1), 3 (mất 1), 3T (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p53",
+          "page": 53,
+          "error": "Safeguard vi phạm: Mất số: [5 (mất 1), 4 (mất 2), 3 (mất 2)]; Tự bịa số lạ: [20 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p69",
+          "page": 69,
+          "error": "Safeguard vi phạm: Mất số: [01 (mất 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p70",
+          "page": 70,
+          "error": "Safeguard vi phạm: Tự bịa số lạ: [106 (thêm 1), 2025 (thêm 1), 30 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p86",
+          "page": 86,
+          "error": "Safeguard vi phạm: Mất số: [9 (mất 1), 21 (mất 1), 30 (mất 1), 2025 (mất 1)]; Tự bịa số lạ: [2 (thêm 1)]"
+        },
+        {
+          "id": "thông_tư_88_table_p93",
+          "page": 93,
+          "error": "Audit rollback: Orig nums empty but VLM added table headers with 1-6"
+        },
+        {
+          "id": "thông_tư_88_table_p95",
+          "page": 95,
+          "error": "Request exception: HTTPConnectionPool(host='localhost', port=1234): Read timed out. (read timeout=180)"
+        },
+        {
+          "id": "thông_tư_88_table_p97",
+          "page": 97,
+          "error": "Request exception: HTTPConnectionPool(host='localhost', port=1234): Read timed out. (read timeout=180)"
+        },
+        {
+          "id": "thông_tư_88_table_p110",
+          "page": 110,
+          "error": "Audit rollback: Orig nums empty but VLM added table headers with 1-6"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_tables": 111,
+    "total_rectified": 59,
+    "total_rejected": 52,
+    "rectified_rate_percent": 53.15,
+    "rejected_rate_percent": 46.85,
+    "safeguard_breaches_in_corpus": 0
+  }
+}

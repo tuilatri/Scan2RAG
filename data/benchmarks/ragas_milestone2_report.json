@@ -1,0 +1,520 @@
+{
+  "timestamp": "2026-11-24T15:50:49Z",
+  "milestone": "2",
+  "benchmark_name": "Milestone 2 RAG Precision & Faithfulness Benchmark",
+  "total_queries": 50,
+  "metrics": {
+    "retrieval_accuracy_pct": 100.0,
+    "exact_citation_accuracy_pct": 88.0,
+    "answer_faithfulness_accuracy_pct": 82.0,
+    "average_latency_ms": 12720.9
+  },
+  "thresholds": {
+    "retrieval_accuracy_min": 85.0,
+    "exact_citation_accuracy_min": 80.0,
+    "answer_faithfulness_min": 75.0
+  },
+  "status": "PASS",
+  "query_results": [
+    {
+      "id": "GT-01",
+      "query": "Cận thị từ -3D đến dưới -4D khám nghĩa vụ quân sự mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-02",
+      "query": "Cận thị từ -1.5D đến dưới -3D chấm điểm mấy?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-03",
+      "query": "Cận thị từ -4D đến dưới -5D thì được xếp loại mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-04",
+      "query": "Cận thị từ -5D trở lên khám nghĩa vụ quân sự mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-05",
+      "query": "Cận thị đã phẫu thuật thì chấm điểm như thế nào?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-06",
+      "query": "Viễn thị từ +1.5D đến dưới +3D được chấm mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-07",
+      "query": "Viễn thị từ +3D đến dưới +4D chấm mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-08",
+      "query": "Viễn thị từ +4D đến dưới +5D thì mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-09",
+      "query": "Loạn thị sinh lý hoặc dưới 1D chấm mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-10",
+      "query": "Loạn thị từ 1D trở lên khám sức khỏe quân sự mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-11",
+      "query": "Thị lực mắt phải 10/10, tổng thị lực 2 mắt 19/10 chấm điểm mấy?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-12",
+      "query": "Thị lực mắt phải 10/10, tổng thị lực 2 mắt 18/10 thì chấm mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-13",
+      "query": "Thị lực mắt phải 9/10, tổng thị lực 2 mắt 17/10 thì được xếp mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-14",
+      "query": "Thị lực mắt phải 8/10, tổng thị lực 2 mắt 16/10 chấm mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-15",
+      "query": "Thị lực mắt phải 6,7/10, tổng 2 mắt từ 13/10 đến 15/10 chấm mấy điểm?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 23,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-16",
+      "query": "Tiêu chuẩn sức khỏe thực hiện nghĩa vụ quân sự theo Điều 4",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 3,
+      "retrieval_hit": true,
+      "citation_hit": false,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-17",
+      "query": "Công dân có sức khỏe loại 4 có được gọi nhập ngũ không?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 3,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-18",
+      "query": "Phương pháp phân loại sức khỏe theo Thông tư 105 quy định bao nhiêu loại?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 4,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-19",
+      "query": "Phương pháp phân loại sức khỏe Loại 1 theo Điều 6",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 4,
+      "retrieval_hit": true,
+      "citation_hit": false,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-20",
+      "query": "Phương pháp phân loại sức khỏe Loại 3 có chỉ tiêu bị điểm 3",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 4,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-21",
+      "query": "Phương pháp phân loại sức khỏe Loại 4 có chỉ tiêu bị điểm 4",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 4,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-22",
+      "query": "Phương pháp phân loại sức khỏe Loại 6 có chỉ tiêu bị điểm 6",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 4,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-23",
+      "query": "Quy định sơ tuyển sức khỏe nghĩa vụ quân sự Điều 7",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 5,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-24",
+      "query": "Trạm y tế xã có trách nhiệm gì trong sơ tuyển sức khỏe nghĩa vụ quân sự?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 5,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-25",
+      "query": "Thời gian khám sức khỏe nghĩa vụ quân sự từ ngày nào đến ngày nào",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 6,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-26",
+      "query": "Khám phúc tra sức khỏe nghĩa vụ quân sự quy định tại điều nào?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 10,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-27",
+      "query": "Hội đồng giám định y khoa quân sự được quy định thế nào?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 7,
+      "retrieval_hit": true,
+      "citation_hit": false,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-28",
+      "query": "Phân loại sức khỏe nghĩa vụ quân sự Điều 9 căn cứ vào đâu?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 8,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-29",
+      "query": "Đối tượng áp dụng của Thông tư 105 gồm những ai?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": false,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-30",
+      "query": "Mục tiêu khám sức khỏe nghĩa vụ quân sự là gì?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-31",
+      "query": "So sánh quy định về tiêu chuẩn sức khỏe giữa Thông tư 105 và Thông tư 106 có gì sửa đổi?",
+      "category": null,
+      "expected_doc": "thông_tư_106",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-32",
+      "query": "Thông tư 106 sửa đổi những điều khoản nào của Thông tư 105?",
+      "category": null,
+      "expected_doc": "thông_tư_106",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-33",
+      "query": "Văn bản hợp nhất 88 có mối quan hệ như thế nào với Thông tư 105 và 106?",
+      "category": null,
+      "expected_doc": "thông_tư_88",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-34",
+      "query": "Đối chiếu quy định tiêu chuẩn sức khỏe trong Văn bản hợp nhất số 88 và Thông tư 105",
+      "category": null,
+      "expected_doc": "thông_tư_88",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-35",
+      "query": "Phân tích sự khác nhau giữa phụ lục khám sức khỏe của Thông tư 105 và Thông tư 106",
+      "category": null,
+      "expected_doc": "thông_tư_106",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-36",
+      "query": "Các trường hợp nào bị tạm hoãn gọi nhập ngũ liên quan đến sức khỏe giữa các văn bản?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 3,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-37",
+      "query": "Khi Thông tư 106 có hiệu lực thì áp dụng quy định cũ của Thông tư 105 hay quy định mới?",
+      "category": null,
+      "expected_doc": "thông_tư_106",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-38",
+      "query": "So sánh thẩm quyền của Hội đồng khám sức khỏe cấp huyện trong Thông tư 105 và 88",
+      "category": null,
+      "expected_doc": "thông_tư_88",
+      "expected_page": 5,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-39",
+      "query": "Tổng hợp các quy định về việc xử lý kết quả khám phúc tra sức khỏe quân nhân",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 10,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-40",
+      "query": "Đối chiếu các tiêu chuẩn sức khỏe giữa Thông tư 68 và Thông tư 105",
+      "category": null,
+      "expected_doc": "thông_tư_68",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-41",
+      "query": "Hướng dẫn của Cục quân y quy định về khám cận thị như thế nào?",
+      "category": null,
+      "expected_doc": "hướng_dẫn_cục_quân_y",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-42",
+      "query": "Nội dung chính trong Hướng dẫn Cục quân y là gì?",
+      "category": null,
+      "expected_doc": "hướng_dẫn_cục_quân_y",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-43",
+      "query": "Thông tư 68 quy định về nội dung gì?",
+      "category": null,
+      "expected_doc": "thông_tư_68",
+      "expected_page": 1,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-44",
+      "query": "Thời hạn hiệu lực của Thông tư 68 như thế nào?",
+      "category": null,
+      "expected_doc": "thông_tư_68",
+      "expected_page": 2,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-45",
+      "query": "Trường hợp mắc bệnh tâm thần có được đi nghĩa vụ quân sự không?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 2,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-46",
+      "query": "Quy định về chiều cao cân nặng của nam công dân gọi nhập ngũ",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 21,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": true
+    },
+    {
+      "id": "GT-47",
+      "query": "Chỉ số BMI bao nhiêu thì không đủ điều kiện nhập ngũ?",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 21,
+      "retrieval_hit": true,
+      "citation_hit": false,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-48",
+      "query": "Quy định về việc khám nghiệm ma túy đối với công dân nhập ngũ",
+      "category": null,
+      "expected_doc": "thông_tư_105",
+      "expected_page": 5,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-49",
+      "query": "Quy định về mức xử phạt vi phạm hành chính khi trốn nghĩa vụ quân sự",
+      "category": null,
+      "expected_doc": "out_of_scope",
+      "expected_page": 0,
+      "retrieval_hit": true,
+      "citation_hit": true,
+      "answer_hit": false
+    },
+    {
+      "id": "GT-50",
+      "query": "Thời hạn nghĩa vụ công an nhân dân là bao nhiêu năm?",
+      "category": null,
+      "expected_doc": "out_of_scope",
+      "expected_page": 0,
+      "retrieval_hit": true,
+      "citation_hit": false,
+      "answer_hit": false
+    }
+  ]
+}
