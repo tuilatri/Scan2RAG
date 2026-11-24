@@ -1,0 +1,97 @@
+"""OCR Vision Auditor: Evaluates table structure, cell alignment, and medical score fidelity."""
+
+import json
+import re
+from pathlib import Path
+from typing import Any
+
+PROCESSED_DIR = Path(__file__).resolve().parent.parent.parent.parent / "data" / "processed"
+
+
+class OcrVisionAuditor:
+    """Audits table structures, row-column alignment, and medical point validation."""
+
+    def __init__(self, data_dir: Path | None = None):
+        self.data_dir = data_dir or PROCESSED_DIR
+
+    def audit(self) -> dict[str, Any]:
+        """Audit all extracted tables across documents."""
+        total_tables = 0
+        vlm_rectified_tables = 0
+        hitl_tables = 0
+        malformed_tables = 0
+        invalid_score_cells = 0
+        total_cells = 0
+        empty_cells = 0
+
+        for file_path in sorted(self.data_dir.glob("*.json")):
+            if file_path.name.startswith("."):
+                continue
+            with open(file_path, encoding="utf-8") as f:
+                data = json.load(f)
+
+            nodes = data.get("nodes", [])
+            for node in nodes:
+                if node.get("level") != "TABLE":
+                    continue
+
+                total_tables += 1
+                meta = node.get("metadata", {})
+                if meta.get("vlm_rectified"):
+                    vlm_rectified_tables += 1
+                if meta.get("hitl_rectified") or meta.get("hitl_approved"):
+                    hitl_tables += 1
+
+                content = node.get("content", "").strip()
+                lines = [line.strip() for line in content.split("\n") if line.strip()]
+                table_lines = [line for line in lines if line.startswith("|") and line.endswith("|")]
+
+                if len(table_lines) < 2:
+                    malformed_tables += 1
+                    continue
+
+                headers = [c.strip() for c in table_lines[0].strip("|").split("|")]
+                expected_cols = len(headers)
+                # Find column index for medical scores
+                score_col_indices = [
+                    i for i, h in enumerate(headers)
+                    if any(term in h.lower() for term in ["điểm", "phân loại", "chỉ số điểm"])
+                ]
+
+                for line in table_lines[1:]:
+                    if re.match(r"^\|(\s*:?-+:?\s*\|)+$", line):
+                        continue
+                    cells = [c.strip() for c in line.strip("|").split("|")]
+                    total_cells += len(cells)
+
+                    if len(cells) != expected_cols:
+                        malformed_tables += 1
+
+                    for idx, cell in enumerate(cells):
+                        if not cell:
+                            empty_cells += 1
+                        # Only validate medical score columns (1-6)
+                        if idx in score_col_indices and cell.isdigit():
+                            val = int(cell)
+                            if val < 1 or val > 6:
+                                invalid_score_cells += 1
+
+        empty_cell_ratio = (empty_cells / total_cells * 100) if total_cells else 0.0
+        score = 100.0
+        if malformed_tables > 0:
+            score -= malformed_tables * 5.0
+        if invalid_score_cells > 0:
+            score -= invalid_score_cells * 2.0
+
+        return {
+            "persona": "ocr_vision_specialist",
+            "score": max(round(score, 1), 0.0),
+            "passed": malformed_tables == 0 and invalid_score_cells == 0,
+            "total_tables": total_tables,
+            "vlm_rectified_tables": vlm_rectified_tables,
+            "hitl_rectified_tables": hitl_tables,
+            "malformed_tables": malformed_tables,
+            "invalid_score_cells": invalid_score_cells,
+            "total_cells": total_cells,
+            "empty_cell_ratio_pct": round(empty_cell_ratio, 2),
+        }
