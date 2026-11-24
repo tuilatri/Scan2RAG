@@ -4,9 +4,23 @@ export interface CitationItem {
   document_name?: string
   breadcrumb?: string
   page_number: number
-  is_table: boolean
-  rerank_score: number
-  snippet: string
+  is_table?: boolean
+  rerank_score?: number
+  snippet?: string
+}
+
+// Alias for CitationItem
+export type Citation = CitationItem;
+
+export interface StreamEvent {
+  event: 'citations' | 'token' | 'done'
+  citations?: CitationItem[]
+  token?: string
+  provider?: string
+  model?: string
+  latency_retrieval_ms?: number
+  latency_rerank_ms?: number
+  latency_total_ms?: number
 }
 
 export interface ChatMessage {
