@@ -1,0 +1,42 @@
+{
+  "total_documents": 5,
+  "total_pages": 287,
+  "total_tables": 111,
+  "rectified_tables": 111,
+  "models_used": {
+    "qwen3-vl-4b": 59,
+    "gemini-auditor-ground-truth": 52
+  },
+  "documents": {
+    "hướng_dẫn_cục_quân_y.json": {
+      "total_tables": 0,
+      "rectified_count": 0,
+      "qwen_count": 0,
+      "gemini_count": 0
+    },
+    "thông_tư_105.json": {
+      "total_tables": 45,
+      "rectified_count": 45,
+      "qwen_count": 19,
+      "gemini_count": 26
+    },
+    "thông_tư_106.json": {
+      "total_tables": 16,
+      "rectified_count": 16,
+      "qwen_count": 12,
+      "gemini_count": 4
+    },
+    "thông_tư_68.json": {
+      "total_tables": 0,
+      "rectified_count": 0,
+      "qwen_count": 0,
+      "gemini_count": 0
+    },
+    "thông_tư_88.json": {
+      "total_tables": 50,
+      "rectified_count": 50,
+      "qwen_count": 28,
+      "gemini_count": 22
+    }
+  }
+}
