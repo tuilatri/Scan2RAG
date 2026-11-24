@@ -61,14 +61,17 @@ def run_benchmark():
         retrieval_hit = False
         citation_hit = False
         expected_docs = item.get("expected_docs", [expected_doc])
+        expected_pages_map = item.get("expected_pages", {})
         if "out_of_scope" in expected_docs:
             retrieval_hit = True
             citation_hit = True
         else:
             for c in citations:
-                if c.get("document_id") in expected_docs:
+                doc_id = c.get("document_id")
+                if doc_id in expected_docs:
                     retrieval_hit = True
-                    if expected_page == 0 or abs(c.get("page_number", 0) - expected_page) <= 2:
+                    target_page = expected_pages_map.get(doc_id, expected_page)
+                    if target_page == 0 or abs(c.get("page_number", 0) - target_page) <= 2:
                         citation_hit = True
                         break
 
@@ -118,7 +121,7 @@ def run_benchmark():
 
     # Invariant assertions
     assert retrieval_acc >= 85.0, f"Retrieval accuracy below threshold: {retrieval_acc:.1f}%"
-    assert citation_acc >= 75.0, f"Citation accuracy below threshold: {citation_acc:.1f}%"
+    assert citation_acc >= 80.0, f"Citation accuracy below threshold: {citation_acc:.1f}%"
     assert answer_acc >= 75.0, f"Faithfulness accuracy below threshold: {answer_acc:.1f}%"
 
     print("\n🎉 MILESTONE 2 BENCHMARK GATE: ALL PASS (High Precision & Faithfulness Validated)")

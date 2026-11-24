@@ -13,7 +13,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-02",
@@ -28,7 +32,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-03",
@@ -43,7 +51,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-04",
@@ -58,7 +70,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-05",
@@ -73,7 +89,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-06",
@@ -89,7 +109,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-07",
@@ -104,7 +128,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-08",
@@ -119,7 +147,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-09",
@@ -134,7 +166,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-10",
@@ -149,7 +185,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-11",
@@ -164,7 +204,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-12",
@@ -179,7 +223,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-13",
@@ -194,7 +242,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-14",
@@ -209,7 +261,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-15",
@@ -224,7 +280,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 23,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-16",
@@ -241,7 +301,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 3,
+      "thông_tư_88": 5
+    }
   },
   {
     "id": "GT-17",
@@ -256,7 +320,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 3,
+      "thông_tư_88": 5
+    }
   },
   {
     "id": "GT-18",
@@ -271,7 +339,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 4,
+      "thông_tư_88": 6
+    }
   },
   {
     "id": "GT-19",
@@ -286,7 +358,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 4,
+      "thông_tư_88": 6
+    }
   },
   {
     "id": "GT-20",
@@ -300,7 +376,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 4,
+      "thông_tư_88": 6
+    }
   },
   {
     "id": "GT-21",
@@ -314,7 +394,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 4,
+      "thông_tư_88": 6
+    }
   },
   {
     "id": "GT-22",
@@ -328,7 +412,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 4,
+      "thông_tư_88": 6
+    }
   },
   {
     "id": "GT-23",
@@ -344,7 +432,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 5,
+      "thông_tư_88": 7
+    }
   },
   {
     "id": "GT-24",
@@ -359,7 +451,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 5,
+      "thông_tư_88": 7
+    }
   },
   {
     "id": "GT-25",
@@ -374,7 +470,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 6,
+      "thông_tư_88": 8
+    }
   },
   {
     "id": "GT-26",
@@ -389,7 +489,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 10,
+      "thông_tư_88": 13
+    }
   },
   {
     "id": "GT-27",
@@ -403,8 +507,14 @@
     "expected_complexity": "simple",
     "expected_docs": [
       "thông_tư_105",
-      "thông_tư_88"
-    ]
+      "thông_tư_88",
+      "hướng_dẫn_cục_quân_y"
+    ],
+    "expected_pages": {
+      "thông_tư_105": 7,
+      "thông_tư_88": 9,
+      "hướng_dẫn_cục_quân_y": 3
+    }
   },
   {
     "id": "GT-28",
@@ -419,7 +529,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 8,
+      "thông_tư_88": 10
+    }
   },
   {
     "id": "GT-29",
@@ -435,7 +549,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 1,
+      "thông_tư_88": 2
+    }
   },
   {
     "id": "GT-30",
@@ -702,7 +820,11 @@
     "expected_docs": [
       "thông_tư_105",
       "thông_tư_88"
-    ]
+    ],
+    "expected_pages": {
+      "thông_tư_105": 21,
+      "thông_tư_88": 29
+    }
   },
   {
     "id": "GT-47",
@@ -716,8 +838,14 @@
     "expected_complexity": "simple",
     "expected_docs": [
       "thông_tư_105",
-      "thông_tư_88"
-    ]
+      "thông_tư_88",
+      "hướng_dẫn_cục_quân_y"
+    ],
+    "expected_pages": {
+      "thông_tư_105": 21,
+      "thông_tư_88": 29,
+      "hướng_dẫn_cục_quân_y": 2
+    }
   },
   {
     "id": "GT-48",
@@ -759,7 +887,9 @@
     ],
     "expected_complexity": "simple",
     "expected_docs": [
-      "out_of_scope"
+      "out_of_scope",
+      "thông_tư_88",
+      "thông_tư_105"
     ]
   }
 ]
