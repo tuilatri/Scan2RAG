@@ -1,0 +1,765 @@
+[
+  {
+    "id": "GT-01",
+    "query": "Cận thị từ -3D đến dưới -4D khám nghĩa vụ quân sự mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "4",
+      "điểm 4",
+      "cận thị"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-02",
+    "query": "Cận thị từ -1.5D đến dưới -3D chấm điểm mấy?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "3",
+      "điểm 3"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-03",
+    "query": "Cận thị từ -4D đến dưới -5D thì được xếp loại mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "5",
+      "điểm 5"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-04",
+    "query": "Cận thị từ -5D trở lên khám nghĩa vụ quân sự mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "6",
+      "điểm 6"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-05",
+    "query": "Cận thị đã phẫu thuật thì chấm điểm như thế nào?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "mục 1.1",
+      "tăng lên 1 điểm"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-06",
+    "query": "Viễn thị từ +1.5D đến dưới +3D được chấm mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "4",
+      "điểm 4",
+      "viễn thị"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-07",
+    "query": "Viễn thị từ +3D đến dưới +4D chấm mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "5",
+      "điểm 5"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-08",
+    "query": "Viễn thị từ +4D đến dưới +5D thì mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "6",
+      "điểm 6"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-09",
+    "query": "Loạn thị sinh lý hoặc dưới 1D chấm mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "2",
+      "điểm 2"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-10",
+    "query": "Loạn thị từ 1D trở lên khám sức khỏe quân sự mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "3",
+      "điểm 3"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-11",
+    "query": "Thị lực mắt phải 10/10, tổng thị lực 2 mắt 19/10 chấm điểm mấy?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "1",
+      "điểm 1"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-12",
+    "query": "Thị lực mắt phải 10/10, tổng thị lực 2 mắt 18/10 thì chấm mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "2",
+      "điểm 2"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-13",
+    "query": "Thị lực mắt phải 9/10, tổng thị lực 2 mắt 17/10 thì được xếp mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "3",
+      "điểm 3"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-14",
+    "query": "Thị lực mắt phải 8/10, tổng thị lực 2 mắt 16/10 chấm mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "4",
+      "điểm 4"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-15",
+    "query": "Thị lực mắt phải 6,7/10, tổng 2 mắt từ 13/10 đến 15/10 chấm mấy điểm?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 23,
+    "expected_answer_keywords": [
+      "5",
+      "điểm 5"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-16",
+    "query": "Tiêu chuẩn sức khỏe thực hiện nghĩa vụ quân sự theo Điều 4",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 3,
+    "expected_answer_keywords": [
+      "loại 1",
+      "loại 2",
+      "loại 3",
+      "tiêu chuẩn chung"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-17",
+    "query": "Công dân có sức khỏe loại 4 có được gọi nhập ngũ không?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 3,
+    "expected_answer_keywords": [
+      "không",
+      "loại 1, 2, 3"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-18",
+    "query": "Phương pháp phân loại sức khỏe theo Thông tư 105 quy định bao nhiêu loại?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 4,
+    "expected_answer_keywords": [
+      "6 loại",
+      "loại 1 đến loại 6"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-19",
+    "query": "Phương pháp phân loại sức khỏe Loại 1 theo Điều 6",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 4,
+    "expected_answer_keywords": [
+      "chỉ tiêu đều đạt điểm 1",
+      "rất tốt"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-20",
+    "query": "Phương pháp phân loại sức khỏe Loại 3 có chỉ tiêu bị điểm 3",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 4,
+    "expected_answer_keywords": [
+      "loại 3"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-21",
+    "query": "Phương pháp phân loại sức khỏe Loại 4 có chỉ tiêu bị điểm 4",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 4,
+    "expected_answer_keywords": [
+      "loại 4"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-22",
+    "query": "Phương pháp phân loại sức khỏe Loại 6 có chỉ tiêu bị điểm 6",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 4,
+    "expected_answer_keywords": [
+      "loại 6"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-23",
+    "query": "Quy định sơ tuyển sức khỏe nghĩa vụ quân sự Điều 7",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 5,
+    "expected_answer_keywords": [
+      "thể lực",
+      "tiền sử",
+      "sơ tuyển"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-24",
+    "query": "Trạm y tế xã có trách nhiệm gì trong sơ tuyển sức khỏe nghĩa vụ quân sự?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 5,
+    "expected_answer_keywords": [
+      "trạm y tế",
+      "sơ tuyển"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-25",
+    "query": "Thời gian khám sức khỏe nghĩa vụ quân sự từ ngày nào đến ngày nào",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 6,
+    "expected_answer_keywords": [
+      "tháng 11",
+      "tháng 12"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-26",
+    "query": "Khám phúc tra sức khỏe nghĩa vụ quân sự quy định tại điều nào?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 10,
+    "expected_answer_keywords": [
+      "điều 11",
+      "phúc tra"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-27",
+    "query": "Hội đồng giám định y khoa quân sự được quy định thế nào?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 7,
+    "expected_answer_keywords": [
+      "giám định",
+      "hội đồng"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-28",
+    "query": "Phân loại sức khỏe nghĩa vụ quân sự Điều 9 căn cứ vào đâu?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 8,
+    "expected_answer_keywords": [
+      "tiêu chuẩn",
+      "phân loại"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-29",
+    "query": "Đối tượng áp dụng của Thông tư 105 gồm những ai?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "công dân",
+      "cơ quan",
+      "tổ chức"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-30",
+    "query": "Mục tiêu khám sức khỏe nghĩa vụ quân sự là gì?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "nghĩa vụ quân sự",
+      "sức khỏe"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-31",
+    "query": "So sánh quy định về tiêu chuẩn sức khỏe giữa Thông tư 105 và Thông tư 106 có gì sửa đổi?",
+    "expected_doc": "thông_tư_106",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "sửa đổi",
+      "thông tư 106",
+      "bổ sung"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_106",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-32",
+    "query": "Thông tư 106 sửa đổi những điều khoản nào của Thông tư 105?",
+    "expected_doc": "thông_tư_106",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "điều",
+      "sửa đổi",
+      "thông tư 105"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_106",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-33",
+    "query": "Văn bản hợp nhất 88 có mối quan hệ như thế nào với Thông tư 105 và 106?",
+    "expected_doc": "thông_tư_88",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "văn bản hợp nhất",
+      "hợp nhất",
+      "105",
+      "106"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_106",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-34",
+    "query": "Đối chiếu quy định tiêu chuẩn sức khỏe trong Văn bản hợp nhất số 88 và Thông tư 105",
+    "expected_doc": "thông_tư_88",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "văn bản hợp nhất",
+      "tiêu chuẩn sức khỏe"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-35",
+    "query": "Phân tích sự khác nhau giữa phụ lục khám sức khỏe của Thông tư 105 và Thông tư 106",
+    "expected_doc": "thông_tư_106",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "phụ lục",
+      "tiêu chuẩn",
+      "sửa đổi"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_106",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-36",
+    "query": "Các trường hợp nào bị tạm hoãn gọi nhập ngũ liên quan đến sức khỏe giữa các văn bản?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 3,
+    "expected_answer_keywords": [
+      "sức khỏe",
+      "loại 4",
+      "loại 5",
+      "loại 6"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-37",
+    "query": "Khi Thông tư 106 có hiệu lực thì áp dụng quy định cũ của Thông tư 105 hay quy định mới?",
+    "expected_doc": "thông_tư_106",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "hiệu lực",
+      "áp dụng quy định mới"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_106",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-38",
+    "query": "So sánh thẩm quyền của Hội đồng khám sức khỏe cấp huyện trong Thông tư 105 và 88",
+    "expected_doc": "thông_tư_88",
+    "expected_page": 5,
+    "expected_answer_keywords": [
+      "hội đồng",
+      "khám sức khỏe",
+      "cấp huyện"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-39",
+    "query": "Tổng hợp các quy định về việc xử lý kết quả khám phúc tra sức khỏe quân nhân",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 10,
+    "expected_answer_keywords": [
+      "phúc tra",
+      "quân sự"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-40",
+    "query": "Đối chiếu các tiêu chuẩn sức khỏe giữa Thông tư 68 và Thông tư 105",
+    "expected_doc": "thông_tư_68",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "thông tư 68",
+      "thông tư 105"
+    ],
+    "expected_complexity": "complex",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_68",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-41",
+    "query": "Hướng dẫn của Cục quân y quy định về khám cận thị như thế nào?",
+    "expected_doc": "hướng_dẫn_cục_quân_y",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "cục quân y",
+      "hướng dẫn"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "hướng_dẫn_cục_quân_y"
+    ]
+  },
+  {
+    "id": "GT-42",
+    "query": "Nội dung chính trong Hướng dẫn Cục quân y là gì?",
+    "expected_doc": "hướng_dẫn_cục_quân_y",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "cục quân y",
+      "hướng dẫn"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "hướng_dẫn_cục_quân_y"
+    ]
+  },
+  {
+    "id": "GT-43",
+    "query": "Thông tư 68 quy định về nội dung gì?",
+    "expected_doc": "thông_tư_68",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "thông tư 68"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_68"
+    ]
+  },
+  {
+    "id": "GT-44",
+    "query": "Thời hạn hiệu lực của Thông tư 68 như thế nào?",
+    "expected_doc": "thông_tư_68",
+    "expected_page": 2,
+    "expected_answer_keywords": [
+      "hiệu lực",
+      "thông tư 68"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_68"
+    ]
+  },
+  {
+    "id": "GT-45",
+    "query": "Trường hợp mắc bệnh tâm thần có được đi nghĩa vụ quân sự không?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 2,
+    "expected_answer_keywords": [
+      "loại 6",
+      "không",
+      "điểm 6"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88",
+      "hướng_dẫn_cục_quân_y"
+    ]
+  },
+  {
+    "id": "GT-46",
+    "query": "Quy định về chiều cao cân nặng của nam công dân gọi nhập ngũ",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 21,
+    "expected_answer_keywords": [
+      "chiều cao",
+      "cân nặng",
+      "thể lực"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-47",
+    "query": "Chỉ số BMI bao nhiêu thì không đủ điều kiện nhập ngũ?",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 21,
+    "expected_answer_keywords": [
+      "bmi",
+      "điểm"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-48",
+    "query": "Quy định về việc khám nghiệm ma túy đối với công dân nhập ngũ",
+    "expected_doc": "thông_tư_105",
+    "expected_page": 5,
+    "expected_answer_keywords": [
+      "ma túy",
+      "xét nghiệm"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "thông_tư_105",
+      "thông_tư_88"
+    ]
+  },
+  {
+    "id": "GT-49",
+    "query": "Quy định về mức xử phạt vi phạm hành chính khi trốn nghĩa vụ quân sự",
+    "expected_doc": "out_of_scope",
+    "expected_page": 0,
+    "expected_answer_keywords": [
+      "không quy định",
+      "không có quy định"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "out_of_scope"
+    ]
+  },
+  {
+    "id": "GT-50",
+    "query": "Thời hạn nghĩa vụ công an nhân dân là bao nhiêu năm?",
+    "expected_doc": "out_of_scope",
+    "expected_page": 0,
+    "expected_answer_keywords": [
+      "không quy định",
+      "không có quy định"
+    ],
+    "expected_complexity": "simple",
+    "expected_docs": [
+      "out_of_scope"
+    ]
+  }
+]

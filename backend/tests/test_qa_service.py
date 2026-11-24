@@ -6,7 +6,7 @@ Defines invariant assertions that MUST pass:
 3. INV-API-01: POST /api/v1/query returns valid schema with citations matching ground truth.
 """
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
 
@@ -18,13 +18,14 @@ from app.services.qa_service import GroundedQAService
 
 def test_hard_constraint_model_router_offline_resilience():
     """Bất biến 1: ModelRouter phải có phản ứng kiên cường khi Local Server offline, không văng unhandled exception."""
-    # Point to nonexistent port
-    router = ModelRouter(local_base_url="http://localhost:9999/v1", groq_api_key=None)
+    # Point to nonexistent port and mock cloud failure
+    router = ModelRouter(local_base_url="http://localhost:9999/v1")
     assert not router.is_local_available(), "Nonexistent port must report unavailable"
 
-    res = router.generate(prompt="Test prompt", system_prompt="Test sys")
-    assert "content" in res
-    assert res["provider"] == "deterministic_offline"
+    with patch.object(router, "_call_provider", side_effect=Exception("Offline")):
+        res = router.generate(prompt="Test prompt", system_prompt="Test sys")
+        assert "content" in res
+        assert res["provider"] == "deterministic_offline"
 
 
 def test_hard_constraint_qa_service_citation_integrity():

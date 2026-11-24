@@ -44,6 +44,7 @@ class QueryResponse(BaseModel):
     citations: list[CitationItem]
     provider: str
     model: str
+    complexity: str = "simple"
     latency_retrieval_ms: float
     latency_rerank_ms: float
     latency_total_ms: float
@@ -60,6 +61,11 @@ def get_qa_service() -> GroundedQAService:
         bm25_searcher = LegalBM25Searcher()
         # Attempt to load saved BM25 index, otherwise initialize
         if not bm25_searcher.load():
+            import sys
+            from pathlib import Path
+            root_dir = Path(__file__).resolve().parent.parent.parent.parent
+            if str(root_dir) not in sys.path:
+                sys.path.insert(0, str(root_dir))
             from scripts.audit_hybrid_retrieval import load_all_corpus_chunks
             chunks = load_all_corpus_chunks()
             bm25_searcher.fit_from_chunks(chunks)

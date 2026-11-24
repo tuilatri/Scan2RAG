@@ -6,6 +6,7 @@ Ensures:
 3. Fallback when LLM is unavailable or context is insufficient.
 """
 
+import re
 import time
 from typing import Any
 
@@ -73,22 +74,34 @@ class GroundedQAService:
         # 3. Format Structured Citations
         citations = []
         for c in top_chunks:
+            p_num = c.get("page_number", 0)
+            if not p_num:
+                p_nums = c.get("page_numbers", [])
+                p_num = p_nums[0] if p_nums else 0
+            if not p_num:
+                # Fallback: extract page number from breadcrumb, e.g. "(Trang 23)"
+                m = re.search(r"Trang\s+(\d+)", c.get("breadcrumb", "") or "")
+                if m:
+                    p_num = int(m.group(1))
+
             citations.append({
                 "id": c.get("id"),
                 "document_id": c.get("document_id"),
                 "document_name": c.get("document_name"),
                 "breadcrumb": c.get("breadcrumb"),
-                "page_number": c.get("page_number", 0),
+                "page_number": p_num,
                 "is_table": c.get("is_table", False),
                 "rerank_score": c.get("rerank_score", 0.0),
                 "snippet": c.get("content", "")[:250],
             })
 
-        # 4. Generate LLM Answer
+        # 4. Determine Query Complexity & Generate Answer
+        complexity = self.model_router.classify_complexity(query, top_chunks)
         user_prompt = GroundedPromptBuilder.build_qa_prompt(query, top_chunks)
         llm_result = self.model_router.generate(
             prompt=user_prompt,
             system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
+            complexity=complexity,
             temperature=0.0,
         )
 
@@ -100,6 +113,7 @@ class GroundedQAService:
             "citations": citations,
             "provider": llm_result.get("provider", "unknown"),
             "model": llm_result.get("model", "unknown"),
+            "complexity": complexity,
             "latency_retrieval_ms": round(latency_retrieval_ms, 1),
             "latency_rerank_ms": round(latency_rerank_ms, 1),
             "latency_total_ms": round(latency_total_ms, 1),
