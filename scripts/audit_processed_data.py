@@ -110,14 +110,26 @@ def audit_corpus():
                 doc_short_nodes += 1
 
             if n.level == HierarchyLevel.TABLE and n.content:
-                # Inspect table cells
+                # Inspect table cells & pipe column consistency
                 lines = [line.strip() for line in n.content.split("\n") if line.strip().startswith("|")]
+                col_counts = set()
                 for line in lines:
                     if re.match(r"^\|[\s\-:|]+\|$", line):
                         continue
                     cells = [c.strip() for c in line.strip("|").split("|")]
+                    col_counts.add(len(cells))
                     total_table_cells += len(cells)
                     total_empty_cells += sum(1 for c in cells if not c)
+
+                if len(col_counts) > 1:
+                    errors.append(f"{doc_id} table {n.id}: inconsistent pipe column count {col_counts}")
+
+                # Inspect metadata consistency
+                if n.metadata:
+                    if n.metadata.get("vlm_rectified") and n.metadata.get("vlm_rejected"):
+                        errors.append(f"{doc_id} table {n.id}: metadata conflict! Both vlm_rectified and vlm_rejected are True")
+                    if n.metadata.get("vlm_rectified") and n.metadata.get("vlm_error"):
+                        errors.append(f"{doc_id} table {n.id}: metadata debt! Has vlm_error while vlm_rectified is True")
 
                 # Inspect safeguard on rectified table
                 if n.metadata and n.metadata.get("vlm_rectified"):
@@ -179,8 +191,8 @@ def audit_corpus():
         errors.append("Critical Error: 0 Chapter nodes found across corpus!")
     if orphan_rate > 25.0:
         errors.append(f"Structural Debt Warning: Orphan rate {orphan_rate:.1f}% exceeds 25% limit")
-    if empty_cell_rate > 55.0:
-        errors.append(f"Table Debt Warning: Empty cell rate {empty_cell_rate:.1f}% exceeds 55% limit")
+    if empty_cell_rate > 50.0:
+        errors.append(f"Table Debt Warning: Empty cell rate {empty_cell_rate:.1f}% exceeds 50% limit")
     if rectified_tables_safeguard_failures > 0:
         errors.append(f"Safeguard Critical Failure: {rectified_tables_safeguard_failures} rectified tables failed 100% number lock")
 
