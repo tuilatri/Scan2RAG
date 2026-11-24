@@ -27,7 +27,7 @@ from app.retrieval.reranker import LegalReranker
 
 def load_all_corpus_chunks():
     data_dir = Path("data/processed")
-    chunker = SemanticLegalChunker(max_tokens=600, overlap_tokens=50)
+    chunker = SemanticLegalChunker()
     all_chunks = []
     for f in sorted(data_dir.glob("*.json")):
         with open(f, "r", encoding="utf-8") as fp:

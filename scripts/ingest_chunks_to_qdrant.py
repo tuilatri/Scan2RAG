@@ -22,6 +22,13 @@ def ingest_corpus_to_qdrant(batch_size: int = 100):
     chunker = SemanticLegalChunker()
     embedder = LegalEmbedder()
     store = LegalVectorStore()
+
+    # Recreate collection to ensure clean state without duplicates
+    client = store.client
+    collections = client.get_collections().collections
+    if any(c.name == store.collection_name for c in collections):
+        print(f"Recreating clean collection '{store.collection_name}'...")
+        client.delete_collection(collection_name=store.collection_name)
     store.ensure_collection()
 
     processed_files = sorted(glob.glob("data/processed/*.json"))
