@@ -8,7 +8,6 @@ Defines invariant assertions that MUST pass:
 """
 
 from unittest.mock import MagicMock
-import pytest
 
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.hybrid_searcher import LegalHybridSearcher

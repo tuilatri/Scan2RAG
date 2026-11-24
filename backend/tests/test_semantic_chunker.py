@@ -9,10 +9,11 @@ Defines invariant assertions that MUST pass:
 
 import json
 from pathlib import Path
+
 import pytest
 
-from app.models.chunk_schema import LegalChunk
 from app.chunking.semantic_chunker import SemanticLegalChunker
+from app.models.chunk_schema import LegalChunk
 
 
 @pytest.fixture
