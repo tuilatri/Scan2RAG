@@ -86,7 +86,7 @@ class OcrVisionAuditor:
         return {
             "persona": "ocr_vision_specialist",
             "score": max(round(score, 1), 0.0),
-            "passed": malformed_tables == 0 and invalid_score_cells <= 1,
+            "passed": malformed_tables == 0 and invalid_score_cells == 0,
             "total_tables": total_tables,
             "vlm_rectified_tables": vlm_rectified_tables,
             "hitl_rectified_tables": hitl_tables,

@@ -1,16 +1,17 @@
 {
   "milestone": "Milestone 3",
-  "timestamp": "2026-11-24T18:19:01.466969+00:00",
+  "timestamp": "2026-11-24T18:31:29.020815+00:00",
   "summary": {
-    "overall_quality_score": 99.3,
+    "overall_quality_score": 100.0,
     "overall_passed": true,
-    "avg_ttft_ms": 0.0,
+    "avg_ttft_status_ms": 0.0,
+    "avg_citations_latency_ms": 6132.4,
     "ttft_under_1s": true,
     "frontend_verified": true,
     "hitl_interface_ready": true
   },
   "multi_persona_eval": {
-    "overall_quality_score": 99.3,
+    "overall_quality_score": 100.0,
     "overall_passed": true,
     "personas": {
       "data_pipeline": {
@@ -48,13 +49,13 @@
       },
       "ocr_vision": {
         "persona": "ocr_vision_specialist",
-        "score": 98.0,
+        "score": 100.0,
         "passed": true,
         "total_tables": 111,
         "vlm_rectified_tables": 111,
-        "hitl_rectified_tables": 1,
+        "hitl_rectified_tables": 2,
         "malformed_tables": 0,
-        "invalid_score_cells": 1,
+        "invalid_score_cells": 0,
         "total_cells": 13548,
         "empty_cell_ratio_pct": 51.04
       },
@@ -96,17 +97,20 @@
   "latency_profiles": [
     {
       "query": "Cận thị từ -3D đến dưới -4D khám nghĩa vụ quân sự mấy điểm?",
-      "ttft_ms": 0.0,
+      "ttft_status_ms": 0.0,
+      "citations_latency_ms": 13540.5,
       "citations_found": 5
     },
     {
       "query": "Loạn thị có được tạm hoãn nghĩa vụ quân sự không?",
-      "ttft_ms": 0.0,
+      "ttft_status_ms": 0.0,
+      "citations_latency_ms": 1571.9,
       "citations_found": 5
     },
     {
       "query": "Tiêu chuẩn chỉ số khối cơ thể BMI trong tuyển chọn nghĩa vụ quân sự?",
-      "ttft_ms": 0.0,
+      "ttft_status_ms": 0.1,
+      "citations_latency_ms": 3284.8,
       "citations_found": 5
     }
   ]

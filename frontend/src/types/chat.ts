@@ -13,7 +13,8 @@ export interface CitationItem {
 export type Citation = CitationItem;
 
 export interface StreamEvent {
-  event: 'citations' | 'token' | 'done'
+  event: 'status' | 'citations' | 'token' | 'done'
+  status?: string
   citations?: CitationItem[]
   token?: string
   provider?: string

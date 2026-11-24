@@ -24,6 +24,7 @@ export function useChatStream({
 }: UseChatStreamOptions = {}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
+  const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [currentCitations, setCurrentCitations] = useState<Citation[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -150,7 +151,10 @@ export function useChatStream({
             try {
               const event: StreamEvent = JSON.parse(jsonStr);
 
-              if (event.event === 'citations') {
+              if (event.event === 'status') {
+                setStreamStatus(event.status || 'retrieving');
+              } else if (event.event === 'citations') {
+                setStreamStatus('generating');
                 citationsReceived = event.citations || [];
                 setCurrentCitations(citationsReceived);
                 setMessages((prev) =>
@@ -236,6 +240,7 @@ export function useChatStream({
   return {
     messages,
     isStreaming,
+    streamStatus,
     currentCitations,
     error,
     sendMessage,
