@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.document_endpoints import router as doc_router
+from app.api.ocr_endpoints import router as ocr_router
 from app.api.qa_endpoints import router as qa_router
 
 app = FastAPI(
@@ -23,6 +24,7 @@ app.add_middleware(
 
 app.include_router(qa_router)
 app.include_router(doc_router)
+app.include_router(ocr_router)
 
 
 @app.get("/")

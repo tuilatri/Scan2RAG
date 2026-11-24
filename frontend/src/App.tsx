@@ -3,6 +3,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { SplitPane } from '@/components/layout/split-pane';
 import { ChatContainer } from '@/components/chat/chat-container';
 import { PdfViewerPanel } from '@/components/pdf/pdf-viewer-panel';
+import { OcrReviewContainer } from '@/components/ocr/ocr-review-container';
 import { useChatStream } from '@/hooks/use-chat-stream';
 import { usePdfViewer } from '@/hooks/use-pdf-viewer';
 import { Citation } from '@/types/chat';
@@ -80,16 +81,7 @@ export const App: React.FC = () => {
             }
           />
         ) : (
-          <div className="flex h-[calc(100vh-3.5rem)] items-center justify-center text-center p-6 text-muted-foreground">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                Mô-đun Đối soát OCR (Human-in-the-Loop)
-              </p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                Đang sẵn sàng cho Phase 3: So sánh ảnh gốc cắt từ PyMuPDF và bảng dữ liệu Markdown trích xuất.
-              </p>
-            </div>
-          </div>
+          <OcrReviewContainer />
         )}
       </main>
     </div>
