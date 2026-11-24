@@ -118,3 +118,80 @@ class GroundedQAService:
             "latency_rerank_ms": round(latency_rerank_ms, 1),
             "latency_total_ms": round(latency_total_ms, 1),
         }
+
+    def stream_answer_query(
+        self,
+        query: str,
+        top_k_retrieval: int = 15,
+        top_k_rerank: int = 5,
+        filter_superseded: bool = True,
+    ) -> Any:
+        """Stream answer via SSE events: 'citations', 'token', 'done'."""
+        import json
+
+        t_start = time.time()
+
+        # 1. Hybrid Search
+        candidates = self.hybrid_searcher.search(
+            query=query,
+            top_k=top_k_retrieval,
+            filter_superseded=filter_superseded,
+        )
+        latency_retrieval_ms = (time.time() - t_start) * 1000
+
+        # 2. Cross-Encoder Rerank
+        t_rerank_start = time.time()
+        top_chunks = self.reranker.rerank(
+            query=query,
+            candidates=candidates,
+            top_k=top_k_rerank,
+        )
+        latency_rerank_ms = (time.time() - t_rerank_start) * 1000
+
+        # 3. Format Citations
+        citations = []
+        for c in top_chunks:
+            p_num = c.get("page_number", 0)
+            if not p_num:
+                p_nums = c.get("page_numbers", [])
+                p_num = p_nums[0] if p_nums else 0
+
+            citations.append({
+                "id": c.get("id"),
+                "document_id": c.get("document_id"),
+                "document_name": c.get("document_name"),
+                "breadcrumb": c.get("breadcrumb"),
+                "page_number": p_num,
+                "is_table": c.get("is_table", False),
+                "rerank_score": c.get("rerank_score", 0.0),
+                "snippet": c.get("content", "")[:250],
+            })
+
+        # Yield citations event immediately (TTFB < 1.0s)
+        yield f"data: {json.dumps({'event': 'citations', 'citations': citations, 'latency_retrieval_ms': round(latency_retrieval_ms, 1), 'latency_rerank_ms': round(latency_rerank_ms, 1)}, ensure_ascii=False)}\n\n"
+
+        # 4. Stream LLM Generation
+        complexity = self.model_router.classify_complexity(query, top_chunks)
+        user_prompt = GroundedPromptBuilder.build_qa_prompt(query, top_chunks)
+
+        last_meta = {}
+        for tok, meta in self.model_router.generate_stream(
+            prompt=user_prompt,
+            system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
+            complexity=complexity,
+            temperature=0.0,
+        ):
+            last_meta = meta
+            yield f"data: {json.dumps({'event': 'token', 'token': tok}, ensure_ascii=False)}\n\n"
+
+        latency_total_ms = (time.time() - t_start) * 1000
+
+        # Yield done event
+        done_payload = {
+            "event": "done",
+            "provider": last_meta.get("provider", "unknown"),
+            "model": last_meta.get("model", "unknown"),
+            "complexity": complexity,
+            "latency_total_ms": round(latency_total_ms, 1),
+        }
+        yield f"data: {json.dumps(done_payload, ensure_ascii=False)}\n\n"

@@ -124,4 +124,19 @@ def test_hard_constraint_fastapi_query_endpoint():
     assert len(data["citations"]) == 1
     assert data["citations"][0]["page_number"] == 3
 
+    # Test Query Stream Endpoint (SSE)
+    mock_qa.stream_answer_query.return_value = iter([
+        'data: {"event": "citations", "citations": [{"id": "c1", "page_number": 3}]}\n\n',
+        'data: {"event": "token", "token": "Tiêu chuẩn"}\n\n',
+        'data: {"event": "token", "token": " sức khỏe"}\n\n',
+        'data: {"event": "done", "latency_total_ms": 120.5}\n\n',
+    ])
+    resp_stream = client.post("/api/v1/query/stream", json={"query": "Tiêu chuẩn sức khỏe Điều 4"})
+    assert resp_stream.status_code == 200
+    assert "text/event-stream" in resp_stream.headers.get("content-type", "")
+    stream_text = resp_stream.text
+    assert '"event": "citations"' in stream_text
+    assert '"event": "token"' in stream_text
+    assert '"event": "done"' in stream_text
+
     app.dependency_overrides.clear()

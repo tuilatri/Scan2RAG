@@ -127,6 +127,78 @@ class ModelRouter:
         )
         return response.choices[0].message.content or ""
 
+    def _call_provider_stream(self, client: OpenAI, model: str, messages: list[dict[str, str]], temperature: float) -> Any:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=800,
+            stream=True,
+        )
+        for chunk in response:
+            if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content
+
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str,
+        complexity: str = "simple",
+        temperature: float = 0.0,
+    ) -> Any:
+        """Stream response yielding (token: str, meta: dict) tuples."""
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ]
+
+        # 1. Local attempt for simple queries
+        if complexity == "simple" and self.is_local_available():
+            try:
+                meta = {"provider": "lm_studio_local", "model": self.local_model, "complexity": "simple"}
+                for tok in self._call_provider_stream(self.local_client, self.local_model, messages, temperature):
+                    yield tok, meta
+                return
+            except Exception:
+                pass  # Fall through to cloud
+
+        # 2. Cloud Fallback Chain
+        cloud_order = [self.default_cloud_provider]
+        for p in ["groq", "gemini", "openrouter"]:
+            if p not in cloud_order:
+                cloud_order.append(p)
+
+        for provider in cloud_order:
+            client = self.cloud_clients.get(provider)
+            cfg = self.cloud_configs.get(provider)
+            if client and cfg and cfg["model"]:
+                try:
+                    meta = {"provider": f"{provider}_cloud", "model": cfg["model"], "complexity": complexity}
+                    for tok in self._call_provider_stream(client, cfg["model"], messages, temperature):
+                        yield tok, meta
+                    return
+                except Exception:
+                    continue  # Try next cloud provider
+
+        # 3. If cloud fails but local LM Studio is available
+        if self.is_local_available():
+            try:
+                meta = {"provider": "lm_studio_local", "model": self.local_model, "complexity": complexity}
+                for tok in self._call_provider_stream(self.local_client, self.local_model, messages, temperature):
+                    yield tok, meta
+                return
+            except Exception:
+                pass
+
+        # 4. Deterministic Offline Fallback if all else fails
+        offline_meta = {"provider": "deterministic_offline", "model": "rule-based-fallback", "complexity": complexity}
+        fallback_msg = (
+            "Hệ thống tạm thời không thể kết nối tới các mô hình ngôn ngữ (Cloud Providers hoặc Local LM Studio) "
+            "để phân tích câu trả lời chi tiết. Vui lòng tham khảo các đoạn trích dẫn pháp lý chính thức bên dưới."
+        )
+        for word in fallback_msg.split():
+            yield word + " ", offline_meta
+
     def generate(
         self,
         prompt: str,

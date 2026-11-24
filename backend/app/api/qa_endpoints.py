@@ -8,6 +8,7 @@ Endpoints:
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.retrieval.bm25_searcher import LegalBM25Searcher
@@ -100,6 +101,32 @@ def query_legal_rag(
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"QA Pipeline Error: {str(e)}") from e
+
+
+@router.post("/query/stream")
+def query_legal_rag_stream(
+    payload: QueryRequest,
+    qa_service: GroundedQAService = Depends(get_qa_service),  # noqa: B008
+) -> StreamingResponse:
+    """Stream answer via Server-Sent Events (SSE) for minimal perceived latency."""
+    try:
+        generator = qa_service.stream_answer_query(
+            query=payload.query,
+            top_k_retrieval=payload.top_k_retrieval,
+            top_k_rerank=payload.top_k_rerank,
+            filter_superseded=payload.filter_superseded,
+        )
+        return StreamingResponse(
+            generator,
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"QA Streaming Pipeline Error: {str(e)}") from e
 
 
 @router.get("/health")

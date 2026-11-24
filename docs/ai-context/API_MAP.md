@@ -9,6 +9,7 @@
 | `GET` | `/` | None | None | Root landing info with docs and health URLs |
 | `GET` | `/api/v1/health` | None | None | Service health check, status, active Milestone 2 features |
 | `POST` | `/api/v1/query` | None | None | Legal Question Answering with hybrid retrieval, reranking, and citation metadata |
+| `POST` | `/api/v1/query/stream` | None | None | Real-time SSE streaming endpoint emitting citations, tokens, and done events |
 
 ## Request / Response Schemas
 
@@ -47,6 +48,15 @@
     "latency_total_ms": 840.1
   }
   ```
+
+### `POST /api/v1/query/stream`
+- **Request Body:** Same as `QueryRequest`.
+- **Response Type:** `text/event-stream` (Server-Sent Events)
+- **Event Flow:**
+  1. `{"event": "citations", "citations": [...], "latency_retrieval_ms": 50.2, "latency_rerank_ms": 820.1}` (emitted at ~0.9s)
+  2. `{"event": "token", "token": "Căn "}` (emitted token-by-token)
+  3. `{"event": "token", "token": "cứ "}`
+  4. `{"event": "done", "provider": "lm_studio_local", "model": "qwen2.5-1.5b", "latency_total_ms": 11500.0}`
 
 ### `GET /api/v1/health`
 - **Response Body:**
