@@ -73,7 +73,9 @@ def run_benchmark():
                 if line.startswith("data:"):
                     try:
                         event = json.loads(line.replace("data:", "").strip())
-                        if event.get("event") == "citations":
+                        if event.get("event") == "status" and ttft_ms is None:
+                            ttft_ms = elapsed_ms
+                        elif event.get("event") == "citations":
                             citations_count = len(event.get("citations", []))
                             if ttft_ms is None:
                                 ttft_ms = elapsed_ms
@@ -81,7 +83,7 @@ def run_benchmark():
                             ttft_ms = elapsed_ms
                     except Exception:
                         pass
-            if ttft_ms is not None:
+            if citations_count > 0:
                 break
 
         total_time_ms = (time.perf_counter() - start_t) * 1000

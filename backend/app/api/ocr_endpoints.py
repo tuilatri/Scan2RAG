@@ -159,6 +159,23 @@ def rectify_ocr_table(node_id: str, payload: RectifyRequest) -> dict[str, Any]:
             detail="Invalid Markdown Table format: Must contain at least a header row with 2+ columns.",
         )
 
+    # Validate medical score columns (1-6)
+    score_col_indices = [
+        i for i, h in enumerate(headers)
+        if any(term in h.lower() for term in ["điểm", "phân loại", "chỉ số điểm"])
+    ]
+    for row_idx, row in enumerate(rows):
+        for col_idx in score_col_indices:
+            if col_idx < len(row):
+                cell = row[col_idx].strip()
+                if cell.isdigit():
+                    val = int(cell)
+                    if val < 1 or val > 6:
+                        raise HTTPException(
+                            status_code=422,
+                            detail=f"Invalid medical score '{cell}' at row {row_idx + 1}, column '{headers[col_idx]}': must be between 1 and 6.",
+                        )
+
     target_file = None
     target_data = None
     target_node = None

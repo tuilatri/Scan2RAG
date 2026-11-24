@@ -50,6 +50,15 @@ def test_rectify_ocr_table_invalid_format():
     assert response.status_code == 422
 
 
+def test_rectify_ocr_table_invalid_medical_score():
+    """Test 422 error when submitting an out-of-range medical score (outside 1-6)."""
+    node_id = "thông_tư_88_table_p29"
+    invalid_md = "| TT | Bệnh tật | Điểm |\n| --- | --- | --- |\n| 1 | Cận thị | 9 |"
+    response = client.post(f"/api/v1/ocr/tables/{node_id}/rectify", json={"content": invalid_md})
+    assert response.status_code == 422
+    assert "between 1 and 6" in response.json()["detail"]
+
+
 def test_rectify_ocr_table_success():
     """Test submitting rectification for a table."""
     node_id = "thông_tư_88_table_p29"

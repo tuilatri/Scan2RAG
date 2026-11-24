@@ -6,10 +6,12 @@ import { PdfViewerPanel } from '@/components/pdf/pdf-viewer-panel';
 import { OcrReviewContainer } from '@/components/ocr/ocr-review-container';
 import { useChatStream } from '@/hooks/use-chat-stream';
 import { usePdfViewer } from '@/hooks/use-pdf-viewer';
+import { useBackendHealth } from '@/hooks/use-backend-health';
 import { Citation } from '@/types/chat';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'ocr'>('chat');
+  const { status: backendStatus } = useBackendHealth();
 
   // Streaming Hook
   const {
@@ -46,7 +48,7 @@ export const App: React.FC = () => {
       <Navbar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        backendStatus="connected"
+        backendStatus={backendStatus}
       />
 
       {/* Main Dual-Pane Area */}
