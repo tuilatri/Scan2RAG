@@ -76,6 +76,16 @@
       "optional": false
     },
     {
+      "id": "vector-audit",
+      "cmd": "python",
+      "args": ["scripts/audit_vector_store.py"],
+      "cwd": ".",
+      "tags": ["audit", "vector"],
+      "requires": ["data/qdrant_db"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-tests",
       "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],
