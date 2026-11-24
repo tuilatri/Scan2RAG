@@ -10,6 +10,8 @@ Defines invariant assertions that MUST pass:
 import numpy as np
 import pytest
 
+pytest.importorskip("sentence_transformers", reason="sentence_transformers required for embedding tests")
+
 from app.embeddings.embedder import LegalEmbedder
 
 

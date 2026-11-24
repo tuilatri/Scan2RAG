@@ -17,8 +17,13 @@ from app.chunking.semantic_chunker import SemanticLegalChunker
 
 @pytest.fixture
 def sample_tt105_data():
-    json_path = Path("data/processed/thông_tư_105.json")
-    assert json_path.exists(), "Source corpus thông_tư_105.json must exist"
+    # Support both root cwd and backend cwd runs
+    candidate_paths = [
+        Path("data/processed/thông_tư_105.json"),
+        Path("../data/processed/thông_tư_105.json"),
+    ]
+    json_path = next((p for p in candidate_paths if p.exists()), None)
+    assert json_path is not None and json_path.exists(), "Source corpus thông_tư_105.json must exist"
     with open(json_path, encoding="utf-8") as f:
         return json.load(f)
 

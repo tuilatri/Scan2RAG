@@ -77,7 +77,7 @@
     },
     {
       "id": "vector-audit",
-      "cmd": "python",
+      "cmd": "backend/.venv/Scripts/python.exe",
       "args": ["scripts/audit_vector_store.py"],
       "cwd": ".",
       "tags": ["audit", "vector"],
