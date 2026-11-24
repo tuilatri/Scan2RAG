@@ -46,13 +46,23 @@ class LegalHybridSearcher:
         dense_results = []
         for p in raw_dense_points:
             payload = p.get("payload", {})
+            # Resolve chunk id: prioritize chunk_id/id from payload, fallback to point id
+            chunk_id = payload.get("chunk_id") or payload.get("id") or str(p.get("id"))
+            
+            # Resolve page number: prefer page_number, then first element of page_numbers list
+            page_num = payload.get("page_number")
+            if page_num is None:
+                page_nums = payload.get("page_numbers", [])
+                page_num = page_nums[0] if page_nums else 0
+
             dense_results.append({
-                "id": str(p.get("id")),
+                "id": str(chunk_id),
+                "point_id": p.get("id"),
                 "breadcrumb": payload.get("breadcrumb", ""),
                 "content": payload.get("content", ""),
                 "document_id": payload.get("document_id", ""),
                 "document_name": payload.get("document_name", ""),
-                "page_number": payload.get("page_number", 0),
+                "page_number": int(page_num),
                 "is_table": payload.get("is_table", False),
                 "is_superseded": payload.get("is_superseded", False),
                 "score": p.get("score"),
@@ -99,6 +109,12 @@ class LegalHybridSearcher:
             if document_id and chunk.get("document_id") != document_id:
                 continue
 
+            # Extract page_number if missing or 0
+            page_num = chunk.get("page_number")
+            if not page_num:
+                page_nums = chunk.get("page_numbers", [])
+                page_num = page_nums[0] if page_nums else 0
+
             if cid not in fused_map:
                 fused_map[cid] = {
                     "id": cid,
@@ -106,7 +122,7 @@ class LegalHybridSearcher:
                     "content": chunk.get("content", ""),
                     "document_id": chunk.get("document_id", ""),
                     "document_name": chunk.get("document_name", ""),
-                    "page_number": chunk.get("page_number", 0),
+                    "page_number": int(page_num),
                     "is_table": chunk.get("is_table", False),
                     "is_superseded": chunk.get("is_superseded", False),
                     "dense_rank": None,

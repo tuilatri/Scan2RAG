@@ -5,7 +5,7 @@ Hard Gates:
 2. Vector dimension lock: Stored vector size must be strictly 384.
 3. Ingestion count match: Stored points count must match or exceed total chunks (>= 6000 points).
 4. Top-1 Gold Retrieval Query: Query 'tiêu chuẩn cận thị nghĩa vụ quân sự' must retrieve
-   Thông tư 105 section / table with high confidence (score >= 0.70).
+   Thông tư 105 / Thông tư 88 table with high confidence (score >= 0.70).
 """
 
 import sys
@@ -47,8 +47,8 @@ def audit_vector_store():
     if vec_size != 384:
         errors.append(f"Dimension Mismatch: Expected 384, found {vec_size}")
 
-    if points_count < 100:
-        errors.append(f"Low Points Warning: Collection only has {points_count} points. Full ingestion incomplete.")
+    if points_count < 6000:
+        errors.append(f"Low Points Warning: Collection only has {points_count} points. Full ingestion incomplete (expected >= 6000).")
 
     # Top-1 Retrieval Query Test
     print("\n--- Testing Top-1 Retrieval Quality ---")
@@ -66,13 +66,13 @@ def audit_vector_store():
         score = top1["score"]
         doc_name = top1["payload"].get("document_name", "")
         breadcrumb = top1["payload"].get("breadcrumb", "")
-        print(f"Top 1 Score : {score:.4f} [Threshold >= 0.65]")
+        print(f"Top 1 Score : {score:.4f} [Threshold >= 0.70]")
         print(f"Top 1 Source: {doc_name} -> {breadcrumb}")
 
-        if score < 0.65:
-            errors.append(f"Low Relevance Score: Top-1 score {score:.4f} is below 0.65")
-        if "105" not in breadcrumb and "cận thị" not in top1["payload"].get("content", "").lower():
-            errors.append("Relevance Error: Query for myopia didn't retrieve TT105 myopia standard")
+        if score < 0.70:
+            errors.append(f"Low Relevance Score: Top-1 score {score:.4f} is below 0.70")
+        if "105" not in breadcrumb and "88" not in breadcrumb and "cận thị" not in top1["payload"].get("content", "").lower():
+            errors.append("Relevance Error: Query for myopia didn't retrieve TT105/TT88 myopia standard")
 
     print("-------------------------------------------------------------------------")
     if errors:

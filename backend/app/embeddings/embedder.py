@@ -4,21 +4,24 @@ Specialized for multilingual-e5 models requiring 'passage: ' and 'query: ' prefi
 Produces L2-normalized 384-dimensional dense vectors.
 """
 
+import os
 from sentence_transformers import SentenceTransformer
 
 
 class LegalEmbedder:
     """Embedding generator enforcing prefix rules and L2 normalization."""
 
-    def __init__(self, model_name: str = "intfloat/multilingual-e5-small"):
+    def __init__(self, model_name: str = "intfloat/multilingual-e5-small", device: str | None = None):
         self.model_name = model_name
+        # Respect EMBEDDER_DEVICE env or default to CPU to protect GPU VRAM for LM Studio (KNOWN_TRAPS #1)
+        self.device = device or os.getenv("EMBEDDER_DEVICE", "cpu")
         self._model = None
 
     @property
     def model(self) -> SentenceTransformer:
         """Lazy loader for embedding model."""
         if self._model is None:
-            self._model = SentenceTransformer(self.model_name)
+            self._model = SentenceTransformer(self.model_name, device=self.device)
         return self._model
 
     def embed_text(self, text: str, is_query: bool = False) -> list[float]:

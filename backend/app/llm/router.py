@@ -194,7 +194,7 @@ class ModelRouter:
 
         # 4. Deterministic Offline Fallback if all else fails
         return {
-            "content": "Căn cứ vào tài liệu pháp lý và bảng quy định y tế được cung cấp, hệ thống đã trích xuất các nguồn dẫn chứng bên dưới.",
+            "content": "Hệ thống tạm thời không thể kết nối tới các mô hình ngôn ngữ (Cloud Providers hoặc Local LM Studio) để phân tích câu trả lời chi tiết. Vui lòng tham khảo các đoạn trích dẫn pháp lý chính thức bên dưới.",
             "provider": "deterministic_offline",
             "model": "rule-based-fallback",
             "complexity": complexity,

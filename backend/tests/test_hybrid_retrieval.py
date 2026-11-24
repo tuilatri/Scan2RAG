@@ -47,23 +47,41 @@ def test_hard_constraint_bm25_search_ranking():
 
 
 def test_hard_constraint_rrf_rank_fusion_logic():
-    """Bất biến 3: Thuật toán RRF phải ưu tiên tài liệu xuất hiện ở cả Dense và Sparse."""
-    # Mock VectorStore
+    """Bất biến 3: Thuật toán RRF phải ưu tiên tài liệu xuất hiện ở cả Dense và Sparse và resolve chunk_id đúng từ payload."""
+    # Mock VectorStore returning integer Point IDs (as Qdrant does) and chunk_id in payload
     mock_vector_store = MagicMock()
     mock_vector_store.search.return_value = [
-        {"id": "chunk_dense_only", "score": 0.85, "payload": {"breadcrumb": "B", "content": "C"}},
-        {"id": "chunk_both", "score": 0.80, "payload": {"breadcrumb": "B", "content": "C"}},
+        {
+            "id": 101,  # Qdrant integer point ID
+            "score": 0.85,
+            "payload": {
+                "chunk_id": "doc_tt105_chunk_001",
+                "page_numbers": [15],
+                "breadcrumb": "B",
+                "content": "C",
+            },
+        },
+        {
+            "id": 102,  # Qdrant integer point ID
+            "score": 0.80,
+            "payload": {
+                "chunk_id": "doc_tt105_chunk_002",
+                "page_numbers": [20],
+                "breadcrumb": "B",
+                "content": "C",
+            },
+        },
     ]
 
     # Mock Embedder
     mock_embedder = MagicMock()
     mock_embedder.embed_text.return_value = [0.1] * 384
 
-    # Mock BM25Searcher
+    # Mock BM25Searcher returning chunk_id matching payload["chunk_id"]
     mock_bm25 = MagicMock()
     mock_bm25.search.return_value = [
-        ({"id": "chunk_both", "breadcrumb": "B", "content": "C"}, 12.5),
-        ({"id": "chunk_sparse_only", "breadcrumb": "B", "content": "C"}, 10.0),
+        ({"id": "doc_tt105_chunk_002", "page_numbers": [20], "breadcrumb": "B", "content": "C"}, 12.5),
+        ({"id": "doc_sparse_only_003", "page_numbers": [25], "breadcrumb": "B", "content": "C"}, 10.0),
     ]
 
     hybrid = LegalHybridSearcher(
@@ -75,13 +93,15 @@ def test_hard_constraint_rrf_rank_fusion_logic():
     results = hybrid.search(query="test query", top_k=3)
 
     assert len(results) == 3, "Must return 3 unified candidates"
-    # 'chunk_both' appears at rank 2 in dense and rank 1 in sparse:
+    # 'doc_tt105_chunk_002' appears at rank 2 in dense and rank 1 in sparse:
     # rrf_score = (1 / (60 + 2)) + (1 / (60 + 1)) = 0.01613 + 0.01639 = 0.03252
-    # 'chunk_dense_only' has rrf_score = 1 / (60 + 1) = 0.01639
-    assert results[0]["id"] == "chunk_both", f"Expected chunk_both at Top 1 due to RRF, got {results[0]['id']}"
+    # 'doc_tt105_chunk_001' has rrf_score = 1 / (60 + 1) = 0.01639
+    assert results[0]["id"] == "doc_tt105_chunk_002", f"Expected doc_tt105_chunk_002 at Top 1 due to Dual-Match RRF Boost, got {results[0]['id']}"
+    assert results[0]["page_number"] == 20, f"Expected page_number 20 from page_numbers, got {results[0]['page_number']}"
     assert results[0]["dense_rank"] == 2
     assert results[0]["sparse_rank"] == 1
     assert results[0]["rrf_score"] > results[1]["rrf_score"]
+    assert results[1]["page_number"] in [15, 25]
 
 
 def test_hard_constraint_reranker_sorting():

@@ -4,6 +4,7 @@ Reranks candidate chunks retrieved from Hybrid Search to identify top-k most rel
 Optimized for low VRAM / CPU execution to adhere to the 4GB VRAM constraint.
 """
 
+import os
 from typing import Any
 
 import torch
@@ -19,8 +20,8 @@ class LegalReranker:
         device: str | None = None,
     ):
         if device is None:
-            # Prefer CPU or GPU if sufficient VRAM; MiniLM-L6 is tiny (~80MB) and very fast on CPU
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+            # Respect RERANKER_DEVICE env or default to CPU to protect 4GB GPU VRAM for LM Studio (KNOWN_TRAPS #1)
+            device = os.getenv("RERANKER_DEVICE", "cpu")
         self.device = device
         self.model_name = model_name
         self.model = CrossEncoder(model_name, device=self.device)
