@@ -1,6 +1,7 @@
 import json
 import sys
 from pathlib import Path
+
 from transformers import AutoTokenizer
 
 backend_dir = Path(__file__).resolve().parent.parent / "backend"

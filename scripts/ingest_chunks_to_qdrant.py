@@ -2,9 +2,9 @@
 
 import glob
 import json
+import sys
 import time
 from pathlib import Path
-import sys
 
 backend_dir = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_dir))
@@ -68,6 +68,8 @@ def ingest_corpus_to_qdrant(batch_size: int = 100):
                     "page_numbers": c.page_numbers,
                     "article_id": c.article_id or "",
                     "is_superseded": c.is_superseded,
+                    "superseded_by": c.superseded_by,
+                    "effective_date": c.effective_date,
                 }
                 points.append(PointStruct(id=point_id_counter, vector=v, payload=payload))
                 point_id_counter += 1

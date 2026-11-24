@@ -24,9 +24,8 @@ from pathlib import Path
 backend_dir = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_dir))
 
-import pymupdf  # noqa: E402
-
-from app.models.document_schema import HierarchyLevel, ParsedDocument  # noqa: E402
+import pymupdf
+from app.models.document_schema import HierarchyLevel, ParsedDocument
 
 
 def extract_numbers(text: str) -> list[str]:

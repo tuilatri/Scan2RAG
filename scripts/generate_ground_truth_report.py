@@ -1,5 +1,5 @@
-import json
 import glob
+import json
 import os
 
 os.makedirs('data/benchmarks/ocr_comparison', exist_ok=True)

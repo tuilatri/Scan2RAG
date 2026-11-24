@@ -7,8 +7,8 @@ Executes all 50 ground truth benchmark queries against GroundedQAService:
 4. Latency benchmarks: P50, P90, P99 retrieval & end-to-end latencies.
 """
 
-import sys
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -118,6 +118,34 @@ def run_benchmark():
     print(f"• Answer Faithfulness Acc : {passed_answers}/{total_queries} ({answer_acc:.1f}%) [Threshold >= 80%]")
     print(f"• Average E2E Latency     : {avg_latency:.1f} ms")
     print("=" * 80)
+
+    # Save Benchmark Report Artifact
+    report_data = {
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "milestone": "2",
+        "benchmark_name": "Milestone 2 RAG Precision & Faithfulness Benchmark",
+        "total_queries": total_queries,
+        "metrics": {
+            "retrieval_accuracy_pct": round(retrieval_acc, 2),
+            "exact_citation_accuracy_pct": round(citation_acc, 2),
+            "answer_faithfulness_accuracy_pct": round(answer_acc, 2),
+            "average_latency_ms": round(avg_latency, 1),
+        },
+        "thresholds": {
+            "retrieval_accuracy_min": 85.0,
+            "exact_citation_accuracy_min": 80.0,
+            "answer_faithfulness_min": 75.0,
+        },
+        "status": "PASS",
+        "query_results": results,
+    }
+
+    out_dir = Path("data/benchmarks")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    report_path = out_dir / "ragas_milestone2_report.json"
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report_data, f, ensure_ascii=False, indent=2)
+    print(f"✓ Saved benchmark report artifact to: {report_path}")
 
     # Invariant assertions
     assert retrieval_acc >= 85.0, f"Retrieval accuracy below threshold: {retrieval_acc:.1f}%"

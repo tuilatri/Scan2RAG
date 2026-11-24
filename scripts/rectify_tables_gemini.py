@@ -13,10 +13,11 @@ import os
 import re
 import sys
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from collections import Counter
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 backend_dir = Path(__file__).resolve().parent.parent / "backend"
@@ -120,9 +121,9 @@ def rectify_document_gemini(
     max_tables: int | None = None,
 ) -> dict:
     doc_name = pdf_path.stem.replace("_", " ")
-    print(f"\n========================================================")
+    print("\n========================================================")
     print(f"Rectifying Tables with Gemini ({model_name}): {pdf_path.name}")
-    print(f"========================================================")
+    print("========================================================")
 
     stats = {
         "doc_name": doc_name,

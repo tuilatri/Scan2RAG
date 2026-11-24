@@ -9,8 +9,8 @@ Validates:
 3. Reranker refinement: Top-5 reranked chunks exhibit monotonically decreasing rerank scores.
 """
 
-import sys
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -19,9 +19,9 @@ backend_path = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
 from app.chunking.semantic_chunker import SemanticLegalChunker
-from app.retrieval.qdrant_client import LegalVectorStore
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.hybrid_searcher import LegalHybridSearcher
+from app.retrieval.qdrant_client import LegalVectorStore
 from app.retrieval.reranker import LegalReranker
 
 

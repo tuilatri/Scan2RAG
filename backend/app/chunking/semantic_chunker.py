@@ -12,6 +12,15 @@ from app.models.chunk_schema import LegalChunk
 class SemanticLegalChunker:
     """Structure-aware chunker designed for Vietnamese legal and military documents."""
 
+    # Official effective dates for legal corpus documents
+    OFFICIAL_EFFECTIVE_DATES = {
+        "thông_tư_105": "2024-01-01",
+        "thông_tư_106": "2025-01-01",
+        "thông_tư_88": "2024-12-24",
+        "thông_tư_68": "2024-07-21",
+        "hướng_dẫn_cục_quân_y": "2024-09-01",
+    }
+
     # Provisions in TT105 explicitly amended or superseded by TT106/2024/TT-BQP or VBHN 88
     TT105_SUPERSEDED_NODE_IDS = {
         "thông_tư_105_clause_61",   # Khoản 3 Điều 3 (được sửa đổi bởi Khoản 1 Điều 1 TT 106)
@@ -124,7 +133,7 @@ class SemanticLegalChunker:
                 or str(node.get("parent_id", "")) in self.TT105_SUPERSEDED_NODE_IDS
             )
             superseded_by = "thông_tư_106" if is_superseded else None
-            effective_date = "2024-01-01" if doc_id == "thông_tư_105" else ("2025-01-01" if doc_id == "thông_tư_106" else None)
+            effective_date = self.OFFICIAL_EFFECTIVE_DATES.get(doc_id)
 
             # Case 1: Table Node -> Preserved with Table Windowing to strictly fit embedding limits (<512 tokens)
             if is_table:

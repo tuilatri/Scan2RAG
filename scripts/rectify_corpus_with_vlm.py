@@ -26,9 +26,9 @@ def rectify_document_tables(
     max_tables: int | None = None,
 ) -> dict:
     doc_name = pdf_path.stem.replace("_", " ")
-    print(f"\n========================================================")
+    print("\n========================================================")
     print(f"Rectifying Tables with Qwen-VL: {doc_name} ({pdf_path.name})")
-    print(f"========================================================")
+    print("========================================================")
 
     stats = {
         "doc_name": doc_name,
