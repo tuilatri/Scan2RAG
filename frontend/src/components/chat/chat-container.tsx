@@ -10,6 +10,7 @@ import { ShieldCheck, Sparkles } from 'lucide-react';
 interface ChatContainerProps {
   messages: Message[];
   isStreaming: boolean;
+  streamStatus?: string | null;
   currentCitations: Citation[];
   error: string | null;
   activeCitationId?: string;
@@ -21,6 +22,7 @@ interface ChatContainerProps {
 export const ChatContainer: React.FC<ChatContainerProps> = ({
   messages,
   isStreaming,
+  streamStatus,
   currentCitations,
   error,
   activeCitationId,
@@ -75,6 +77,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             <StreamIndicator
               isStreaming={isStreaming}
               citationCount={currentCitations.length}
+              streamStatus={streamStatus}
             />
             {error && (
               <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">

@@ -18,8 +18,7 @@ export const CitationCard: React.FC<CitationCardProps> = ({
   onSelect,
 }) => {
   const isSuperseded =
-    citation.document_id === 'thông_tư_105' ||
-    citation.breadcrumb?.toLowerCase().includes('105/2023');
+    citation.is_superseded === true || citation.document_id === 'thông_tư_105';
 
   return (
     <div

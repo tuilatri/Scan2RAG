@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { parseMarkdownTable, matrixToMarkdown } from '@/lib/markdown-table-parser';
+import { useOcrAudit } from '@/hooks/use-ocr-audit';
 
 describe('Markdown Table Bi-directional Parser', () => {
   const sampleMarkdown = `| TT | Bệnh tật | Điểm |
@@ -32,5 +34,41 @@ describe('Markdown Table Bi-directional Parser', () => {
     const { headers, rows } = parseMarkdownTable('');
     expect(headers).toEqual([]);
     expect(rows).toEqual([]);
+  });
+});
+
+describe('useOcrAudit Undo/Redo & Header Edit', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('supports updateCell, updateHeader, undo, and redo', async () => {
+    const mockTables = [{ id: 't1', document_id: 'thông_tư_88', document_name: 'TT88', page_number: 1, title: 'T1', rows_count: 1, cols_count: 2, vlm_rectified: true, hitl_approved: false, hitl_rectified: false }];
+    const mockDetail = { id: 't1', document_id: 'thông_tư_88', document_name: 'TT88', page_number: 1, title: 'T1', content: '| H1 | H2 |\n| --- | --- |\n| A | 1 |', headers: ['H1', 'H2'], rows: [['A', '1']] };
+
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      if (url.endsWith('/tables/t1')) return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDetail) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockTables) });
+    }));
+
+    const { result } = renderHook(() => useOcrAudit());
+    await waitFor(() => expect(result.current.tableDetail?.id).toBe('t1'));
+
+    act(() => {
+      result.current.updateCell(0, 1, '4');
+    });
+    expect(result.current.editableRows[0][1]).toBe('4');
+    expect(result.current.canUndo).toBe(true);
+
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.editableRows[0][1]).toBe('1');
+    expect(result.current.canRedo).toBe(true);
+
+    act(() => {
+      result.current.redo();
+    });
+    expect(result.current.editableRows[0][1]).toBe('4');
   });
 });

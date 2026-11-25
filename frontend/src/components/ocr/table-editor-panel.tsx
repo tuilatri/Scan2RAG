@@ -8,6 +8,7 @@ interface TableEditorPanelProps {
   editableHeaders: string[];
   editableRows: string[][];
   onUpdateCell: (rowIndex: number, colIndex: number, value: string) => void;
+  onUpdateHeader?: (colIndex: number, value: string) => void;
 }
 
 export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
@@ -15,6 +16,7 @@ export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
   editableHeaders,
   editableRows,
   onUpdateCell,
+  onUpdateHeader,
 }) => {
   return (
     <div className="flex-1 flex flex-col h-full bg-background overflow-hidden">
@@ -50,7 +52,7 @@ export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
                       rowIndex={-1}
                       colIndex={colIdx}
                       isHeader={true}
-                      onUpdate={() => {}}
+                      onUpdate={(_, cIdx, val) => onUpdateHeader?.(cIdx, val)}
                     />
                   </th>
                 ))}

@@ -27,6 +27,11 @@ export const OcrReviewContainer: React.FC = () => {
     setFilterDocId,
     setSearchQuery,
     updateCell,
+    updateHeader,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     saveRectification,
     revertToRawBackup,
     revertToCurrentSaved,
@@ -54,10 +59,14 @@ export const OcrReviewContainer: React.FC = () => {
           viewMode={viewMode}
           isSaving={isSaving}
           hasRawBackup={!!tableDetail?.raw_content_backup}
+          canUndo={canUndo}
+          canRedo={canRedo}
           onViewModeChange={setViewMode}
           onSave={() => saveRectification(true)}
           onRevertRaw={revertToRawBackup}
           onRevertSaved={revertToCurrentSaved}
+          onUndo={undo}
+          onRedo={redo}
         />
 
         {/* Notifications */}
@@ -90,6 +99,7 @@ export const OcrReviewContainer: React.FC = () => {
                   editableHeaders={editableHeaders}
                   editableRows={editableRows}
                   onUpdateCell={updateCell}
+                  onUpdateHeader={updateHeader}
                 />
               )}
               {viewMode === 'diff' && (
