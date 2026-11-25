@@ -23,9 +23,17 @@ export const CitationCard: React.FC<CitationCardProps> = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(citation)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(citation);
+        }
+      }}
       className={cn(
-        'group cursor-pointer rounded-lg border p-2.5 text-left transition-all duration-150',
+        'group cursor-pointer rounded-lg border p-2.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         isSelected
           ? 'border-primary bg-primary/5 shadow-sm'
           : 'border-border/70 bg-card hover:border-primary/50 hover:bg-muted/40'
@@ -78,7 +86,9 @@ export const CitationCard: React.FC<CitationCardProps> = ({
 
       <div className="mt-2 flex items-center justify-between text-[10px] text-muted-foreground border-t pt-1.5">
         <span className="font-mono">
-          Độ tin cậy: {((citation.rerank_score || 0.8) * 100).toFixed(0)}%
+          {citation.rerank_score !== undefined
+            ? `Độ tin cậy: ${(citation.rerank_score * 100).toFixed(0)}%`
+            : 'Căn cứ trích xuất'}
         </span>
         <span className="flex items-center text-primary group-hover:translate-x-0.5 transition-transform">
           Xem văn bản gốc <ArrowRight className="h-2.5 w-2.5 ml-0.5" />

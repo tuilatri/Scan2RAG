@@ -92,8 +92,7 @@
       "cwd": "backend",
       "tags": ["slow", "backend"],
       "requires": ["backend/tests"],
-      "env": { "PYTHONUTF8": "1" },
-      "optional": true
+      "env": { "PYTHONUTF8": "1" }
     },
     {
       "id": "frontend-tests",
@@ -102,8 +101,7 @@
       "cwd": "frontend",
       "tags": ["frontend"],
       "requires": [],
-      "env": {},
-      "optional": true
+      "env": {}
     }
   ]
 }
