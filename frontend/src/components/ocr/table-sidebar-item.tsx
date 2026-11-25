@@ -21,7 +21,7 @@ export const TableSidebarItem: React.FC<TableSidebarItemProps> = ({
       className={cn(
         'group cursor-pointer rounded-lg border p-2 text-left transition-all duration-150',
         isSelected
-          ? 'border-primary bg-primary/5 shadow-xs'
+          ? 'border-primary bg-primary/5 shadow-sm'
           : 'border-border/60 bg-card hover:border-primary/40 hover:bg-muted/30'
       )}
     >

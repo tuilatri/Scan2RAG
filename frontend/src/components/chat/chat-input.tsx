@@ -77,7 +77,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       {/* Main Form Box */}
       <form
         onSubmit={handleSubmit}
-        className="relative rounded-xl border bg-background shadow-xs focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all"
+        className="relative rounded-xl border bg-background shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all"
       >
         <textarea
           ref={textareaRef}

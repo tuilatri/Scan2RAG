@@ -41,7 +41,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       <ScrollArea className="flex-1 p-4">
         {messages.length === 0 ? (
           <div className="flex h-[60vh] flex-col items-center justify-center text-center px-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 shadow-xs">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 shadow-sm">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <h2 className="text-lg font-semibold tracking-tight text-foreground">

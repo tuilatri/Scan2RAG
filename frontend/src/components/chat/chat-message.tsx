@@ -25,13 +25,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         'flex w-full space-x-3 py-4 px-4 rounded-xl transition-colors',
         isUser
           ? 'bg-muted/30 ml-auto max-w-[85%] border self-end'
-          : 'bg-card border shadow-xs max-w-full'
+          : 'bg-card border shadow-sm max-w-full'
       )}
     >
       {/* Avatar */}
       <div
         className={cn(
-          'flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg font-semibold text-xs shadow-xs',
+          'flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-lg font-semibold text-xs shadow-sm',
           isUser
             ? 'bg-primary text-primary-foreground'
             : 'bg-primary/10 text-primary border border-primary/20'
