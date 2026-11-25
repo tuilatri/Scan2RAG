@@ -10,6 +10,12 @@
 | `GET` | `/api/v1/health` | None | None | Service health check, status, active Milestone 2 features |
 | `POST` | `/api/v1/query` | None | None | Legal Question Answering with hybrid retrieval, reranking, and citation metadata |
 | `POST` | `/api/v1/query/stream` | None | None | Real-time SSE streaming endpoint emitting citations, tokens, and done events |
+| `GET` | `/api/v1/documents` | None | None | List canonical legal documents with validity metadata & file sizes |
+| `GET` | `/api/v1/documents/{doc_id}` | None | None | Get specific document details by ID |
+| `GET` | `/api/v1/documents/{doc_id}/pdf` | None | None | Stream raw PDF with HTTP 206 Partial Content (Range bytes) support |
+| `GET` | `/api/v1/ocr/tables` | None | None | List 111 extracted medical/legal tables with review and VLM status |
+| `GET` | `/api/v1/ocr/tables/{node_id}` | None | None | Get detailed table matrix, headers, rows, and raw OCR backup |
+| `POST` | `/api/v1/ocr/tables/{node_id}/rectify` | None | None | Submit human rectification with atomic write & column validation |
 
 ## Request / Response Schemas
 

@@ -131,6 +131,9 @@ class GroundedQAService:
 
         t_start = time.time()
 
+        # Emit immediate status event for <1.0s SSE TTFT
+        yield f"data: {json.dumps({'event': 'status', 'status': 'retrieving'}, ensure_ascii=False)}\n\n"
+
         # 1. Hybrid Search
         candidates = self.hybrid_searcher.search(
             query=query,

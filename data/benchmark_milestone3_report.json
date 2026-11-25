@@ -1,0 +1,118 @@
+{
+  "milestone": "Milestone 3",
+  "timestamp": "2026-11-24T18:46:48.387621+00:00",
+  "summary": {
+    "overall_quality_score": 100.0,
+    "overall_passed": true,
+    "avg_ttft_status_ms": 0.0,
+    "avg_citations_latency_ms": 5290.4,
+    "status_ttft_under_1s": true,
+    "citations_under_1s": false,
+    "frontend_verified": true,
+    "hitl_interface_ready": true
+  },
+  "multi_persona_eval": {
+    "overall_quality_score": 100.0,
+    "overall_passed": true,
+    "personas": {
+      "data_pipeline": {
+        "persona": "data_pipeline_engineer",
+        "score": 100.0,
+        "passed": true,
+        "total_nodes": 6786,
+        "orphan_nodes": 28,
+        "orphan_ratio_pct": 0.41,
+        "empty_content_nodes": 0,
+        "short_noise_nodes": 1,
+        "avg_tokens_per_node": 15.7,
+        "doc_summaries": {
+          "hướng_dẫn_cục_quân_y": {
+            "nodes": 221,
+            "orphan_ratio": 1.81
+          },
+          "thông_tư_105": {
+            "nodes": 2492,
+            "orphan_ratio": 0.0
+          },
+          "thông_tư_106": {
+            "nodes": 1255,
+            "orphan_ratio": 1.59
+          },
+          "thông_tư_68": {
+            "nodes": 230,
+            "orphan_ratio": 0.87
+          },
+          "thông_tư_88": {
+            "nodes": 2588,
+            "orphan_ratio": 0.08
+          }
+        }
+      },
+      "ocr_vision": {
+        "persona": "ocr_vision_specialist",
+        "score": 100.0,
+        "passed": true,
+        "total_tables": 111,
+        "vlm_rectified_tables": 111,
+        "hitl_rectified_tables": 2,
+        "malformed_tables": 0,
+        "invalid_score_cells": 0,
+        "total_cells": 13548,
+        "empty_cell_ratio_pct": 51.04
+      },
+      "legal_domain": {
+        "persona": "legal_domain_specialist",
+        "score": 100.0,
+        "passed": true,
+        "total_nodes": 6786,
+        "superseded_nodes": 0,
+        "qdrant_superseded_points": 81,
+        "non_nfc_nodes": 0,
+        "has_tt105_superseded": true,
+        "has_tt88_valid": true,
+        "doc_legal_stats": {
+          "hướng_dẫn_cục_quân_y": {
+            "nodes_count": 221,
+            "superseded_count": 0
+          },
+          "thông_tư_105": {
+            "nodes_count": 2492,
+            "superseded_count": 0
+          },
+          "thông_tư_106": {
+            "nodes_count": 1255,
+            "superseded_count": 0
+          },
+          "thông_tư_68": {
+            "nodes_count": 230,
+            "superseded_count": 0
+          },
+          "thông_tư_88": {
+            "nodes_count": 2588,
+            "superseded_count": 0
+          }
+        }
+      }
+    }
+  },
+  "latency_profiles": [
+    {
+      "query": "Cận thị từ -3D đến dưới -4D khám nghĩa vụ quân sự mấy điểm?",
+      "ttft_status_ms": 0.0,
+      "citations_latency_ms": 13129.1,
+      "citations_found": 5
+    },
+    {
+      "query": "Loạn thị có được tạm hoãn nghĩa vụ quân sự không?",
+      "ttft_status_ms": 0.1,
+      "citations_latency_ms": 1343.9,
+      "citations_found": 5
+    },
+    {
+      "query": "Tiêu chuẩn chỉ số khối cơ thể BMI trong tuyển chọn nghĩa vụ quân sự?",
+      "ttft_status_ms": 0.0,
+      "citations_latency_ms": 1398.2,
+      "citations_found": 5
+    }
+  ]
+}
