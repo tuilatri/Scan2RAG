@@ -17,6 +17,7 @@ export const App: React.FC = () => {
   const {
     messages,
     isStreaming,
+    streamStatus,
     currentCitations,
     error,
     sendMessage,
@@ -61,6 +62,7 @@ export const App: React.FC = () => {
               <ChatContainer
                 messages={messages}
                 isStreaming={isStreaming}
+                streamStatus={streamStatus}
                 currentCitations={currentCitations}
                 error={error}
                 activeCitationId={activeCitation?.id}

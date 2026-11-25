@@ -1,25 +1,33 @@
 import React from 'react';
-import { Save, RotateCcw, CheckCircle, Code2, Table as TableIcon, Eye } from 'lucide-react';
+import { RotateCcw, CheckCircle, Code2, Table as TableIcon, Eye, Undo2, Redo2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface TableToolbarProps {
   viewMode: 'grid' | 'diff' | 'raw';
   isSaving: boolean;
   hasRawBackup: boolean;
+  canUndo?: boolean;
+  canRedo?: boolean;
   onViewModeChange: (mode: 'grid' | 'diff' | 'raw') => void;
   onSave: () => void;
   onRevertRaw: () => void;
   onRevertSaved: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
 export const TableToolbar: React.FC<TableToolbarProps> = ({
   viewMode,
   isSaving,
   hasRawBackup,
+  canUndo = false,
+  canRedo = false,
   onViewModeChange,
   onSave,
   onRevertRaw,
   onRevertSaved,
+  onUndo,
+  onRedo,
 }) => {
   return (
     <div className="flex items-center justify-between border-b bg-card px-4 py-2 text-xs">
@@ -56,6 +64,30 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
 
       {/* Action Buttons */}
       <div className="flex items-center space-x-2">
+        {onUndo && (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!canUndo}
+            className="h-7 px-2 text-xs"
+            onClick={onUndo}
+            title="Hoàn tác (Undo)"
+          >
+            <Undo2 className="h-3.5 w-3.5" />
+          </Button>
+        )}
+        {onRedo && (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!canRedo}
+            className="h-7 px-2 text-xs"
+            onClick={onRedo}
+            title="Làm lại (Redo)"
+          >
+            <Redo2 className="h-3.5 w-3.5" />
+          </Button>
+        )}
         {hasRawBackup && (
           <Button
             variant="ghost"

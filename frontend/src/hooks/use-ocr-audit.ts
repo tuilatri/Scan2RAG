@@ -14,6 +14,8 @@ export function useOcrAudit({
   const [tableDetail, setTableDetail] = useState<TableDetail | null>(null);
   const [editableRows, setEditableRows] = useState<string[][]>([]);
   const [editableHeaders, setEditableHeaders] = useState<string[]>([]);
+  const [history, setHistory] = useState<{ headers: string[]; rows: string[][] }[]>([]);
+  const [historyIdx, setHistoryIdx] = useState<number>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +64,8 @@ export function useOcrAudit({
         setTableDetail(data);
         setEditableHeaders([...data.headers]);
         setEditableRows(data.rows.map((r) => [...r]));
+        setHistory([{ headers: [...data.headers], rows: data.rows.map((r) => [...r]) }]);
+        setHistoryIdx(0);
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') {
           return;
@@ -86,20 +90,67 @@ export function useOcrAudit({
     }
   }, [selectedTableId, fetchTableDetail]);
 
-  // Update a single cell
-  const updateCell = useCallback((rowIndex: number, colIndex: number, value: string) => {
-    setEditableRows((prev) => {
-      const updated = prev.map((row, rIdx) => {
-        if (rIdx === rowIndex) {
-          const newRow = [...row];
-          newRow[colIndex] = value;
-          return newRow;
-        }
-        return row;
+  const pushHistory = useCallback(
+    (nextHeaders: string[], nextRows: string[][]) => {
+      setHistory((prev) => {
+        const sliced = prev.slice(0, historyIdx + 1);
+        return [...sliced, { headers: [...nextHeaders], rows: nextRows.map((r) => [...r]) }];
       });
-      return updated;
-    });
-  }, []);
+      setHistoryIdx((prev) => prev + 1);
+    },
+    [historyIdx]
+  );
+
+  // Update a single cell
+  const updateCell = useCallback(
+    (rowIndex: number, colIndex: number, value: string) => {
+      setEditableRows((prev) => {
+        const updated = prev.map((row, rIdx) => {
+          if (rIdx === rowIndex) {
+            const newRow = [...row];
+            newRow[colIndex] = value;
+            return newRow;
+          }
+          return row;
+        });
+        pushHistory(editableHeaders, updated);
+        return updated;
+      });
+    },
+    [editableHeaders, pushHistory]
+  );
+
+  // Update a header cell
+  const updateHeader = useCallback(
+    (colIndex: number, value: string) => {
+      setEditableHeaders((prev) => {
+        const updated = [...prev];
+        updated[colIndex] = value;
+        pushHistory(updated, editableRows);
+        return updated;
+      });
+    },
+    [editableRows, pushHistory]
+  );
+
+  const canUndo = historyIdx > 0;
+  const canRedo = historyIdx >= 0 && historyIdx < history.length - 1;
+
+  const undo = useCallback(() => {
+    if (historyIdx <= 0) return;
+    const target = history[historyIdx - 1];
+    setEditableHeaders([...target.headers]);
+    setEditableRows(target.rows.map((r) => [...r]));
+    setHistoryIdx((prev) => prev - 1);
+  }, [history, historyIdx]);
+
+  const redo = useCallback(() => {
+    if (historyIdx >= history.length - 1) return;
+    const target = history[historyIdx + 1];
+    setEditableHeaders([...target.headers]);
+    setEditableRows(target.rows.map((r) => [...r]));
+    setHistoryIdx((prev) => prev + 1);
+  }, [history, historyIdx]);
 
   // Save changes
   const saveRectification = useCallback(
@@ -198,6 +249,11 @@ export function useOcrAudit({
     setFilterDocId,
     setSearchQuery,
     updateCell,
+    updateHeader,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     saveRectification,
     revertToRawBackup,
     revertToCurrentSaved,

@@ -5,6 +5,7 @@ export interface CitationItem {
   breadcrumb?: string
   page_number: number
   is_table?: boolean
+  is_superseded?: boolean
   rerank_score?: number
   snippet?: string
 }
