@@ -29,6 +29,16 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: scan2rag_backend
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      SCAN2RAG_API_KEY: ${SCAN2RAG_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:5174}
     ports:
       - "8000:8000"
     volumes:

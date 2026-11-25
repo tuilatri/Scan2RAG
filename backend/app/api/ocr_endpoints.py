@@ -12,8 +12,10 @@ import threading
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+
+from app.core.security import verify_api_key
 
 router = APIRouter(prefix="/api/v1/ocr", tags=["OCR HITL Rectification"])
 
@@ -149,7 +151,7 @@ def get_ocr_table_detail(node_id: str) -> dict[str, Any]:
     raise HTTPException(status_code=404, detail=f"Table node '{node_id}' not found.")
 
 
-@router.post("/tables/{node_id}/rectify")
+@router.post("/tables/{node_id}/rectify", dependencies=[Depends(verify_api_key)])
 def rectify_ocr_table(node_id: str, payload: RectifyRequest) -> dict[str, Any]:
     """Submit human rectification for a table, validating format and atomically updating JSON."""
     headers, rows = parse_markdown_to_matrix(payload.content)

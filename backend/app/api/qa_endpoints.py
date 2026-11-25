@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from app.core.security import verify_api_key
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.hybrid_searcher import LegalHybridSearcher
 from app.retrieval.qdrant_client import LegalVectorStore
@@ -85,7 +86,7 @@ def get_qa_service() -> GroundedQAService:
     return _qa_service_instance
 
 
-@router.post("/query", response_model=QueryResponse)
+@router.post("/query", response_model=QueryResponse, dependencies=[Depends(verify_api_key)])
 def query_legal_rag(
     payload: QueryRequest,
     qa_service: GroundedQAService = Depends(get_qa_service),  # noqa: B008
@@ -103,7 +104,7 @@ def query_legal_rag(
         raise HTTPException(status_code=500, detail=f"QA Pipeline Error: {str(e)}") from e
 
 
-@router.post("/query/stream")
+@router.post("/query/stream", dependencies=[Depends(verify_api_key)])
 def query_legal_rag_stream(
     payload: QueryRequest,
     qa_service: GroundedQAService = Depends(get_qa_service),  # noqa: B008
