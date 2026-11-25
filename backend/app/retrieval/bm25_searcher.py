@@ -6,7 +6,7 @@ Features:
 3. Fast keyword scoring (<15ms).
 """
 
-import pickle
+import json
 import re
 import unicodedata
 from pathlib import Path
@@ -31,10 +31,11 @@ class LegalBM25Searcher:
         re.UNICODE
     )
 
-    def __init__(self, index_path: str = "data/bm25_index.pkl"):
+    def __init__(self, index_path: str = "data/bm25_index.json"):
         self.index_path = Path(index_path)
-        self.bm25: BM25Okapi = None
+        self.bm25: BM25Okapi | None = None
         self.corpus_chunks: list[dict[str, Any]] = []
+        self._tokenized_corpus: list[list[str]] = []
 
     @classmethod
     def tokenize(cls, text: str) -> list[str]:
@@ -55,25 +56,39 @@ class LegalBM25Searcher:
             full_text = f"{c.get('breadcrumb', '')} {c.get('title', '')} {c.get('content', '')}"
             tokenized_corpus.append(self.tokenize(full_text))
 
+        self._tokenized_corpus = tokenized_corpus
         self.bm25 = BM25Okapi(tokenized_corpus)
 
     def save(self, path: str = None) -> None:
-        """Persist BM25 index and chunk metadata to disk."""
+        """Persist BM25 tokenized corpus and chunk metadata to disk as safe JSON."""
         save_path = Path(path) if path else self.index_path
         save_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(save_path, "wb") as f:
-            pickle.dump({"corpus_chunks": self.corpus_chunks, "bm25": self.bm25}, f)
+        with open(save_path, "w", encoding="utf-8") as f:
+            json.dump(
+                {"corpus_chunks": self.corpus_chunks, "tokenized_corpus": self._tokenized_corpus},
+                f,
+                ensure_ascii=False,
+            )
 
     def load(self, path: str = None) -> bool:
-        """Load BM25 index from disk if exists."""
+        """Load BM25 index from safe JSON on disk if exists."""
         load_path = Path(path) if path else self.index_path
         if not load_path.exists():
             return False
-        with open(load_path, "rb") as f:
-            data = pickle.load(f)
+        try:
+            with open(load_path, encoding="utf-8") as f:
+                data = json.load(f)
             self.corpus_chunks = data["corpus_chunks"]
-            self.bm25 = data["bm25"]
-        return True
+            self._tokenized_corpus = data["tokenized_corpus"]
+            if not self.corpus_chunks or not self._tokenized_corpus:
+                return False
+            self.bm25 = BM25Okapi(self._tokenized_corpus)
+            return True
+        except Exception:
+            self.corpus_chunks = []
+            self._tokenized_corpus = []
+            self.bm25 = None
+            return False
 
     def search(self, query: str, top_k: int = 20) -> list[tuple[dict[str, Any], float]]:
         """Search top_k chunks matching query with BM25 score.
