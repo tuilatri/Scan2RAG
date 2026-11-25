@@ -7,12 +7,21 @@ from typing import Any
 
 PROCESSED_DIR = Path(__file__).resolve().parent.parent.parent.parent / "data" / "processed"
 
+SCORE_LIKE_PATTERN = re.compile(r"^[1-6](?:[Tt])?$")
+SCORE_HEADER_TERMS = ("điểm", "phân loại", "chỉ số điểm")
+ID_HEADER_TERMS = ("stt", "tt", "số thứ tự", "no.", "id")
+SHIFTED_SCORE_PENALTY = 1.0
+
 
 class OcrVisionAuditor:
     """Audits table structures, row-column alignment, and medical point validation."""
 
     def __init__(self, data_dir: Path | None = None):
         self.data_dir = data_dir or PROCESSED_DIR
+
+    @staticmethod
+    def _is_score_like(cell: str) -> bool:
+        return bool(SCORE_LIKE_PATTERN.match(cell.strip()))
 
     def audit(self) -> dict[str, Any]:
         """Audit all extracted tables across documents."""
@@ -54,11 +63,22 @@ class OcrVisionAuditor:
 
                 headers = [c.strip() for c in table_lines[0].strip("|").split("|")]
                 expected_cols = len(headers)
-                # Find column index for medical scores
                 score_col_indices = [
                     i for i, h in enumerate(headers)
-                    if any(term in h.lower() for term in ["điểm", "phân loại", "chỉ số điểm"])
+                    if any(term in h.lower() for term in SCORE_HEADER_TERMS)
                 ]
+                id_col_indices = [
+                    i for i, h in enumerate(headers)
+                    if h.strip().lower() in ID_HEADER_TERMS
+                ]
+                if not score_col_indices:
+                    body_rows = [
+                        [c.strip() for c in line.strip("|").split("|")]
+                        for line in table_lines[1:]
+                        if not re.match(r"^\|(\s*:?-+:?\s*\|)+$", line)
+                    ]
+                    if sum(self._is_score_like(c) for row in body_rows for c in row) >= 2:
+                        score_col_indices = [expected_cols - 1]
 
                 sep_count = 0
                 for line in table_lines[1:]:
@@ -76,6 +96,10 @@ class OcrVisionAuditor:
                     for idx, cell in enumerate(cells):
                         if not cell:
                             empty_cells += 1
+                        if idx in id_col_indices:
+                            continue
+                        if self._is_score_like(cell) and idx not in score_col_indices:
+                            shifted_score_cells += 1
                         # Only validate medical score columns (1-6)
                         if idx in score_col_indices and cell.isdigit():
                             val = int(cell)
@@ -88,6 +112,8 @@ class OcrVisionAuditor:
             score -= malformed_tables * 5.0
         if invalid_score_cells > 0:
             score -= invalid_score_cells * 2.0
+        if shifted_score_cells > 0:
+            score -= shifted_score_cells * SHIFTED_SCORE_PENALTY
 
         return {
             "persona": "ocr_vision_specialist",

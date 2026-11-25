@@ -6,11 +6,11 @@
 
 | Metric | Measured Value |
 |---|---|
-| Collected pytest items | 54 |
-| Backend test files | 13 |
-| Frontend Vitest items | 16 |
+| Collected pytest items | 63 |
+| Backend test files | 17 |
+| Frontend Vitest items | 21 |
 | Frontend test files | 4 |
-| Lines in test_vlm_rectifier.py | 59 |
+| Lines in test_vlm_rectifier.py | 59 (non-empty) |
 
 ## 2. How to run
 

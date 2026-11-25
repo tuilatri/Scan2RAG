@@ -27,3 +27,8 @@
 - **Root cause**: Free-form dictionary keys (`dict.get("key")`) drifted between generator (`vlm_rectified`) and auditor (`rectified_by`), causing silent bypass.
 - **Fix**: Enforce Pydantic schema (`TableMetadata`) with typed models and mandatory `corpus-audit` gate inside `kit.config.json`.
 
+## 6. Self-Reported Zero Trap in Auditors
+- **Symptom**: `ocr_vision_auditor` báo `shifted_score_cells: 0, score: 100.0, passed: true` dù corpus có hàng trăm ô điểm nằm sai cột; `audit_processed_data.py` bỏ qua number-lock cho bảng HITL nên `thông_tư_105_table_p24` / `thông_tư_88_table_p30` đổi `9 → 5` vẫn in "0 safeguard breaches".
+- **Root cause**: Counter khởi tạo rồi không bao giờ tăng; nhánh `hitl_rectified` bị tách khỏi phép đối soát `Counter(orig) == Counter(rect)`; header OCR lỗi (`Diểm` thay vì `Điểm`) làm detector bỏ sót cả bảng.
+- **Fix**: Đếm `shifted_score_cells` từ dữ liệu thực (loại cột `STT`, xử lý header mờ), trừ điểm và giữ `passed=false`; áp `check_number_lock(raw_backup, content)` cho mọi bảng đã rectify, kể cả HITL. Không bao giờ nới ngưỡng để gate xanh.
+
