@@ -115,9 +115,11 @@ def run_benchmark():
     print(f"• Total Evaluated Queries : {total_queries}")
     print(f"• Retrieval Accuracy      : {passed_retrieval}/{total_queries} ({retrieval_acc:.1f}%) [Threshold >= 85%]")
     print(f"• Exact Page Citation Acc : {passed_citations}/{total_queries} ({citation_acc:.1f}%) [Threshold >= 80%]")
-    print(f"• Answer Faithfulness Acc : {passed_answers}/{total_queries} ({answer_acc:.1f}%) [Threshold >= 80%]")
+    print(f"• Answer Faithfulness Acc : {passed_answers}/{total_queries} ({answer_acc:.1f}%) [Threshold >= 75%]")
     print(f"• Average E2E Latency     : {avg_latency:.1f} ms")
     print("=" * 80)
+
+    passed_all = retrieval_acc >= 85.0 and citation_acc >= 80.0 and answer_acc >= 75.0
 
     # Save Benchmark Report Artifact
     report_data = {
@@ -136,7 +138,7 @@ def run_benchmark():
             "exact_citation_accuracy_min": 80.0,
             "answer_faithfulness_min": 75.0,
         },
-        "status": "PASS",
+        "status": "PASS" if passed_all else "FAIL",
         "query_results": results,
     }
 
