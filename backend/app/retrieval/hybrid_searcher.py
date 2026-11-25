@@ -136,17 +136,19 @@ class LegalHybridSearcher:
                 fused_map[cid]["sparse_score"] = bm25_score
                 fused_map[cid]["rrf_score"] += 1.0 / (self.rrf_k + rank)
 
-        # 4. Optional: Handle superseded filter/deprioritization
+        # 4. Handle superseded hard-filter & VBHN 88 priority boost
         candidates = list(fused_map.values())
+        if document_id:
+            candidates = [c for c in candidates if c.get("document_id") == document_id]
         if filter_superseded:
-            # Penalize or filter superseded chunks if consolidated TT 88 is present
-            filtered_candidates = []
-            for item in candidates:
-                if item.get("is_superseded") and not item.get("document_id") == "thông_tư_88":
-                    # Deprioritize heavily by halving RRF score
-                    item["rrf_score"] *= 0.3
-                filtered_candidates.append(item)
-            candidates = filtered_candidates
+            candidates = [
+                item
+                for item in candidates
+                if not (item.get("is_superseded") and item.get("document_id") != "thông_tư_88")
+            ]
+        for item in candidates:
+            if item.get("document_id") == "thông_tư_88":
+                item["rrf_score"] *= 1.15
 
         # 5. Sort by RRF score descending
         candidates.sort(key=lambda x: x["rrf_score"], reverse=True)
