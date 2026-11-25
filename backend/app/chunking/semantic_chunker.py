@@ -106,12 +106,18 @@ class SemanticLegalChunker:
             if not content and not title:
                 continue
 
-            # Construct breadcrumb by walking up parent_id
+            # Construct breadcrumb by walking up parent_id & find ancestor ARTICLE
             breadcrumb_parts = []
+            ancestor_article_id = node.get("id") if level == "ARTICLE" else None
             curr = node
             visited_parents = set()
             while curr:
-                c_title = curr.get("title") or curr.get("level") or ""
+                c_level = str(curr.get("level", "")).upper()
+                if c_level == "ARTICLE" and not ancestor_article_id:
+                    ancestor_article_id = curr.get("id")
+                c_title = (curr.get("title") or "").strip()
+                if not c_title and c_level and c_level != "DOCUMENT":
+                    c_title = c_level
                 if c_title:
                     breadcrumb_parts.append(c_title)
                 p_id = curr.get("parent_id")
@@ -120,6 +126,8 @@ class SemanticLegalChunker:
                 visited_parents.add(p_id)
                 curr = node_map.get(p_id)
 
+            if not breadcrumb_parts:
+                breadcrumb_parts.append(f"Trang {page_num}")
             breadcrumb_parts.append(doc_name)
             breadcrumb_parts.reverse()
             breadcrumb = " > ".join(breadcrumb_parts)
@@ -182,7 +190,7 @@ class SemanticLegalChunker:
                 token_count=self._approx_token_count(full_chunk_text),
                 is_table=False,
                 page_numbers=[page_num],
-                article_id=node.get("id") if level == "ARTICLE" else node.get("parent_id"),
+                article_id=ancestor_article_id,
                 is_superseded=is_superseded,
                 superseded_by=superseded_by,
                 effective_date=effective_date,
