@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Citation, StreamEvent } from '@/types/chat';
+import { API_BASE_URL, apiHeaders } from '@/lib/api-config';
 
 export interface Message {
   id: string;
@@ -19,7 +20,7 @@ interface UseChatStreamOptions {
 }
 
 export function useChatStream({
-  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  apiBaseUrl = API_BASE_URL,
   timeoutMs = 65000,
 }: UseChatStreamOptions = {}) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -111,9 +112,7 @@ export function useChatStream({
       try {
         const response = await fetch(`${apiBaseUrl}/api/v1/query/stream`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: apiHeaders(true),
           body: JSON.stringify({
             query: queryText.trim(),
             top_k_retrieval: options?.topKRetrieval ?? 15,

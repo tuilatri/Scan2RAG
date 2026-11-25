@@ -7,15 +7,15 @@
 | Method | Path | Auth | Rate limit | Description |
 |---|---|---|---|---|
 | `GET` | `/` | None | None | Root landing info with docs and health URLs |
-| `GET` | `/api/v1/health` | None | None | Service health check, status, active Milestone 2 features |
-| `POST` | `/api/v1/query` | None | None | Legal Question Answering with hybrid retrieval, reranking, and citation metadata |
-| `POST` | `/api/v1/query/stream` | None | None | Real-time SSE streaming endpoint emitting citations, tokens, and done events |
-| `GET` | `/api/v1/documents` | None | None | List canonical legal documents with validity metadata & file sizes |
-| `GET` | `/api/v1/documents/{doc_id}` | None | None | Get specific document details by ID |
-| `GET` | `/api/v1/documents/{doc_id}/pdf` | None | None | Stream raw PDF with HTTP 206 Partial Content (Range bytes) support |
-| `GET` | `/api/v1/ocr/tables` | None | None | List 111 extracted medical/legal tables with review and VLM status |
-| `GET` | `/api/v1/ocr/tables/{node_id}` | None | None | Get detailed table matrix, headers, rows, and raw OCR backup |
-| `POST` | `/api/v1/ocr/tables/{node_id}/rectify` | None | None | Submit human rectification with atomic write & column validation |
+| `GET` | `/api/v1/health` | None (liveness) | None | Service health check, status, active Milestone 2 features |
+| `POST` | `/api/v1/query` | `X-API-Key` / `Bearer` | 60/min per IP | Legal Question Answering with hybrid retrieval, reranking, and citation metadata |
+| `POST` | `/api/v1/query/stream` | `X-API-Key` / `Bearer` | 60/min per IP | Real-time SSE streaming endpoint emitting citations, tokens, and done events |
+| `GET` | `/api/v1/documents` | `X-API-Key` / `Bearer` | 120/min per IP | List canonical legal documents with validity metadata & file sizes |
+| `GET` | `/api/v1/documents/{doc_id}` | `X-API-Key` / `Bearer` | 120/min per IP | Get specific document details by ID |
+| `GET` | `/api/v1/documents/{doc_id}/pdf` | `?api_key=` (iframe only) | 30/min per IP | Stream raw PDF with HTTP 206 Partial Content (Range bytes) support |
+| `GET` | `/api/v1/ocr/tables` | `X-API-Key` / `Bearer` | 120/min per IP | List 111 extracted medical/legal tables with review and VLM status |
+| `GET` | `/api/v1/ocr/tables/{node_id}` | `X-API-Key` / `Bearer` | 120/min per IP | Get detailed table matrix, headers, rows, and raw OCR backup |
+| `POST` | `/api/v1/ocr/tables/{node_id}/rectify` | `X-API-Key` / `Bearer` | 10/min per IP | Submit human rectification with atomic write & column validation |
 
 ## Request / Response Schemas
 
@@ -81,5 +81,5 @@
   ```
 
 ## Conventions
-- Rate limit storage: None currently (Planned for production gateway)
-- Auth scheme: None currently (Open local development API; bearer token planned for Milestone 4)
+- Rate limit storage: in-memory sliding window per client IP (single-instance; use Redis when scaling). Env: `RATE_LIMIT_QUERY_PER_MIN=60`, `RATE_LIMIT_RECTIFY_PER_MIN=10`, `RATE_LIMIT_PDF_PER_MIN=30`.
+- Auth scheme: `X-API-Key` or `Authorization: Bearer`. Fail-closed by default; only `GET /api/v1/health` is public. Dev override requires `ENVIRONMENT=development` AND `ALLOW_UNAUTHENTICATED_DEV=true`. PDF iframe may pass `?api_key=` — a browser-visible demo key only, never a production secret. Internal errors are logged server-side and redacted from responses.

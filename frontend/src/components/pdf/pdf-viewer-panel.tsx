@@ -3,6 +3,7 @@ import { Citation } from '@/types/chat';
 import { PdfToolbar } from './pdf-toolbar';
 import { PdfCanvas } from './pdf-canvas';
 import { DocumentMetaCard } from './document-meta-card';
+import { API_BASE_URL, withApiKey } from '@/lib/api-config';
 
 interface PdfViewerPanelProps {
   activeDocId: string;
@@ -21,13 +22,13 @@ export const PdfViewerPanel: React.FC<PdfViewerPanelProps> = ({
   activePage,
   activeCitation,
   zoomLevel,
-  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  apiBaseUrl = API_BASE_URL,
   onPageChange,
   onZoomIn,
   onZoomOut,
   onResetZoom,
 }) => {
-  const pdfUrl = `${apiBaseUrl}/api/v1/documents/${activeDocId}/pdf`;
+  const pdfUrl = withApiKey(`${apiBaseUrl}/api/v1/documents/${activeDocId}/pdf`);
 
   return (
     <div className="flex h-full flex-col bg-background border-l">

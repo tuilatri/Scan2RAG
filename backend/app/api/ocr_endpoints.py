@@ -7,6 +7,7 @@ Provides endpoints to:
 """
 
 import json
+import logging
 import os
 import re
 import tempfile
@@ -18,6 +19,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.security import verify_api_key
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/ocr", tags=["OCR HITL Rectification"])
 
@@ -83,7 +86,7 @@ def parse_markdown_to_matrix(md_text: str) -> tuple[list[str], list[list[str]]]:
     return raw_headers, rows
 
 
-@router.get("/tables", response_model=list[TableSummary])
+@router.get("/tables", response_model=list[TableSummary], dependencies=[Depends(verify_api_key)])
 def list_ocr_tables() -> list[dict[str, Any]]:
     """List all extracted tables across processed JSON files."""
     tables = []
@@ -120,7 +123,7 @@ def list_ocr_tables() -> list[dict[str, Any]]:
     return tables
 
 
-@router.get("/tables/{node_id}", response_model=TableDetail)
+@router.get("/tables/{node_id}", response_model=TableDetail, dependencies=[Depends(verify_api_key)])
 def get_ocr_table_detail(node_id: str) -> dict[str, Any]:
     """Get full details of a specific table node, including matrix format."""
     for file_path in sorted(PROCESSED_DIR.glob("*.json")):
@@ -234,10 +237,11 @@ def rectify_ocr_table(node_id: str, payload: RectifyRequest) -> dict[str, Any]:
                 tmp_path = Path(tmp_f.name)
                 json.dump(target_data, tmp_f, ensure_ascii=False, indent=2)
             os.replace(tmp_path, target_file)
-        except Exception as e:
+        except Exception:
             if tmp_path and tmp_path.exists():
                 tmp_path.unlink()
-            raise HTTPException(status_code=500, detail=f"Failed to write rectified data: {str(e)}") from e
+            logger.exception("Failed to write rectified table")
+            raise HTTPException(status_code=500, detail="Failed to save rectified data.") from None
 
     return {
         "status": "success",
