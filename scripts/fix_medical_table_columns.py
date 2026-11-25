@@ -108,7 +108,13 @@ def normalize_table(
                     cells[idx] = ""
                     changed = True
                 elif collisions is not None:
-                    collisions.append({"reason": "target_occupied", "cells": cells, "column": idx})
+                    collisions.append({
+                        "reason": "target_occupied",
+                        "cells": cells,
+                        "column": idx,
+                        "cell_value": cell,
+                        "row": len(cleaned_rows),
+                    })
 
         cleaned_rows.append(cells)
 

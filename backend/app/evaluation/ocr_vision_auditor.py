@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 PROCESSED_DIR = Path(__file__).resolve().parent.parent.parent.parent / "data" / "processed"
+DECISIONS_PATH = Path(__file__).resolve().parents[3] / "docs" / "quality" / "score_collision_decisions.json"
 
 SCORE_LIKE_PATTERN = re.compile(r"^[1-6](?:[Tt])?$")
 SCORE_HEADER_TERMS = ("điểm", "phân loại", "chỉ số điểm")
@@ -23,6 +24,34 @@ class OcrVisionAuditor:
     def _is_score_like(cell: str) -> bool:
         return bool(SCORE_LIKE_PATTERN.match(cell.strip()))
 
+    @staticmethod
+    def _load_reviewed_exceptions() -> set[tuple[str, int, int, int, str]]:
+        if not DECISIONS_PATH.exists():
+            return set()
+        data = json.loads(DECISIONS_PATH.read_text(encoding="utf-8"))
+        required = ("node_id", "page_number", "row", "col", "cell_value", "reason", "reviewer", "timestamp")
+        return {
+            (
+                str(item["node_id"]), int(item["page_number"]), int(item["row"]),
+                int(item["col"]), str(item["cell_value"]),
+            )
+            for item in data.get("items", [])
+            if all(item.get(field) not in (None, "") for field in required)
+            and not item.get("needs_human", False)
+        }
+
+    @staticmethod
+    def _invalid_decision_count() -> int:
+        if not DECISIONS_PATH.exists():
+            return 0
+        data = json.loads(DECISIONS_PATH.read_text(encoding="utf-8"))
+        required = ("node_id", "page_number", "row", "col", "cell_value", "reason", "reviewer", "timestamp")
+        return sum(
+            1 for item in data.get("items", [])
+            if any(item.get(field) in (None, "") for field in required)
+            or item.get("needs_human", False)
+        )
+
     def audit(self) -> dict[str, Any]:
         """Audit all extracted tables across documents."""
         total_tables = 0
@@ -32,6 +61,9 @@ class OcrVisionAuditor:
         invalid_score_cells = 0
         duplicate_separators = 0
         shifted_score_cells = 0
+        reviewed_exceptions = 0
+        reviewed_keys = self._load_reviewed_exceptions()
+        invalid_decisions = self._invalid_decision_count()
         total_cells = 0
         empty_cells = 0
 
@@ -85,12 +117,15 @@ class OcrVisionAuditor:
                         score_col_indices = [expected_cols - 1]
 
                 sep_count = 0
+                data_row_idx = 0
                 for line in table_lines[1:]:
                     if re.match(r"^\|(\s*:?-+:?\s*\|)+$", line):
                         sep_count += 1
                         if sep_count > 1:
                             duplicate_separators += 1
                         continue
+                    row_index = data_row_idx
+                    data_row_idx += 1
                     cells = [c.strip() for c in line.strip("|").split("|")]
                     total_cells += len(cells)
 
@@ -104,6 +139,12 @@ class OcrVisionAuditor:
                             continue
                         if self._is_score_like(cell) and idx not in score_col_indices:
                             shifted_score_cells += 1
+                            key = (
+                                str(node.get("id")), int(node.get("page_number", 1)),
+                                row_index, idx, cell,
+                            )
+                            if key in reviewed_keys:
+                                reviewed_exceptions += 1
                         # Only validate medical score columns (1-6)
                         if idx in score_col_indices and cell.isdigit():
                             val = int(cell)
@@ -122,7 +163,12 @@ class OcrVisionAuditor:
         return {
             "persona": "ocr_vision_specialist",
             "score": max(round(score, 1), 0.0),
-            "passed": malformed_tables == 0 and invalid_score_cells == 0 and duplicate_separators == 0 and shifted_score_cells == 0,
+            "passed": (
+                malformed_tables == 0 and invalid_score_cells == 0
+                and duplicate_separators == 0
+                and shifted_score_cells == reviewed_exceptions
+                and invalid_decisions == 0
+            ),
             "total_tables": total_tables,
             "vlm_rectified_tables": vlm_rectified_tables,
             "hitl_rectified_tables": hitl_tables,
@@ -130,6 +176,8 @@ class OcrVisionAuditor:
             "invalid_score_cells": invalid_score_cells,
             "duplicate_separators": duplicate_separators,
             "shifted_score_cells": shifted_score_cells,
+            "reviewed_exceptions": reviewed_exceptions,
+            "invalid_decisions": invalid_decisions,
             "total_cells": total_cells,
             "empty_cell_ratio_pct": round(empty_cell_ratio, 2),
         }

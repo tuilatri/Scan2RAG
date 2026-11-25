@@ -76,6 +76,16 @@
       "optional": false
     },
     {
+      "id": "score-review",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_score_review.py"],
+      "cwd": ".",
+      "tags": ["audit", "data"],
+      "requires": ["docs/quality/score_collision_decisions.json"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "vector-audit",
       "cmd": "backend/.venv/Scripts/python.exe",
       "args": ["scripts/audit_vector_store.py"],
