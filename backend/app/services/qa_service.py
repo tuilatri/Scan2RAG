@@ -178,14 +178,18 @@ class GroundedQAService:
         user_prompt = GroundedPromptBuilder.build_qa_prompt(query, top_chunks)
 
         last_meta = {}
-        for tok, meta in self.model_router.generate_stream(
-            prompt=user_prompt,
-            system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
-            complexity=complexity,
-            temperature=0.0,
-        ):
-            last_meta = meta
-            yield f"data: {json.dumps({'event': 'token', 'token': tok}, ensure_ascii=False)}\n\n"
+        try:
+            for tok, meta in self.model_router.generate_stream(
+                prompt=user_prompt,
+                system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
+                complexity=complexity,
+                temperature=0.0,
+            ):
+                last_meta = meta
+                yield f"data: {json.dumps({'event': 'token', 'token': tok}, ensure_ascii=False)}\n\n"
+        except Exception:
+            yield f"data: {json.dumps({'event': 'error', 'message': 'Đã xảy ra lỗi khi sinh câu trả lời.'}, ensure_ascii=False)}\n\n"
+            return
 
         latency_total_ms = (time.time() - t_start) * 1000
 

@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { useChatStream } from '@/hooks/use-chat-stream';
 import { ModelBadge } from '@/components/chat/model-badge';
 import { StreamIndicator } from '@/components/chat/stream-indicator';
 import { CitationCard } from '@/components/chat/citation-card';
@@ -119,5 +120,70 @@ describe('PDF Components Unit Tests', () => {
     const prevPageBtn = screen.getByTitle('Trang trước');
     fireEvent.click(prevPageBtn);
     expect(handlePageChange).toHaveBeenCalledWith(4);
+  });
+});
+
+describe('useChatStream Hook Tests', () => {
+  it('finalizes assistant message when stopStream is called', async () => {
+    const encoder = new TextEncoder();
+    const neverEndingStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode('data: {"event":"status","status":"retrieving"}\n\n'));
+      },
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        body: neverEndingStream,
+      })
+    );
+
+    const { result } = renderHook(() => useChatStream());
+
+    act(() => {
+      result.current.sendMessage('Cận thị 3 độ?');
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    act(() => {
+      result.current.stopStream();
+    });
+
+    expect(result.current.isStreaming).toBe(false);
+    const lastMsg = result.current.messages[result.current.messages.length - 1];
+    expect(lastMsg.isStreaming).toBe(false);
+    vi.unstubAllGlobals();
+  });
+
+  it('sets error when stream ends without done event', async () => {
+    const encoder = new TextEncoder();
+    const incompleteStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode('data: {"event":"token","token":"Xin chào"}\n\n'));
+        controller.close();
+      },
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        body: incompleteStream,
+      })
+    );
+
+    const { result } = renderHook(() => useChatStream());
+
+    await act(async () => {
+      await result.current.sendMessage('Test incomplete');
+    });
+
+    expect(result.current.error).toContain('ngắt giữa chừng');
+    const lastMsg = result.current.messages[result.current.messages.length - 1];
+    expect(lastMsg.isStreaming).toBe(false);
+    vi.unstubAllGlobals();
   });
 });

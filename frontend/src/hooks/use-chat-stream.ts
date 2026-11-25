@@ -20,7 +20,7 @@ interface UseChatStreamOptions {
 
 export function useChatStream({
   apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
-  timeoutMs = 30000,
+  timeoutMs = 65000,
 }: UseChatStreamOptions = {}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -36,6 +36,10 @@ export function useChatStream({
       abortControllerRef.current = null;
     }
     setIsStreaming(false);
+    setStreamStatus(null);
+    setMessages((prev) =>
+      prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
+    );
   }, []);
 
   const sendMessage = useCallback(
@@ -76,27 +80,33 @@ export function useChatStream({
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      // Timeout watchdog
-      const timeoutId = setTimeout(() => {
-        if (abortControllerRef.current === controller) {
-          controller.abort();
-          setError('Yêu cầu quá thời gian chờ (Timeout 30s). Vui lòng thử lại.');
-          setIsStreaming(false);
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? {
-                    ...msg,
-                    content:
-                      msg.content ||
-                      '⚠️ Yêu cầu bị gián đoạn do phản hồi từ máy chủ vượt quá thời gian cho phép.',
-                    isStreaming: false,
-                  }
-                : msg
-            )
-          );
-        }
-      }, timeoutMs);
+      // Inactivity watchdog (resets on every received chunk)
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      const resetWatchdog = () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          if (abortControllerRef.current === controller) {
+            controller.abort();
+            setError(`Yêu cầu quá thời gian chờ (${Math.round(timeoutMs / 1000)}s). Vui lòng thử lại.`);
+            setIsStreaming(false);
+            setStreamStatus(null);
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? {
+                      ...msg,
+                      content:
+                        msg.content ||
+                        'Yêu cầu bị gián đoạn do phản hồi từ máy chủ vượt quá thời gian cho phép.',
+                      isStreaming: false,
+                    }
+                  : msg
+              )
+            );
+          }
+        }, timeoutMs);
+      };
+      resetWatchdog();
 
       try {
         const response = await fetch(`${apiBaseUrl}/api/v1/query/stream`, {
@@ -128,11 +138,14 @@ export function useChatStream({
         let providerName = '';
         let modelName = '';
         let latencyTotal = 0;
+        let receivedDone = false;
+        let streamErrorMsg: string | null = null;
         let lineBuffer = '';
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          resetWatchdog();
 
           const chunk = decoder.decode(value, { stream: true });
           lineBuffer += chunk;
@@ -174,9 +187,13 @@ export function useChatStream({
                   )
                 );
               } else if (event.event === 'done') {
+                receivedDone = true;
                 providerName = event.provider || '';
                 modelName = event.model || '';
                 latencyTotal = event.latency_total_ms || 0;
+              } else if (event.event === 'error') {
+                streamErrorMsg = event.message || 'Lỗi từ máy chủ trong quá trình sinh câu trả lời.';
+                setError(streamErrorMsg);
               }
             } catch {
               // Ignore malformed JSON chunk line safely
@@ -185,6 +202,18 @@ export function useChatStream({
         }
 
         clearTimeout(timeoutId);
+
+        if (streamErrorMsg) {
+          accumulatedText = accumulatedText
+            ? `${accumulatedText}\n\n[Lỗi: ${streamErrorMsg}]`
+            : `Lỗi: ${streamErrorMsg}`;
+        } else if (!receivedDone) {
+          const incompleteMsg = 'Luồng phản hồi bị ngắt giữa chừng trước khi hoàn tất.';
+          setError(incompleteMsg);
+          accumulatedText = accumulatedText
+            ? `${accumulatedText}\n\n[${incompleteMsg}]`
+            : incompleteMsg;
+        }
 
         // Finalize assistant message
         setMessages((prev) =>
@@ -205,7 +234,9 @@ export function useChatStream({
       } catch (err: unknown) {
         clearTimeout(timeoutId);
         if (err instanceof DOMException && err.name === 'AbortError') {
-          // Handled by user abort / timeout
+          setMessages((prev) =>
+            prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
+          );
           return;
         }
         const errorMsg = err instanceof Error ? err.message : 'Lỗi không xác định khi truy vấn SSE.';
