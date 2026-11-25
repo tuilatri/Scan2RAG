@@ -46,18 +46,19 @@ export const SplitPane: React.FC<SplitPaneProps> = ({
         </div>
       )}
 
-      {/* Right Synchronized PDF Pane */}
+      {/* Right Synchronized PDF Pane (Desktop side-by-side + Mobile full-screen overlay) */}
       {isRightPaneOpen && (
-        <div className="hidden lg:flex flex-col h-full flex-1 transition-all duration-200 ease-in-out relative">
-          <div className="absolute right-2 top-2 z-20">
+        <div className="fixed inset-0 z-40 flex flex-col bg-background lg:static lg:z-auto lg:flex-1 transition-all duration-200 ease-in-out">
+          <div className="absolute right-2 top-2 z-50">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={onToggleRightPane}
-              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground bg-background/90 backdrop-blur"
               title="Đóng khung PDF"
             >
-              <PanelLeftClose className="h-4 w-4" />
+              <PanelLeftClose className="h-4 w-4 lg:mr-0 mr-1" />
+              <span className="lg:hidden">Đóng PDF</span>
             </Button>
           </div>
           {rightPane}
