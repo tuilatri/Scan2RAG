@@ -11,7 +11,7 @@ interface PagePreviewCardProps {
 export const PagePreviewCard: React.FC<PagePreviewCardProps> = ({
   documentId,
   pageNumber,
-  apiBaseUrl = 'http://localhost:8000',
+  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
 }) => {
   const pdfUrl = `${apiBaseUrl}/api/v1/documents/${documentId}/pdf#page=${pageNumber}`;
 

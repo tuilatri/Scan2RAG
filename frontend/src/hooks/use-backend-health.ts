@@ -8,7 +8,7 @@ interface UseBackendHealthOptions {
 }
 
 export function useBackendHealth({
-  apiBaseUrl = 'http://localhost:8000',
+  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   pollIntervalMs = 30000,
 }: UseBackendHealthOptions = {}) {
   const [status, setStatus] = useState<BackendStatus>('connecting');

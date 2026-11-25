@@ -19,7 +19,7 @@ interface UseChatStreamOptions {
 }
 
 export function useChatStream({
-  apiBaseUrl = 'http://localhost:8000',
+  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   timeoutMs = 30000,
 }: UseChatStreamOptions = {}) {
   const [messages, setMessages] = useState<Message[]>([]);

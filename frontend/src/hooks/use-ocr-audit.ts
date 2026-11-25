@@ -7,7 +7,7 @@ interface UseOcrAuditOptions {
 }
 
 export function useOcrAudit({
-  apiBaseUrl = 'http://localhost:8000',
+  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
 }: UseOcrAuditOptions = {}) {
   const [tables, setTables] = useState<TableSummary[]>([]);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
