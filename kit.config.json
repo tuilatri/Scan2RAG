@@ -106,6 +106,16 @@
       "optional": false
     },
     {
+      "id": "security-audit",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_auth_matrix.py"],
+      "cwd": ".",
+      "tags": ["audit", "security"],
+      "requires": ["backend/app/main.py", "backend/app/core/security.py"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-tests",
       "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],

@@ -5,6 +5,7 @@ Endpoints:
 2. GET /api/v1/health: Health check reporting Vector DB, BM25 Index, and LLM Router status.
 """
 
+import logging
 import threading
 from typing import Any
 
@@ -18,6 +19,8 @@ from app.retrieval.hybrid_searcher import LegalHybridSearcher
 from app.retrieval.qdrant_client import LegalVectorStore
 from app.retrieval.reranker import LegalReranker
 from app.services.qa_service import GroundedQAService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["Question Answering"])
 
@@ -103,8 +106,9 @@ def query_legal_rag(
             filter_superseded=payload.filter_superseded,
         )
         return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"QA Pipeline Error: {str(e)}") from e
+    except Exception:
+        logger.exception("QA pipeline failure")
+        raise HTTPException(status_code=500, detail="QA pipeline unavailable.") from None
 
 
 @router.post("/query/stream", dependencies=[Depends(verify_api_key)])
@@ -129,8 +133,9 @@ def query_legal_rag_stream(
                 "X-Accel-Buffering": "no",
             },
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"QA Streaming Pipeline Error: {str(e)}") from e
+    except Exception:
+        logger.exception("QA streaming pipeline failure")
+        raise HTTPException(status_code=500, detail="QA streaming pipeline unavailable.") from None
 
 
 @router.get("/health")

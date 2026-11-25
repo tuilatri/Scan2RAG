@@ -33,3 +33,8 @@
 - **Fix**: Đếm `shifted_score_cells` từ dữ liệu thực (loại cột `STT`, xử lý header mờ), trừ điểm và giữ `passed=false`; áp `check_number_lock(raw_backup, content)` cho mọi bảng đã rectify, kể cả HITL. Không bao giờ nới ngưỡng để gate xanh.
 - **Caveat sau 1B-review**: ảnh scan `data/exports/review/thông_tư_88_p30.png` xác nhận dòng "+ Nếu ở 2 bên mắt" có điểm **6** (không phải `9` của backup lẫn `5` của script hardcode). Giá trị đã được re-baseline ở cả `content` và `raw_content_backup` kèm `score_review_*` audit trail → `invalid_score_cells=0`, number-lock vẫn PASS. Không tự đổi số khi chưa có ảnh scan.
 
+## 7. Fail-Open Auth & Internal Error Leak
+- **Symptom**: `verify_api_key` trả về sớm khi env key rỗng; 5/8 endpoint business không có dependency auth; exception handler trả `str(e)` cho client; không có rate limit → public API đốt token cloud / tải PDF 57 MB.
+- **Root cause**: dev convenience mode được dùng làm mặc định production; CORS từng cho phép `*` kèm credentials; lỗi được serialize trực tiếp từ exception.
+- **Fix**: fail-closed (`ENVIRONMENT=production` luôn yêu cầu key; dev override phải `ALLOW_UNAUTHENTICATED_DEV=true`), auth cho mọi route trừ `/health`, `verify_api_key_query` cho iframe PDF, rate limit middleware theo IP, redact lỗi + `logger.exception`. Gate `security-audit` kiểm tra ma trận 8 route, CORS explicit, middleware và fail-closed — không xanh giả (đã sửa lỗi traversal `_IncludedRouter`).
+

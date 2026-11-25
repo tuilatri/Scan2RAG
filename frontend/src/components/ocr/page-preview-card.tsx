@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { API_BASE_URL, withApiKey } from '@/lib/api-config';
 
 interface PagePreviewCardProps {
   documentId: string;
@@ -11,9 +12,9 @@ interface PagePreviewCardProps {
 export const PagePreviewCard: React.FC<PagePreviewCardProps> = ({
   documentId,
   pageNumber,
-  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  apiBaseUrl = API_BASE_URL,
 }) => {
-  const pdfUrl = `${apiBaseUrl}/api/v1/documents/${documentId}/pdf#page=${pageNumber}`;
+  const pdfUrl = withApiKey(`${apiBaseUrl}/api/v1/documents/${documentId}/pdf#page=${pageNumber}`);
 
   return (
     <div className="w-96 flex flex-col h-full border-l bg-card/60">

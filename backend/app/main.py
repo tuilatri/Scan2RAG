@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.document_endpoints import router as doc_router
 from app.api.ocr_endpoints import router as ocr_router
 from app.api.qa_endpoints import router as qa_router
+from app.core.rate_limit import RateLimitMiddleware
 
 app = FastAPI(
     title="Scan2RAG Legal Intelligence API",
@@ -29,6 +30,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(RateLimitMiddleware)
 
 app.include_router(qa_router)
 app.include_router(doc_router)

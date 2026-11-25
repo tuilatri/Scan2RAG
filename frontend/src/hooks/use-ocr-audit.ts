@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { TableSummary, TableDetail } from '@/types/ocr';
 import { matrixToMarkdown, parseMarkdownTable } from '@/lib/markdown-table-parser';
+import { API_BASE_URL, apiHeaders } from '@/lib/api-config';
 
 interface UseOcrAuditOptions {
   apiBaseUrl?: string;
 }
 
 export function useOcrAudit({
-  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  apiBaseUrl = API_BASE_URL,
 }: UseOcrAuditOptions = {}) {
   const [tables, setTables] = useState<TableSummary[]>([]);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export function useOcrAudit({
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables`);
+      const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables`, { headers: apiHeaders() });
       if (!res.ok) throw new Error(`Lỗi tải danh mục bảng: ${res.statusText}`);
       const data: TableSummary[] = await res.json();
       setTables(data);
@@ -58,6 +59,7 @@ export function useOcrAudit({
       try {
         const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables/${tableId}`, {
           signal: controller.signal,
+          headers: apiHeaders(),
         });
         if (!res.ok) throw new Error(`Lỗi tải chi tiết bảng: ${res.statusText}`);
         const data: TableDetail = await res.json();
@@ -168,7 +170,7 @@ export function useOcrAudit({
           `${apiBaseUrl}/api/v1/ocr/tables/${selectedTableId}/rectify`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: apiHeaders(true),
             body: JSON.stringify({
               content: newMarkdown,
               approved,

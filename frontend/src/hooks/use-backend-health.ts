@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL, apiHeaders } from '@/lib/api-config';
 
 export type BackendStatus = 'connected' | 'connecting' | 'offline';
 
@@ -8,7 +9,7 @@ interface UseBackendHealthOptions {
 }
 
 export function useBackendHealth({
-  apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  apiBaseUrl = API_BASE_URL,
   pollIntervalMs = 30000,
 }: UseBackendHealthOptions = {}) {
   const [status, setStatus] = useState<BackendStatus>('connecting');
@@ -19,6 +20,7 @@ export function useBackendHealth({
     try {
       const res = await fetch(`${apiBaseUrl}/api/v1/health`, {
         signal: controller.signal,
+        headers: apiHeaders(),
       });
       setStatus(res.ok ? 'connected' : 'offline');
     } catch {

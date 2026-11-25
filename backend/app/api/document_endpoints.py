@@ -3,14 +3,19 @@
 Provides endpoints to list legal documents and stream raw PDF files with HTTP 206 Partial Content (Range bytes) support.
 """
 
+import logging
 import os
 import urllib.parse
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Header, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+
+from app.core.security import verify_api_key, verify_api_key_query
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/documents", tags=["Documents"])
 
@@ -80,7 +85,7 @@ class DocumentMeta(BaseModel):
     size_bytes: int = 0
 
 
-@router.get("", response_model=list[DocumentMeta])
+@router.get("", response_model=list[DocumentMeta], dependencies=[Depends(verify_api_key)])
 def list_documents() -> list[dict[str, Any]]:
     """Return the list of all registered legal documents with their metadata."""
     results = []
@@ -95,7 +100,7 @@ def list_documents() -> list[dict[str, Any]]:
     return results
 
 
-@router.get("/{doc_id}")
+@router.get("/{doc_id}", dependencies=[Depends(verify_api_key)])
 def get_document_info(doc_id: str) -> dict[str, Any]:
     """Return metadata for a specific document by ID."""
     doc_id_normalized = doc_id.lower().strip()
@@ -108,7 +113,7 @@ def get_document_info(doc_id: str) -> dict[str, Any]:
     raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found.")
 
 
-@router.get("/{doc_id}/pdf")
+@router.get("/{doc_id}/pdf", dependencies=[Depends(verify_api_key_query)])
 def stream_document_pdf(
     doc_id: str,
     request: Request,
@@ -178,5 +183,6 @@ def stream_document_pdf(
             "Content-Disposition": f"inline; filename*=UTF-8''{safe_filename}",
         }
         return Response(content=data, status_code=206, headers=headers)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to process Range request: {str(e)}") from e
+    except Exception:
+        logger.exception("Failed to process PDF Range request")
+        raise HTTPException(status_code=400, detail="Failed to process Range request.") from None
