@@ -36,7 +36,7 @@ export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
 
       {/* Editable Table Grid */}
       <ScrollArea className="flex-1 p-4">
-        <div className="rounded-lg border bg-card shadow-xs overflow-x-auto">
+        <div className="rounded-lg border bg-card shadow-sm overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b bg-muted/30">
