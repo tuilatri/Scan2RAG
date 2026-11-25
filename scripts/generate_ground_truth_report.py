@@ -39,13 +39,20 @@ for f in files:
         ]
     }
 
+safeguard_breaches = sum(
+    1
+    for fn in files
+    for t in json.load(open(f"data/processed/{fn}", encoding="utf-8")).get("nodes", [])
+    if t.get("level") == "TABLE" and t.get("metadata", {}).get("safeguard_passed") is False
+)
+
 report['summary'] = {
     'total_tables': total_tables,
     'total_rectified': total_rectified,
     'total_rejected': total_rejected,
     'rectified_rate_percent': round(total_rectified / total_tables * 100, 2) if total_tables else 0,
     'rejected_rate_percent': round(total_rejected / total_tables * 100, 2) if total_tables else 0,
-    'safeguard_breaches_in_corpus': 0
+    'safeguard_breaches_in_corpus': safeguard_breaches
 }
 
 out_path = 'data/benchmarks/ocr_comparison/qwen3_vl_4b_report.json'
