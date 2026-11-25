@@ -7,7 +7,9 @@ Provides endpoints to:
 """
 
 import json
+import os
 import re
+import tempfile
 import threading
 from pathlib import Path
 from typing import Any
@@ -218,15 +220,23 @@ def rectify_ocr_table(node_id: str, payload: RectifyRequest) -> dict[str, Any]:
         if payload.reviewer_notes:
             meta["reviewer_notes"] = payload.reviewer_notes
 
-        # Atomic write with backup
-        tmp_file = target_file.with_suffix(".tmp")
+        # Atomic write using unique NamedTemporaryFile + os.replace
+        tmp_path: Path | None = None
         try:
-            with open(tmp_file, "w", encoding="utf-8") as f:
-                json.dump(target_data, f, ensure_ascii=False, indent=2)
-            tmp_file.replace(target_file)
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=target_file.parent,
+                prefix=f".{target_file.stem}_",
+                suffix=".tmp",
+                delete=False,
+            ) as tmp_f:
+                tmp_path = Path(tmp_f.name)
+                json.dump(target_data, tmp_f, ensure_ascii=False, indent=2)
+            os.replace(tmp_path, target_file)
         except Exception as e:
-            if tmp_file.exists():
-                tmp_file.unlink()
+            if tmp_path and tmp_path.exists():
+                tmp_path.unlink()
             raise HTTPException(status_code=500, detail=f"Failed to write rectified data: {str(e)}") from e
 
     return {

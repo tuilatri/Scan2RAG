@@ -5,6 +5,7 @@ Endpoints:
 2. GET /api/v1/health: Health check reporting Vector DB, BM25 Index, and LLM Router status.
 """
 
+import threading
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -52,37 +53,39 @@ class QueryResponse(BaseModel):
     latency_total_ms: float
 
 
-# Dependency Injection for Singleton QAService
+# Dependency Injection for Singleton QAService (thread-safe double-checked locking)
 _qa_service_instance: GroundedQAService | None = None
+_qa_service_lock = threading.Lock()
 
 
 def get_qa_service() -> GroundedQAService:
     global _qa_service_instance
     if _qa_service_instance is None:
-        vector_store = LegalVectorStore(collection_name="vietnamese_legal_docs")
-        bm25_searcher = LegalBM25Searcher()
-        # Attempt to load saved BM25 index, otherwise initialize
-        if not bm25_searcher.load():
-            import sys
-            from pathlib import Path
-            root_dir = Path(__file__).resolve().parent.parent.parent.parent
-            if str(root_dir) not in sys.path:
-                sys.path.insert(0, str(root_dir))
-            from scripts.audit_hybrid_retrieval import load_all_corpus_chunks
-            chunks = load_all_corpus_chunks()
-            bm25_searcher.fit_from_chunks(chunks)
-            bm25_searcher.save()
+        with _qa_service_lock:
+            if _qa_service_instance is None:
+                vector_store = LegalVectorStore(collection_name="vietnamese_legal_docs")
+                bm25_searcher = LegalBM25Searcher()
+                if not bm25_searcher.load():
+                    import sys
+                    from pathlib import Path
+                    root_dir = Path(__file__).resolve().parent.parent.parent.parent
+                    if str(root_dir) not in sys.path:
+                        sys.path.insert(0, str(root_dir))
+                    from scripts.audit_hybrid_retrieval import load_all_corpus_chunks
+                    chunks = load_all_corpus_chunks()
+                    bm25_searcher.fit_from_chunks(chunks)
+                    bm25_searcher.save()
 
-        hybrid_searcher = LegalHybridSearcher(
-            vector_store=vector_store,
-            bm25_searcher=bm25_searcher,
-            rrf_k=60,
-        )
-        reranker = LegalReranker(model_name="BAAI/bge-reranker-base")
-        _qa_service_instance = GroundedQAService(
-            hybrid_searcher=hybrid_searcher,
-            reranker=reranker,
-        )
+                hybrid_searcher = LegalHybridSearcher(
+                    vector_store=vector_store,
+                    bm25_searcher=bm25_searcher,
+                    rrf_k=60,
+                )
+                reranker = LegalReranker(model_name="BAAI/bge-reranker-base")
+                _qa_service_instance = GroundedQAService(
+                    hybrid_searcher=hybrid_searcher,
+                    reranker=reranker,
+                )
     return _qa_service_instance
 
 
