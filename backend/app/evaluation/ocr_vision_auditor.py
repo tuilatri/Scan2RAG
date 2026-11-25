@@ -77,7 +77,11 @@ class OcrVisionAuditor:
                         for line in table_lines[1:]
                         if not re.match(r"^\|(\s*:?-+:?\s*\|)+$", line)
                     ]
-                    if sum(self._is_score_like(c) for row in body_rows for c in row) >= 2:
+                    score_like_cols = {
+                        i for row in body_rows for i, c in enumerate(row)
+                        if i not in id_col_indices and self._is_score_like(c)
+                    }
+                    if expected_cols >= 3 and len(score_like_cols) <= 2:
                         score_col_indices = [expected_cols - 1]
 
                 sep_count = 0
@@ -96,7 +100,7 @@ class OcrVisionAuditor:
                     for idx, cell in enumerate(cells):
                         if not cell:
                             empty_cells += 1
-                        if idx in id_col_indices:
+                        if not score_col_indices or idx in id_col_indices:
                             continue
                         if self._is_score_like(cell) and idx not in score_col_indices:
                             shifted_score_cells += 1

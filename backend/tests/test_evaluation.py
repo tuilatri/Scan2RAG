@@ -114,3 +114,14 @@ def test_ocr_vision_auditor_detects_shifted_score_with_unclear_header(tmp_path: 
     res = OcrVisionAuditor(data_dir=tmp_path).audit()
     assert res["shifted_score_cells"] == 1
     assert res["passed"] is False
+
+
+def test_ocr_vision_auditor_ignores_row_numbers_when_header_has_no_score(tmp_path: Path):
+    """A 2-column table with row numbers in col 0 is not a shifted-score table."""
+    _write_table_fixture(
+        tmp_path,
+        "| STT | Nội dung |\n| --- | --- |\n| 1 | Số lượng cần kiểm tra |\n| 2 | Số lượng đã kiểm tra |\n",
+    )
+    res = OcrVisionAuditor(data_dir=tmp_path).audit()
+    assert res["shifted_score_cells"] == 0
+    assert res["passed"] is True
