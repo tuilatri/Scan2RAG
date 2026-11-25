@@ -96,6 +96,16 @@
       "optional": false
     },
     {
+      "id": "index-consistency",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_index_consistency.py"],
+      "cwd": ".",
+      "tags": ["audit", "vector"],
+      "requires": ["data/bm25_index.json", "data/qdrant_db"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-tests",
       "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],
