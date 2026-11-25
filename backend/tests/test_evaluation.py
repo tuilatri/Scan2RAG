@@ -58,3 +58,59 @@ def test_data_pipeline_auditor_passes_clean_nodes(tmp_path: Path):
     res = DataPipelineAuditor(data_dir=tmp_path).audit()
     assert res["passed"] is True
     assert res["orphan_nodes"] == 0
+
+
+def _write_table_fixture(tmp_path: Path, content: str) -> None:
+    sample_doc = {
+        "document_id": "thông_tư_105",
+        "nodes": [
+            {"id": "t1", "level": "TABLE", "title": "Bảng", "content": content, "metadata": {}}
+        ],
+    }
+    (tmp_path / "thông_tư_105.json").write_text(
+        json.dumps(sample_doc, ensure_ascii=False), encoding="utf-8"
+    )
+
+
+def test_ocr_vision_auditor_accepts_score_in_designated_column(tmp_path: Path):
+    """Scores in the declared score column are not shifted."""
+    _write_table_fixture(
+        tmp_path,
+        "| TT | Bệnh tật | Điểm |\n| --- | --- | --- |\n| 1 | Cận thị | 3T |\n",
+    )
+    res = OcrVisionAuditor(data_dir=tmp_path).audit()
+    assert res["shifted_score_cells"] == 0
+    assert res["passed"] is True
+
+
+def test_ocr_vision_auditor_detects_shifted_score(tmp_path: Path):
+    """A military score in a non-score column is a shifted cell."""
+    _write_table_fixture(
+        tmp_path,
+        "| TT | Bệnh tật | Mức | Điểm |\n| --- | --- | --- | --- |\n| 1 | Cận thị | 3T | 4 |\n",
+    )
+    res = OcrVisionAuditor(data_dir=tmp_path).audit()
+    assert res["shifted_score_cells"] == 1
+    assert res["passed"] is False
+
+
+def test_ocr_vision_auditor_ignores_stt_column(tmp_path: Path):
+    """Row numbers 1..6 in STT are not medical scores."""
+    _write_table_fixture(
+        tmp_path,
+        "| STT | Bệnh tật | Điểm |\n| --- | --- | --- |\n| 1 | Cận thị | 2 |\n| 2 | Viễn thị | 3 |\n",
+    )
+    res = OcrVisionAuditor(data_dir=tmp_path).audit()
+    assert res["shifted_score_cells"] == 0
+    assert res["passed"] is True
+
+
+def test_ocr_vision_auditor_detects_shifted_score_with_unclear_header(tmp_path: Path):
+    """Scanned header without 'Điểm' still flags scores outside the last column."""
+    _write_table_fixture(
+        tmp_path,
+        "| II | Tt i rrun tinh) | S |\n| --- | --- | --- |\n| m | 5 |  |\n| II a + | ε | 2 |\n",
+    )
+    res = OcrVisionAuditor(data_dir=tmp_path).audit()
+    assert res["shifted_score_cells"] == 1
+    assert res["passed"] is False

@@ -32,6 +32,24 @@ def extract_numbers(text: str) -> list[str]:
     return [n.upper() for n in re.findall(r"\b\d+(?:\.\d+)?(?:[Tt]|%)?", text) if n.strip()]
 
 
+def check_number_lock(raw_backup: str | None, rectified: str) -> tuple[bool, str]:
+    """Compare numeric tokens before/after rectification."""
+    if not raw_backup:
+        return False, "Thiếu raw_content_backup"
+
+    lost = Counter(extract_numbers(raw_backup)) - Counter(extract_numbers(rectified))
+    added = Counter(extract_numbers(rectified)) - Counter(extract_numbers(raw_backup))
+    if not lost and not added:
+        return True, ""
+
+    reasons = []
+    if lost:
+        reasons.append("Mất số: " + ", ".join(f"{k} ({v})" for k, v in lost.items()))
+    if added:
+        reasons.append("Thêm số: " + ", ".join(f"{k} ({v})" for k, v in added.items()))
+    return False, "; ".join(reasons)
+
+
 def audit_corpus():
     raw_dir = Path("data/raw")
     processed_dir = Path("data/processed")
@@ -136,6 +154,12 @@ def audit_corpus():
                     if not n.metadata.get("hitl_approved") or "|" not in n.content:
                         rectified_tables_safeguard_failures += 1
                         errors.append(f"{doc_id} node {n.id}: hitl_rectified table missing hitl_approved or invalid markdown")
+                    number_lock_ok, reason = check_number_lock(
+                        n.metadata.get("raw_content_backup"), n.content
+                    )
+                    if not number_lock_ok:
+                        rectified_tables_safeguard_failures += 1
+                        errors.append(f"{doc_id} node {n.id}: HITL number lock broken! {reason}")
                 elif n.metadata and n.metadata.get("vlm_rectified"):
                     rectified_tables_checked += 1
                     raw_backup = n.metadata.get("raw_content_backup")
