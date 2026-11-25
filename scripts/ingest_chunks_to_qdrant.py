@@ -9,9 +9,31 @@ from pathlib import Path
 backend_dir = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_dir))
 
+from qdrant_client.models import PointIdsList, PointStruct
+
 from app.chunking.semantic_chunker import SemanticLegalChunker
 from app.embeddings.embedder import LegalEmbedder
 from app.retrieval.qdrant_client import LegalVectorStore
+
+
+def purge_stale_points(client, collection_name: str, keep_count: int) -> int:
+    """Delete point ids above the current corpus size (stale after re-chunk)."""
+    stale: list[int] = []
+    offset = 0
+    while True:
+        points, next_offset = client.scroll(
+            collection_name=collection_name, limit=1000, offset=offset, with_payload=False
+        )
+        stale.extend(int(p.id) for p in points if int(p.id) > keep_count)
+        if next_offset is None:
+            break
+        offset = next_offset
+    if stale:
+        client.delete(
+            collection_name=collection_name,
+            points_selector=PointIdsList(points=stale),
+        )
+    return len(stale)
 
 
 def ingest_corpus_to_qdrant(batch_size: int = 100):
@@ -39,7 +61,7 @@ def ingest_corpus_to_qdrant(batch_size: int = 100):
 
     for fpath in processed_files:
         doc_name = Path(fpath).name
-        print(f"\nProcessing {doc_name}...")
+        print(f"\nProcessing {doc_name.encode('ascii', 'backslashreplace').decode()}...")
         with open(fpath, "r", encoding="utf-8") as fp:
             doc_data = json.load(fp)
 
@@ -52,7 +74,6 @@ def ingest_corpus_to_qdrant(batch_size: int = 100):
             vecs = embedder.embed_batch(texts, is_query=False, batch_size=batch_size)
 
             # Build points
-            from qdrant_client.models import PointStruct
             points = []
             for c, v in zip(b_chunks, vecs):
                 # Clean payload
@@ -79,8 +100,10 @@ def ingest_corpus_to_qdrant(batch_size: int = 100):
             total_indexed += len(points)
             print(f"  Indexed {doc_indexed}/{len(chunks)} chunks of {doc_name}...")
 
+    stale_deleted = purge_stale_points(client, store.collection_name, total_indexed)
     total_time = time.time() - start_time
-    print(f"\n🎉 Successfully indexed {total_indexed} points into Qdrant in {total_time:.1f}s!")
+    print(f"\nDeleted {stale_deleted} stale point(s) beyond id {total_indexed}.")
+    print(f"🎉 Successfully indexed {total_indexed} points into Qdrant in {total_time:.1f}s!")
 
 
 if __name__ == "__main__":

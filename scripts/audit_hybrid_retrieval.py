@@ -34,16 +34,10 @@ def load_all_corpus_chunks():
             doc_data = json.load(fp)
             chunks = chunker.chunk_document(doc_data)
             for c in chunks:
-                all_chunks.append({
-                    "id": c.id,
-                    "breadcrumb": c.breadcrumb,
-                    "content": c.content,
-                    "document_id": c.document_id,
-                    "document_name": c.document_name,
-                    "page_number": c.page_numbers[0] if c.page_numbers else 0,
-                    "is_table": c.is_table,
-                    "is_superseded": c.is_superseded,
-                })
+                payload = c.model_dump()
+                payload["id"] = str(c.id)
+                payload["page_number"] = c.page_numbers[0] if c.page_numbers else 0
+                all_chunks.append(payload)
     return all_chunks
 
 

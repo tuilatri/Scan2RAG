@@ -67,6 +67,8 @@ data/processed/*
 !data/processed/.gitkeep
 data/exports/*
 !data/exports/.gitkeep
+data/bm25_index.json
+data/bm25_index.pkl
 *.pdf
 *.png
 *.jpg

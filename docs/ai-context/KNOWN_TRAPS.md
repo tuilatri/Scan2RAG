@@ -25,7 +25,7 @@
 ## 5. Silent Metadata Contract Drift
 - **Symptom**: Audit script reports "0 safeguard breaches" even when data has errors, or fails to detect rectified tables.
 - **Root cause**: Free-form dictionary keys (`dict.get("key")`) drifted between generator (`vlm_rectified`) and auditor (`rectified_by`), causing silent bypass.
-- **Fix**: Enforce Pydantic schema (`TableMetadata`) with typed models and mandatory `corpus-audit` gate inside `kit.config.json`.
+- **Fix**: Enforce Pydantic schema (`TableMetadata`) with typed models and mandatory `corpus-audit` gate inside `kit.config.json`. Sau 1C: BM25 JSON rebuild dùng `LegalChunk.model_dump()` (16 field) và gate `index-consistency` so sánh chunker/BM25/Qdrant (7.259/7.259/7.259), point id `1..N`, 0 breadcrumb `> DOCUMENT`, `superseded_by`/`effective_date` đầy đủ — contract drift bị khóa bằng gate, không phải bằng convention.
 
 ## 6. Self-Reported Zero Trap in Auditors
 - **Symptom**: `ocr_vision_auditor` báo `shifted_score_cells: 0, score: 100.0, passed: true` dù corpus có hàng trăm ô điểm nằm sai cột; `audit_processed_data.py` bỏ qua number-lock cho bảng HITL nên `thông_tư_105_table_p24` / `thông_tư_88_table_p30` đổi `9 → 5` vẫn in "0 safeguard breaches".
