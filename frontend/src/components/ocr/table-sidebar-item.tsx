@@ -17,9 +17,17 @@ export const TableSidebarItem: React.FC<TableSidebarItemProps> = ({
 }) => {
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(table.id)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(table.id);
+        }
+      }}
       className={cn(
-        'group cursor-pointer rounded-lg border p-2 text-left transition-all duration-150',
+        'group cursor-pointer rounded-lg border p-2 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         isSelected
           ? 'border-primary bg-primary/5 shadow-sm'
           : 'border-border/60 bg-card hover:border-primary/40 hover:bg-muted/30'

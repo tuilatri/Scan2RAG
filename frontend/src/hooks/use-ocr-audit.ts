@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TableSummary, TableDetail } from '@/types/ocr';
 import { matrixToMarkdown, parseMarkdownTable } from '@/lib/markdown-table-parser';
 
@@ -20,6 +20,7 @@ export function useOcrAudit({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [filterDocId, setFilterDocId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const detailAbortRef = useRef<AbortController | null>(null);
 
   // Fetch list of tables
   const fetchTables = useCallback(async () => {
@@ -40,23 +41,36 @@ export function useOcrAudit({
     }
   }, [apiBaseUrl, selectedTableId]);
 
-  // Fetch detail when selectedTableId changes
+  // Fetch detail when selectedTableId changes (with AbortController to prevent stale race)
   const fetchTableDetail = useCallback(
     async (tableId: string) => {
+      if (detailAbortRef.current) {
+        detailAbortRef.current.abort();
+      }
+      const controller = new AbortController();
+      detailAbortRef.current = controller;
+
       setIsLoading(true);
       setError(null);
       setSuccessMessage(null);
       try {
-        const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables/${tableId}`);
+        const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables/${tableId}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`Lỗi tải chi tiết bảng: ${res.statusText}`);
         const data: TableDetail = await res.json();
         setTableDetail(data);
         setEditableHeaders([...data.headers]);
         setEditableRows(data.rows.map((r) => [...r]));
       } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
         setError(err instanceof Error ? err.message : 'Lỗi tải dữ liệu bảng.');
       } finally {
-        setIsLoading(false);
+        if (detailAbortRef.current === controller) {
+          setIsLoading(false);
+        }
       }
     },
     [apiBaseUrl]

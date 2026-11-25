@@ -13,7 +13,7 @@ export const StreamIndicator: React.FC<StreamIndicatorProps> = ({
   if (!isStreaming) return null;
 
   return (
-    <div className="flex items-center space-x-2 text-xs text-muted-foreground py-1 px-3 bg-muted/40 rounded-md border border-border/50 animate-pulse">
+    <div className="flex items-center space-x-2 text-xs text-muted-foreground py-1 px-3 bg-muted/40 rounded-md border border-border/50">
       <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
       <span>
         {citationCount > 0
