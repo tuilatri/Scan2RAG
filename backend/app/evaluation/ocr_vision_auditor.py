@@ -21,6 +21,8 @@ class OcrVisionAuditor:
         hitl_tables = 0
         malformed_tables = 0
         invalid_score_cells = 0
+        duplicate_separators = 0
+        shifted_score_cells = 0
         total_cells = 0
         empty_cells = 0
 
@@ -58,8 +60,12 @@ class OcrVisionAuditor:
                     if any(term in h.lower() for term in ["điểm", "phân loại", "chỉ số điểm"])
                 ]
 
+                sep_count = 0
                 for line in table_lines[1:]:
                     if re.match(r"^\|(\s*:?-+:?\s*\|)+$", line):
+                        sep_count += 1
+                        if sep_count > 1:
+                            duplicate_separators += 1
                         continue
                     cells = [c.strip() for c in line.strip("|").split("|")]
                     total_cells += len(cells)
@@ -86,12 +92,14 @@ class OcrVisionAuditor:
         return {
             "persona": "ocr_vision_specialist",
             "score": max(round(score, 1), 0.0),
-            "passed": malformed_tables == 0 and invalid_score_cells == 0,
+            "passed": malformed_tables == 0 and invalid_score_cells == 0 and duplicate_separators == 0 and shifted_score_cells == 0,
             "total_tables": total_tables,
             "vlm_rectified_tables": vlm_rectified_tables,
             "hitl_rectified_tables": hitl_tables,
             "malformed_tables": malformed_tables,
             "invalid_score_cells": invalid_score_cells,
+            "duplicate_separators": duplicate_separators,
+            "shifted_score_cells": shifted_score_cells,
             "total_cells": total_cells,
             "empty_cell_ratio_pct": round(empty_cell_ratio, 2),
         }

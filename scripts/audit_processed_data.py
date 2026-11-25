@@ -130,8 +130,13 @@ def audit_corpus():
                     if n.metadata.get("vlm_rectified") and n.metadata.get("vlm_error"):
                         errors.append(f"{doc_id} table {n.id}: metadata debt! Has vlm_error while vlm_rectified is True")
 
-                # Inspect safeguard on rectified table (skip raw number_lock if human-rectified via HITL)
-                if n.metadata and n.metadata.get("vlm_rectified") and not n.metadata.get("hitl_rectified"):
+                # Inspect safeguard on rectified table
+                if n.metadata and n.metadata.get("hitl_rectified"):
+                    rectified_tables_checked += 1
+                    if not n.metadata.get("hitl_approved") or "|" not in n.content:
+                        rectified_tables_safeguard_failures += 1
+                        errors.append(f"{doc_id} node {n.id}: hitl_rectified table missing hitl_approved or invalid markdown")
+                elif n.metadata and n.metadata.get("vlm_rectified"):
                     rectified_tables_checked += 1
                     raw_backup = n.metadata.get("raw_content_backup")
                     if not raw_backup:
