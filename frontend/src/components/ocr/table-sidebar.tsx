@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TableSummary } from '@/types/ocr';
+import { ScrollControls } from '@/components/ui/scroll-controls';
 import { TableSidebarItem } from './table-sidebar-item';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -31,6 +32,14 @@ export const TableSidebar: React.FC<TableSidebarProps> = ({
   onFilterChange,
   onSearchChange,
 }) => {
+  const listRef = useRef<HTMLDivElement>(null);
+  const scrollList = (delta: number) => {
+    const viewport = listRef.current?.querySelector(
+      '[data-radix-scroll-area-viewport]'
+    ) as HTMLElement | null;
+    viewport?.scrollBy({ top: delta, behavior: 'smooth' });
+  };
+
   return (
     <div className="flex h-full w-80 flex-col border-r bg-card/60">
       {/* Header & Search */}
@@ -73,7 +82,16 @@ export const TableSidebar: React.FC<TableSidebarProps> = ({
       </div>
 
       {/* Tables List */}
-      <ScrollArea className="flex-1 p-2">
+      <div className="flex items-center justify-end border-b px-2 py-1">
+        <ScrollControls
+          direction="vertical"
+          label="Danh sách bảng"
+          onPrev={() => scrollList(-240)}
+          onNext={() => scrollList(240)}
+        />
+      </div>
+      <div ref={listRef} className="min-h-0 flex-1">
+        <ScrollArea className="h-full p-2">
         {tables.length === 0 ? (
           <div className="p-4 text-center text-xs text-muted-foreground">
             Không tìm thấy bảng phù hợp.
@@ -90,7 +108,8 @@ export const TableSidebar: React.FC<TableSidebarProps> = ({
             ))}
           </div>
         )}
-      </ScrollArea>
+        </ScrollArea>
+      </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@
 
 ## Bắt đầu nhanh
 
-Cài đặt, cấu hình `.env`, sinh artifact dữ liệu, chạy backend/frontend và chạy verify: **[HOW_TO_RUN.md](HOW_TO_RUN.md)**. Giao diện có 3 chế độ: Trợ lý Tra cứu RAG, Đối soát OCR (HITL) và So sánh văn bản.
+Cài đặt, cấu hình `.env`, sinh artifact dữ liệu, chạy backend/frontend và chạy verify: **[HOW_TO_RUN.md](HOW_TO_RUN.md)**.
 
 ---
 

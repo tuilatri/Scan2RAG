@@ -51,7 +51,7 @@ describe('Layout Components', () => {
     expect(screen.getByText(/Trợ lý Tra cứu Văn bản Pháp luật/i)).toBeInTheDocument();
     expect(screen.getByText('Trợ lý Tra cứu RAG')).toBeInTheDocument();
     expect(screen.getByText('Đối soát OCR (HITL)')).toBeInTheDocument();
-    expect(screen.getByText('Backend & Qdrant Sẵn sàng')).toBeInTheDocument();
+    expect(screen.getByText('Hệ thống chạy')).toBeInTheDocument();
   });
 });
 
@@ -60,7 +60,7 @@ describe('Accessibility', () => {
     render(<Navbar activeTab="chat" onTabChange={() => {}} backendStatus="connected" />);
 
     const tabs = screen.getAllByRole('tab');
-    expect(tabs).toHaveLength(3);
+    expect(tabs).toHaveLength(2);
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     expect(tabs[0]).toHaveAttribute('aria-current', 'page');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');

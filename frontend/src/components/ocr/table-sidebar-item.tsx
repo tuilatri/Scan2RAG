@@ -34,9 +34,12 @@ export const TableSidebarItem: React.FC<TableSidebarItemProps> = ({
       )}
     >
       <div className="flex items-start justify-between gap-1.5">
-        <div className="flex items-center space-x-1.5 overflow-hidden">
-          <TableIcon className="h-3.5 w-3.5 shrink-0 text-primary" />
-          <span className="truncate text-xs font-medium text-foreground">
+        <div className="flex min-w-0 items-start space-x-1.5">
+          <TableIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <span
+            className="line-clamp-2 text-xs font-medium leading-4 text-foreground"
+            title={table.title || table.id}
+          >
             {table.title || table.id}
           </span>
         </div>
@@ -45,11 +48,11 @@ export const TableSidebarItem: React.FC<TableSidebarItemProps> = ({
         </Badge>
       </div>
 
-      <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
-        <span className="font-mono">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[11px] leading-4 text-muted-foreground">
+        <span className="font-mono shrink-0">
           {table.rows_count} hàng × {table.cols_count} cột
         </span>
-        <div>
+        <div className="whitespace-nowrap">
           {table.hitl_approved ? (
             <span className="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-medium">
               <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" /> Đã duyệt
