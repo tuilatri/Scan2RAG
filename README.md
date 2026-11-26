@@ -38,7 +38,7 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
            [ Hybrid Vector Search DB ] (Qdrant · PostgreSQL: planned)
                           │
                           ▼
-         [ Model Router ] (LangGraph agent: planned)
+         [ Model Router ] (LangGraph compare: additive)
                    /              \
      (Simple / Fast)            (Complex / Reasoning)
            ▼                              ▼
@@ -56,7 +56,7 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 2. **Structure-Aware & Parent-Child Chunking**: Khôi phục cấu trúc văn bản pháp luật Việt Nam (`Chương -> Điều -> Khoản -> Điểm`). Khi match một điểm nhỏ, hệ thống tự động bồi đắp context cha (Khoản, Điều).
 3. **Document Versioning & Temporal Consistency**: Quản lý mối quan hệ giữa *Văn bản gốc*, *Văn bản sửa đổi* và *Văn bản hợp nhất* nhằm tránh xung đột điều khoản đã hết hiệu lực.
 4. **Hybrid Retrieval + Reranking**: Kết hợp Dense Search (`multilingual-e5-small` / `BGE-M3`) và Sparse Search (`BM25`), sau đó rerank qua Cross-Encoder.
-5. **Hybrid Local–Cloud Routing**: Định tuyến câu hỏi: tra cứu metadata -> lookup; câu hỏi thông thường -> Local LLM (qua **LM Studio**, tối ưu VRAM); câu hỏi suy luận phức tạp -> Cloud LLM miễn phí qua **Groq** / **OpenRouter** (`:free`) / **Gemini**. Multi-hop LangGraph agent hiện là planned.
+5. **Hybrid Local–Cloud Routing**: Định tuyến câu hỏi: tra cứu metadata -> lookup; câu hỏi thông thường -> Local LLM (qua **LM Studio**, tối ưu VRAM); câu hỏi suy luận phức tạp -> Cloud LLM miễn phí qua **Groq** / **OpenRouter** (`:free`) / **Gemini**. LangGraph compare workflow bổ sung tại `POST /api/v1/query/compare`.
 6. **Benchmark & Evaluation**: Đo OCR (CER/WER), retrieval (Recall@K, nDCG) và generation (RAGAS: Faithfulness, Answer Relevance). Số liệu đo được và caveat được liệt kê ở mục [Benchmark & kiểm chứng](#benchmark--kiểm-chứng).
 
 ---
@@ -74,7 +74,8 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 ### 2. Query & Serving Pipeline (Online)
 - **Query Analyzer & Router**: Phân loại ý định (metadata search, factual single-hop, hay multi-document comparison).
 - **Retrieval Engine**: Hybrid search (BM25 + Dense) kết hợp RRF (Reciprocal Rank Fusion) và Reranker.
-- **Model Router (đã implement)**: Chọn local/cloud theo độ phức tạp. **Agentic Workflow (LangGraph)** — so sánh đa văn bản, Evidence Checker, retry — là **planned, chưa implement**.
+- **Model Router (đã implement)**: Chọn local/cloud theo độ phức tạp — giữ làm default cho chat.
+- **LangGraph Compare Workflow (additive)**: `POST /api/v1/query/compare` — so sánh đa văn bản qua 5 node `plan → retrieve → evidence_check → retry → synthesize`, retry tối đa 1 lần.
 - **Citation Validator**: Đảm bảo mọi câu trả lời đều có trích dẫn chính xác đến `Tên văn bản`, `Điều/Khoản` và `Số trang PDF`.
 
 ---
@@ -140,7 +141,7 @@ Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop c�
 | **Relational Database**| PostgreSQL (Test/Prod) — **planned, chưa implement** | Dự định lưu metadata, versioning, logs, user |
 | **Local LLM** | LM Studio (`http://localhost:1234/v1`) | Chạy suy luận cục bộ bằng Qwen2.5 GGUF |
 | **Cloud LLM (Free)**| Groq API, OpenRouter (`:free`) | Suy luận đa tài liệu, reasoning miễn phí |
-| **Agent Framework** | Model router (đã implement) · LangGraph/LangChain (**planned**) | Routing local/cloud; agent workflow chưa implement |
+| **Agent Framework** | Model router (default) · LangGraph (additive) | Routing local/cloud; graph so sánh đa văn bản tại endpoint riêng |
 | **Evaluation** | RAGAS, Custom Evaluation Suite | Đánh giá CER, WER, Recall@K, Faithfulness |
 | **Frontend** | React + TypeScript (Vite, Tailwind) | Giao diện Chat, Review OCR, Dashboard |
 
@@ -169,7 +170,7 @@ Scan2RAG/
 │   │   ├── embeddings/                 # Embedding service
 │   │   ├── retrieval/                  # Dense, Sparse, Hybrid search & Reranker
 │   │   ├── llm/                        # Local & Cloud model clients, Router
-│   │   ├── agents/                     # LangGraph workflow (planned, chưa tạo)
+│   │   ├── agents/                     # LangGraph compare workflow (additive)
 │   │   └── database/                   # PostgreSQL models (planned, chưa tạo); Qdrant ở retrieval/
 │   └── tests/
 ├── frontend/                           # React + TypeScript App
@@ -193,7 +194,7 @@ Scan2RAG/
 - **Artifact dữ liệu:** `data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json` bị gitignore — clone sạch không có, phải tạo local (xem [HOW_TO_RUN.md](HOW_TO_RUN.md)).
 - **CI vs local:** CI chạy 5 gate không cần artifact; 11 gate (gồm corpus/score/vector/benchmark/backend-tests) chỉ chạy đủ trên máy có dữ liệu — xem `docs/ai-context/TESTING_GUIDE.md` §2.
 - **Demo PDF:** video/GIF quay bằng Chromium headless (không có plugin xem PDF) với file mock 1 trang → vùng xem PDF bị trắng; UI vẫn hiện metadata/breadcrumb và toolbar. Đây là giới hạn của khâu quay demo, không phải lỗi sản phẩm.
-- **Chưa implement (planned):** PostgreSQL, Docling, LangGraph agent workflow — đối chiếu `docs/ai-context/ARCHITECTURE.md`.
+- **Chưa implement (planned):** PostgreSQL, Docling — đối chiếu `docs/ai-context/ARCHITECTURE.md`. LangGraph đã có dạng additive tại endpoint `/api/v1/query/compare`.
 
 ---
 

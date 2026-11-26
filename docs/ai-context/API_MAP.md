@@ -10,6 +10,7 @@
 | `GET` | `/api/v1/health` | None (liveness) | None | Service health check, status, active Milestone 2 features |
 | `POST` | `/api/v1/query` | `X-API-Key` / `Bearer` | 60/min per IP | Legal Question Answering with hybrid retrieval, reranking, and citation metadata |
 | `POST` | `/api/v1/query/stream` | `X-API-Key` / `Bearer` | 60/min per IP | Real-time SSE streaming endpoint emitting citations, tokens, and done events |
+| `POST` | `/api/v1/query/compare` | `X-API-Key` / `Bearer` | 60/min per IP | Additive LangGraph multi-document comparison with bounded evidence retry (max 1) |
 | `GET` | `/api/v1/documents` | `X-API-Key` / `Bearer` | 120/min per IP | List canonical legal documents with validity metadata & file sizes |
 | `GET` | `/api/v1/documents/{doc_id}` | `X-API-Key` / `Bearer` | 120/min per IP | Get specific document details by ID |
 | `GET` | `/api/v1/documents/{doc_id}/pdf` | `?api_key=` (iframe only) | 30/min per IP | Stream raw PDF with HTTP 206 Partial Content (Range bytes) support |
@@ -63,6 +64,18 @@
   2. `{"event": "citations", "citations": [...], "latency_retrieval_ms": 50.2, "latency_rerank_ms": 820.1}`
   3. `{"event": "token", "token": "Căn "}` (emitted token-by-token)
   4. `{"event": "done", "provider": "lm_studio_local", "model": "qwen2.5-1.5b", "latency_total_ms": 11500.0}` (or `{"event": "error", "message": "..."}` on failure)
+
+### `POST /api/v1/query/compare`
+- **Request Body (`CompareRequest`):**
+  ```json
+  {
+    "query": "So sánh quy định cận thị giữa Thông tư 105 và Thông tư 106",
+    "top_k_retrieval": 15,
+    "top_k_rerank": 5
+  }
+  ```
+- **Response Body (`CompareResponse`):** `query`, `answer`, `citations` (same `CitationItem`), `evidence` (`document_id`, `chunk_count`, `citation_ids`), `retry_count` (0 hoặc 1), `provider`, `model`.
+- **Note:** Endpoint bổ sung dùng LangGraph; `/query` và `/query/stream` vẫn là pipeline rule-based.
 
 ### `GET /api/v1/health`
 - **Response Body:**

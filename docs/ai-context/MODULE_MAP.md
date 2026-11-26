@@ -18,6 +18,14 @@
 | `backend/app/ingestion/text_normalizer.py` | 128 | Unicode NFC normalization & Vietnamese diacritics |
 | `backend/app/ingestion/vlm_rectifier.py` | 149 | Multi-modal VLM table rectification with Counter safeguard |
 
+### `backend/app/agents/` — LangGraph compare workflow (additive)
+
+| File | Lines | Role |
+|---|---:|---|
+| `backend/app/agents/__init__.py` | 1 | Package marker for additive agentic workflows |
+| `backend/app/agents/state.py` | 14 | `CompareState` TypedDict for the compare graph |
+| `backend/app/agents/compare_graph.py` | 131 | 5-node graph: plan → retrieve → evidence_check → retry → synthesize |
+
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).
 - `data/processed/`: 5 structured JSON corpora, 6.786 nodes, 111 Markdown tables (100% rectified).

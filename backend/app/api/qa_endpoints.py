@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from app.agents.compare_graph import build_compare_graph
 from app.core.paths import PROCESSED_DIR
 from app.core.security import verify_api_key
 from app.retrieval.bm25_searcher import LegalBM25Searcher
@@ -57,6 +58,28 @@ class QueryResponse(BaseModel):
     latency_total_ms: float
 
 
+class CompareRequest(BaseModel):
+    query: str = Field(..., min_length=2, max_length=1000, description="Multi-document comparison question")
+    top_k_retrieval: int = Field(default=15, ge=1, le=50)
+    top_k_rerank: int = Field(default=5, ge=1, le=10)
+
+
+class EvidenceItem(BaseModel):
+    document_id: str
+    chunk_count: int
+    citation_ids: list[str | None]
+
+
+class CompareResponse(BaseModel):
+    query: str
+    answer: str
+    citations: list[CitationItem]
+    evidence: list[EvidenceItem]
+    retry_count: int
+    provider: str
+    model: str
+
+
 # Dependency Injection for Singleton QAService (thread-safe double-checked locking)
 _qa_service_instance: GroundedQAService | None = None
 _qa_service_lock = threading.Lock()
@@ -91,6 +114,24 @@ def get_qa_service() -> GroundedQAService:
                     reranker=reranker,
                 )
     return _qa_service_instance
+
+
+_compare_graph_instance: Any = None
+_compare_graph_lock = threading.Lock()
+
+
+def get_compare_graph() -> Any:
+    global _compare_graph_instance
+    if _compare_graph_instance is None:
+        with _compare_graph_lock:
+            if _compare_graph_instance is None:
+                qa_service = get_qa_service()
+                _compare_graph_instance = build_compare_graph(
+                    hybrid_searcher=qa_service.hybrid_searcher,
+                    reranker=qa_service.reranker,
+                    model_router=qa_service.model_router,
+                )
+    return _compare_graph_instance
 
 
 @router.post("/query", response_model=QueryResponse, dependencies=[Depends(verify_api_key)])
@@ -137,6 +178,28 @@ def query_legal_rag_stream(
     except Exception:
         logger.exception("QA streaming pipeline failure")
         raise HTTPException(status_code=500, detail="QA streaming pipeline unavailable.") from None
+
+
+@router.post("/query/compare", response_model=CompareResponse, dependencies=[Depends(verify_api_key)])
+def compare_legal_documents(
+    payload: CompareRequest,
+    graph: Any = Depends(get_compare_graph),  # noqa: B008
+) -> CompareResponse:
+    """Additive LangGraph workflow for multi-document comparison."""
+    try:
+        result = graph.invoke({"query": payload.query})
+        return CompareResponse(
+            query=payload.query,
+            answer=result.get("answer", ""),
+            citations=result.get("citations", []),
+            evidence=result.get("evidence_summary", []),
+            retry_count=result.get("retry_count", 0),
+            provider=result.get("provider", "unknown"),
+            model=result.get("model", "unknown"),
+        )
+    except Exception:
+        logger.exception("Compare pipeline failure")
+        raise HTTPException(status_code=500, detail="Compare pipeline unavailable.") from None
 
 
 @router.get("/health")
