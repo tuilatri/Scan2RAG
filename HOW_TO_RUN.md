@@ -70,12 +70,12 @@ Terminal 1 (backend):
 
 ```powershell
 cd backend
-..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
 ```bash
 cd backend
-../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+./.venv/bin/python -m uvicorn app.main:app --reload --port 8000
 ```
 
 Terminal 2 (frontend):
@@ -95,7 +95,7 @@ Xong. Vào `http://localhost:5173`. Kiểm tra API tại `http://localhost:8000/
 
 Clone sạch **không có** PDF và corpus — chúng bị gitignore. Bạn cần PDF gốc, rồi chạy 3 lệnh.
 
-**Bước 1 — Copy PDF vào** `data/raw/` (ví dụ `Thong_tu_105.pdf`, `Thong_tu_88.pdf`).
+**Bước 1 — Copy PDF vào** `data/raw/` (ví dụ `Thông_tư_105.pdf`, `Thông_tư_88.pdf` — giữ nguyên dấu tiếng Việt).
 
 **Bước 2 — Chạy lần lượt từ thư mục gốc:**
 
@@ -121,9 +121,15 @@ Chạy Qdrant nếu chưa có: `docker compose up -d qdrant`.
 
 Chỉ muốn thử 1 văn bản / vài trang:
 
-```bash
-python scripts/ingest_documents.py --file Thong_tu_105.pdf --max-pages 5
+```powershell
+backend\.venv\Scripts\python.exe scripts\ingest_documents.py --file "Thông_tư_105.pdf" --max-pages 5
 ```
+
+```bash
+backend/.venv/bin/python scripts/ingest_documents.py --file "Thông_tư_105.pdf" --max-pages 5
+```
+
+> Tên truyền vào `--file` phải **khớp chính xác** tên file trong `data/raw/`. Xem danh sách bằng `Get-ChildItem data\raw` (Windows) hoặc `ls data/raw`.
 
 ---
 
@@ -146,10 +152,31 @@ CI trên GitHub chỉ chạy 5 gate đầu. **CI xanh không có nghĩa là dữ
 
 ## 4. Tạo lại demo
 
-```bash
-python scripts/capture_demo_frames.py     # 7 ảnh trong data/exports/demo/frames/
-python scripts/build_demo_video.py        # data/exports/demo/scan2rag_demo.mp4
+Cài thêm 2 package cho khâu quay (**chưa có** trong `backend/requirements.txt`):
+
+```powershell
+backend\.venv\Scripts\python.exe -m pip install playwright imageio-ffmpeg
+backend\.venv\Scripts\python.exe -m playwright install chromium
 ```
+
+```bash
+backend/.venv/bin/python -m pip install playwright imageio-ffmpeg
+backend/.venv/bin/python -m playwright install chromium
+```
+
+Chạy từ thư mục gốc repo:
+
+```powershell
+backend\.venv\Scripts\python.exe scripts\capture_demo_frames.py
+backend\.venv\Scripts\python.exe scripts\build_demo_video.py
+```
+
+```bash
+backend/.venv/bin/python scripts/capture_demo_frames.py
+backend/.venv/bin/python scripts/build_demo_video.py
+```
+
+Kết quả: 7 ảnh trong `data/exports/demo/frames/` và video `data/exports/demo/scan2rag_demo.mp4`.
 
 Copy video sang chỗ README dùng:
 
@@ -163,14 +190,19 @@ cp data/exports/demo/scan2rag_demo.mp4 docs/assets/scan2rag_demo.mp4
 
 Rồi tạo GIF và kiểm tra:
 
+```powershell
+backend\.venv\Scripts\python.exe scripts\build_demo_preview_gif.py --build
+backend\.venv\Scripts\python.exe scripts\build_demo_preview_gif.py --check
+```
+
 ```bash
-python scripts/build_demo_preview_gif.py --build
-python scripts/build_demo_preview_gif.py --check
+backend/.venv/bin/python scripts/build_demo_preview_gif.py --build
+backend/.venv/bin/python scripts/build_demo_preview_gif.py --check
 ```
 
 Lệnh check phải in `frames=7 transitions=6` và exit `0`.
 
-> `capture_demo_frames.py` cần `playwright` + `pymupdf` (`pip install playwright pymupdf` rồi `python -m playwright install chromium`). Script tự chạy Vite, tự chặn API bằng dữ liệu mẫu.
+> Script tự chạy Vite, tự chặn API bằng dữ liệu mẫu. `pymupdf` và `pillow` đã có trong `requirements.txt`; `playwright` + `imageio-ffmpeg` cần cài riêng như trên.
 >
 > **Vì sao vùng PDF trong demo có nội dung:** script trả một ảnh trang đã render bằng PyMuPDF thay vì file PDF — Chromium headless không có plugin xem PDF nên cách này hoạt động ổn định. Nếu có `data/raw/*105*.pdf`, script ưu tiên **trang 23 thật** (ảnh scan); nếu không có thì dùng trang mock tự sinh. Caption video vẫn ghi **DEMO DATA** — câu trả lời và điểm số trong chat là dữ liệu mẫu, ngay cả khi trang PDF hiển thị là thật.
 
@@ -181,7 +213,7 @@ Lệnh check phải in `frames=7 transitions=6` và exit `0`.
 | Bạn thấy | Nguyên nhân / làm gì |
 |---|---|
 | `PREFLIGHT — missing data/bm25_index.json` | Chưa chạy mục 2, hoặc đang verify trên máy không có corpus |
-| `ModuleNotFoundError: paddle` / `playwright` | Cài lại bằng `backend/requirements.txt`; `pip install playwright pymupdf` cho demo |
+| `ModuleNotFoundError: paddle` / `playwright` / `imageio_ffmpeg` | Cài lại `backend/requirements.txt`; riêng demo cài thêm `playwright imageio-ffmpeg` vào venv (xem mục 4) |
 | `401 Unauthorized` | Đặt `SCAN2RAG_API_KEY` trong `.env`, `VITE_API_KEY` khớp trong `frontend/.env.local`; dev local cần `ALLOW_UNAUTHENTICATED_DEV=true` |
 | Hỏi đáp trả "không tìm thấy" | Chưa nạp Qdrant: chạy lại `ingest_chunks_to_qdrant.py`, kiểm tra `localhost:6333` |
 | `CUDA out of memory` | Xem mục 6 |
