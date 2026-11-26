@@ -37,6 +37,19 @@ def needs_grounded_retry(answer: str, chunks: list[dict[str, Any]]) -> bool:
     return bool(chunks) and REFUSAL_PHRASE in answer
 
 
+DIOPTER_RANGE_PATTERN = re.compile(
+    r"\b(\d+(?:[.,]\d+)?)\s*đến\s*dưới\s*(\d+(?:[.,]\d+)?)\s*độ\b",
+    re.IGNORECASE,
+)
+
+
+def normalize_medical_query(query: str) -> str:
+    """Turn '3 đến dưới 4 độ' into the corpus form '-3D đến dưới -4D'."""
+    return DIOPTER_RANGE_PATTERN.sub(
+        lambda match: f"-{match.group(1)}D đến dưới -{match.group(2)}D", query
+    )
+
+
 class GroundedQAService:
     """End-to-end question answering pipeline with rigorous grounding and citations."""
 
@@ -49,6 +62,28 @@ class GroundedQAService:
         self.hybrid_searcher = hybrid_searcher
         self.reranker = reranker
         self.model_router = model_router or ModelRouter()
+
+    def _augment_with_normalized_query(
+        self,
+        query: str,
+        normalized_query: str,
+        top_chunks: list[dict[str, Any]],
+        top_k_retrieval: int,
+        top_k_rerank: int,
+    ) -> list[dict[str, Any]]:
+        if normalized_query == query:
+            return top_chunks
+        candidates = self.hybrid_searcher.search(
+            query=normalized_query,
+            top_k=top_k_retrieval,
+            filter_superseded=True,
+        )
+        extra = self.reranker.rerank(
+            query=normalized_query, candidates=candidates, top_k=top_k_rerank
+        )
+        seen = {chunk.get("id") for chunk in top_chunks}
+        merged = [chunk for chunk in extra if chunk.get("id") not in seen] + top_chunks
+        return merged[:top_k_rerank]
 
     def answer_query(
         self,
@@ -91,6 +126,10 @@ class GroundedQAService:
             top_k=top_k_rerank,
         )
         latency_rerank_ms = (time.time() - t_rerank_start) * 1000
+        normalized_query = normalize_medical_query(query)
+        top_chunks = self._augment_with_normalized_query(
+            query, normalized_query, top_chunks, top_k_retrieval, top_k_rerank
+        )
 
         # 3. Format Structured Citations
         citations = []
@@ -174,6 +213,10 @@ class GroundedQAService:
             top_k=top_k_rerank,
         )
         latency_rerank_ms = (time.time() - t_rerank_start) * 1000
+        normalized_query = normalize_medical_query(query)
+        top_chunks = self._augment_with_normalized_query(
+            query, normalized_query, top_chunks, top_k_retrieval, top_k_rerank
+        )
 
         # 3. Format Citations
         citations = []
