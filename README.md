@@ -5,7 +5,17 @@
 
 ---
 
-## 📌 Tổng quan dự án (Overview)
+## Demo video
+
+<video src="https://raw.githubusercontent.com/tuilatri/Scan2RAG/main/docs/assets/scan2rag_demo.mp4" controls width="100%"></video>
+
+[Tải video demo — 3:00, không âm thanh, caption tiếng Việt](docs/assets/scan2rag_demo.mp4)
+
+Video dùng dữ liệu demo (stub) để đảm bảo tính ổn định khi trình diễn. Các script tạo video nằm tại `scripts/capture_demo_frames.py` và `scripts/build_demo_video.py`.
+
+---
+
+## Tổng quan dự án (Overview)
 
 **Scan2RAG (Vietnamese Document Intelligence)** là hệ thống AI end-to-end xử lý tài liệu chuyên biệt cho văn bản tiếng Việt dạng **PDF scan / ảnh scan** (chất lượng từ scan văn bản giấy, chứa bảng biểu phức tạp, con dấu, chữ ký và độ nhiễu thực tế).
 
@@ -36,7 +46,7 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 
 ---
 
-## ✨ Điểm nổi bật & Kỹ thuật chính (Key Highlights)
+## Điểm nổi bật & Kỹ thuật chính (Key Highlights)
 
 1. **OCR & Image Preprocessing Pipeline**: Xử lý nghiêng (deskew), khử nhiễu (denoise), tăng tương phản trước khi nhận diện qua `PaddleOCR` (so sánh baseline với `Tesseract`).
 2. **Structure-Aware & Parent-Child Chunking**: Khôi phục cấu trúc văn bản pháp luật Việt Nam (`Chương -> Điều -> Khoản -> Điểm`). Khi match một điểm nhỏ, hệ thống tự động bồi đắp context cha (Khoản, Điều).
@@ -47,7 +57,7 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 
 ---
 
-## 🏗️ Kiến trúc hệ thống (System Architecture)
+## Kiến trúc hệ thống (System Architecture)
 
 ### 1. Ingestion Pipeline (Offline)
 - **PDF Inspection**: Phân loại file (Digital Text PDF, Scanned PDF, hoặc Hybrid PDF).
@@ -65,7 +75,7 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 
 ---
 
-## 💻 Môi trường & Cấu hình phần cứng mục tiêu
+## Môi trường & Cấu hình phần cứng mục tiêu
 
 Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop cá nhân có tài nguyên VRAM hạn chế:
 - **CPU**: Intel Core i5-12450H (hoặc tương đương)
@@ -80,7 +90,7 @@ Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop c�
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Thành phần | Công nghệ lựa chọn | Vai trò |
 | :--- | :--- | :--- |
@@ -100,7 +110,7 @@ Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop c�
 
 ---
 
-## 📂 Cấu trúc thư mục (Project Structure)
+## Cấu trúc thư mục (Project Structure)
 
 ```text
 Scan2RAG/
@@ -140,7 +150,7 @@ Scan2RAG/
 
 ---
 
-## 🗺️ Lộ trình triển khai rút gọn (Phased Milestones)
+## Lộ trình triển khai rút gọn (Phased Milestones)
 
 - [ ] **Milestone 1 (Data Pipeline & Ingestion MVP)**:
   - Thu thập 4-5 văn bản quy định nghĩa vụ quân sự (TT 105/2023, TT 106/2025, VBHN 88, TT 68/2025).
@@ -158,7 +168,7 @@ Scan2RAG/
 
 ---
 
-## 📖 Tài liệu kỹ thuật chi tiết
+## Tài liệu kỹ thuật chi tiết
 
 Chi tiết đầy đủ về toàn bộ kiến trúc, bảng phân tích rủi ro, thông số metric và lộ trình 10 phase được lưu tại:  
-👉 **[Tài liệu Đặc tả Kỹ thuật Toàn diện (Project Blueprint & Specs)](docs/project-blueprint-and-specs.md)**
+ **[Tài liệu Đặc tả Kỹ thuật Toàn diện (Project Blueprint & Specs)](docs/project-blueprint-and-specs.md)**
