@@ -5,7 +5,6 @@ runtime code does not import audit scripts (which pull in pymupdf/sys.path).
 """
 
 import re
-from collections import Counter
 
 NUMBER_PATTERN = re.compile(r"\b\d+(?:\.\d+)?(?:[Tt]|%)?")
 
@@ -16,5 +15,5 @@ def extract_numbers(text: str) -> list[str]:
 
 def unsupported_numbers(answer: str, evidence_text: str) -> dict[str, int]:
     """Numbers present in the answer but absent from the cited evidence."""
-    added = Counter(extract_numbers(answer)) - Counter(extract_numbers(evidence_text))
-    return dict(added)
+    added = set(extract_numbers(answer)) - set(extract_numbers(evidence_text))
+    return {number: 1 for number in sorted(added)}

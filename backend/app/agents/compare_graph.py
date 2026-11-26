@@ -4,6 +4,7 @@ from typing import Any
 
 from langgraph.graph import END, StateGraph
 
+from app.agents.planner import detect_documents, plan_subqueries
 from app.agents.state import CompareState
 from app.agents.verification import extract_numbers, unsupported_numbers
 from app.chunking.semantic_chunker import SemanticLegalChunker
@@ -14,29 +15,6 @@ MAX_RETRIES = 1
 MAX_VERIFY_RETRIES = 1
 PREFERRED_DOC = "thông_tư_88"
 SUPERSEDED_BY = {"thông_tư_105": "thông_tư_106"}
-DOCUMENT_TOKENS = (
-    ("105", "thông_tư_105"),
-    ("106", "thông_tư_106"),
-    ("88", "thông_tư_88"),
-    ("hợp nhất", "thông_tư_88"),
-)
-FALLBACK_DOCS = ("thông_tư_105", "thông_tư_106")
-
-
-def detect_documents(query: str) -> list[str]:
-    lowered = query.lower()
-    found: list[str] = []
-    for token, document_id in DOCUMENT_TOKENS:
-        if token in lowered and document_id not in found:
-            found.append(document_id)
-    for document_id in FALLBACK_DOCS:
-        if len(found) >= 2:
-            break
-        if document_id not in found:
-            found.append(document_id)
-    return found
-
-
 def _citation(chunk: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": chunk.get("id"),
@@ -56,10 +34,14 @@ def build_compare_graph(
     model_router: Any,
     top_k_retrieval: int = 15,
     top_k_rerank: int = 5,
+    planner_enabled: bool = False,
 ):
-    def retrieve_for(sub_query: str, limit: int):
+    def retrieve_for(sub_query: str, limit: int, document_id: str | None = None):
         candidates = hybrid_searcher.search(
-            query=sub_query, top_k=limit, filter_superseded=True
+            query=sub_query,
+            top_k=limit,
+            filter_superseded=True,
+            document_id=document_id,
         )
         chunks = reranker.rerank(
             query=sub_query, candidates=candidates, top_k=top_k_rerank
@@ -67,18 +49,35 @@ def build_compare_graph(
         return chunks, [_citation(chunk) for chunk in chunks]
 
     def plan(state: CompareState):
-        documents = detect_documents(state["query"])
+        if planner_enabled:
+            planned = plan_subqueries(state["query"], model_router)
+            documents = planned["documents"]
+            sub_queries = planned["sub_queries"]
+            source = planned["source"]
+        else:
+            documents = detect_documents(state["query"])
+            sub_queries = [f'{state["query"]} — {document_id}' for document_id in documents]
+            source = "deterministic"
+        sub_query_docs = (
+            [documents[index % len(documents)] for index in range(len(sub_queries))]
+            if documents
+            else []
+        )
         return {
             "target_docs": documents,
-            "sub_queries": [f'{state["query"]} — {document_id}' for document_id in documents],
+            "sub_queries": sub_queries,
+            "sub_query_docs": sub_query_docs,
+            "plan_source": source,
             "retry_count": 0,
         }
 
     def retrieve(state: CompareState):
         evidence: list[dict[str, Any]] = []
         citations: list[dict[str, Any]] = []
-        for sub_query in state["sub_queries"]:
-            chunks, cites = retrieve_for(sub_query, top_k_retrieval)
+        for sub_query, document_id in zip(
+            state["sub_queries"], state["sub_query_docs"], strict=False
+        ):
+            chunks, cites = retrieve_for(sub_query, top_k_retrieval, document_id)
             evidence.append({"sub_query": sub_query, "chunks": chunks, "citations": cites})
             citations.extend(cites)
         return {"evidence": evidence, "citations": citations}
@@ -106,7 +105,9 @@ def build_compare_graph(
         evidence = list(state["evidence"])
         for document_id in state["missing"]:
             chunks, cites = retrieve_for(
-                f'{state["query"]} — {document_id}', min(top_k_retrieval * 2, 50)
+                f'{state["query"]} — {document_id}',
+                min(top_k_retrieval * 2, 50),
+                document_id,
             )
             evidence.append({"sub_query": document_id, "chunks": chunks, "citations": cites})
         citations = [citation for item in evidence for citation in item["citations"]]

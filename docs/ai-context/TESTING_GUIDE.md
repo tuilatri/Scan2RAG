@@ -6,8 +6,8 @@
 
 | Metric | Measured Value |
 |---|---|
-| Collected pytest items | 126 |
-| Backend test files | 27 |
+| Collected pytest items | 129 |
+| Backend test files | 28 |
 | Frontend Vitest items | 31 |
 | Frontend test files | 4 |
 | Lines in test_vlm_rectifier.py | 59 (non-empty) |
