@@ -16,8 +16,13 @@ def _doc_number(pattern: str) -> int | None:
 
 
 def _collected_pytest() -> int | None:
+    venv_python = (
+        ROOT / "backend/.venv/Scripts/python.exe"
+        if sys.platform == "win32"
+        else ROOT / "backend/.venv/bin/python"
+    )
     result = subprocess.run(
-        [str(ROOT / "backend/.venv/Scripts/python.exe"), "-m", "pytest", "backend/tests", "--collect-only", "-q"],
+        [str(venv_python), "-m", "pytest", "backend/tests", "--collect-only", "-q"],
         cwd=ROOT, capture_output=True, text=True, timeout=180,
     )
     match = re.search(r"(\d+) tests? collected", result.stdout + result.stderr)
