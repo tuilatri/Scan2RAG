@@ -13,6 +13,12 @@
 
 ---
 
+## Bắt đầu nhanh
+
+Cài đặt, cấu hình `.env`, sinh artifact dữ liệu, chạy backend/frontend và chạy verify: **[HOW_TO_RUN.md](HOW_TO_RUN.md)**.
+
+---
+
 ## Tổng quan dự án (Overview)
 
 **Scan2RAG (Vietnamese Document Intelligence)** là hệ thống AI end-to-end xử lý tài liệu chuyên biệt cho văn bản tiếng Việt dạng **PDF scan / ảnh scan** (chất lượng từ scan văn bản giấy, chứa bảng biểu phức tạp, con dấu, chữ ký và độ nhiễu thực tế).
@@ -23,16 +29,16 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
                [ Scanned PDF / Image ]
                           │
                           ▼
-            [ OCR & Layout Ingestion ] (PaddleOCR, Docling, OpenCV)
+            [ OCR & Layout Ingestion ] (PaddleOCR, OpenCV · Docling: planned)
                           │
                           ▼
            [ Structure-aware Chunking ] (Chương / Điều / Khoản / Điểm)
                           │
                           ▼
-           [ Hybrid Vector Search DB ] (PostgreSQL [Test/Prod] + Qdrant)
+           [ Hybrid Vector Search DB ] (Qdrant · PostgreSQL: planned)
                           │
                           ▼
-         [ Agentic Query Router & Planner ] (LangGraph / Python)
+         [ Model Router ] (LangGraph agent: planned)
                    /              \
      (Simple / Fast)            (Complex / Reasoning)
            ▼                              ▼
@@ -50,8 +56,8 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 2. **Structure-Aware & Parent-Child Chunking**: Khôi phục cấu trúc văn bản pháp luật Việt Nam (`Chương -> Điều -> Khoản -> Điểm`). Khi match một điểm nhỏ, hệ thống tự động bồi đắp context cha (Khoản, Điều).
 3. **Document Versioning & Temporal Consistency**: Quản lý mối quan hệ giữa *Văn bản gốc*, *Văn bản sửa đổi* và *Văn bản hợp nhất* nhằm tránh xung đột điều khoản đã hết hiệu lực.
 4. **Hybrid Retrieval + Reranking**: Kết hợp Dense Search (`multilingual-e5-small` / `BGE-M3`) và Sparse Search (`BM25`), sau đó rerank qua Cross-Encoder.
-5. **Hybrid Local–Cloud Routing**: Định tuyến câu hỏi: Tra cứu metadata -> Database lookup; Câu hỏi thông thường -> Local LLM (chạy qua **LM Studio**, tối ưu VRAM); Câu hỏi suy luận phức tạp/đa tài liệu -> Cloud LLM miễn phí qua **Groq API** hoặc **OpenRouter** (`:free` models) / Multi-hop Agent.
-6. **Rigorous Benchmark & Evaluation**: Đo lường định lượng từ OCR (CER, WER), Retrieval (Recall@K, nDCG) đến Generation (Faithfulness, Answer Relevance qua RAGAS) trên bộ 50-100 ground truth Q&A.
+5. **Hybrid Local–Cloud Routing**: Định tuyến câu hỏi: tra cứu metadata -> lookup; câu hỏi thông thường -> Local LLM (qua **LM Studio**, tối ưu VRAM); câu hỏi suy luận phức tạp -> Cloud LLM miễn phí qua **Groq** / **OpenRouter** (`:free`) / **Gemini**. Multi-hop LangGraph agent hiện là planned.
+6. **Benchmark & Evaluation**: Đo OCR (CER/WER), retrieval (Recall@K, nDCG) và generation (RAGAS: Faithfulness, Answer Relevance). Số liệu đo được và caveat được liệt kê ở mục [Benchmark & kiểm chứng](#benchmark--kiểm-chứng).
 
 ---
 
@@ -63,12 +69,12 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 - **OCR Engine**: Trích xuất text và layout bounding box bằng PaddleOCR.
 - **Human-in-the-loop Correction UI**: Giao diện kiểm tra, so sánh ảnh gốc vs text OCR, lưu vết hiệu chỉnh.
 - **Structure Parser & Chunking**: Bóc tách theo cấu trúc phân cấp, sinh metadata chi tiết.
-- **Vector & Relational Storage**: Lưu trữ metadata/versioning tại PostgreSQL và embeddings tại Qdrant.
+- **Vector Storage**: Embeddings và payload metadata/version được lưu tại Qdrant. PostgreSQL (metadata/versioning quan hệ) là **planned, chưa implement**.
 
 ### 2. Query & Serving Pipeline (Online)
 - **Query Analyzer & Router**: Phân loại ý định (metadata search, factual single-hop, hay multi-document comparison).
 - **Retrieval Engine**: Hybrid search (BM25 + Dense) kết hợp RRF (Reciprocal Rank Fusion) và Reranker.
-- **Agentic Workflow (LangGraph)**: Xử lý các câu hỏi phức tạp cần tra cứu nhiều văn bản (so sánh Thông tư 105 và Thông tư 106), đánh giá bằng chứng (Evidence Checker) và retry nếu thiếu thông tin.
+- **Model Router (đã implement)**: Chọn local/cloud theo độ phức tạp. **Agentic Workflow (LangGraph)** — so sánh đa văn bản, Evidence Checker, retry — là **planned, chưa implement**.
 - **Citation Validator**: Đảm bảo mọi câu trả lời đều có trích dẫn chính xác đến `Tên văn bản`, `Điều/Khoản` và `Số trang PDF`.
 
 ---
@@ -88,6 +94,38 @@ Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop c�
 
 ---
 
+## Model & cấu hình
+
+| Vai trò | Model / cấu hình mặc định | Nguồn |
+|---|---|---|
+| Embedding | `intfloat/multilingual-e5-small` (prefix `passage:` / `query:`, 384 chiều, L2-normalized) | `EMBEDDING_MODEL_NAME` trong `.env.example` |
+| Reranker | `BAAI/bge-reranker-base` (CrossEncoder, mặc định CPU để giữ VRAM cho LM Studio) | `RERANKER_MODEL_NAME` |
+| LLM local | `qwen2.5-1.5b-instruct` / `qwen2.5-3b-instruct` qua LM Studio `http://localhost:1234/v1` | `LOCAL_LLM_MODEL`, `LM_STUDIO_BASE_URL` |
+| Cloud mặc định | Groq `qwen/qwen3.8-27b` | `DEFAULT_CLOUD_PROVIDER=groq`, `GROQ_MODEL` |
+| Cloud `:free` | OpenRouter `google/gemma-4-26b-a4b-it:free` | `OPENROUTER_MODEL` |
+| Cloud fallback | Gemini `gemini-3.5-flash-lite` | `GEMINI_MODEL`, `GEMINI_URL` |
+| OCR | PaddleOCR tiếng Việt + OpenCV deskew/denoise | `OCR_ENGINE`, `USE_GPU_OCR` |
+
+> Với máy 4GB VRAM: chạy Ingestion (OCR/Embedding) và Serving (LLM) ở **hai pha riêng**; model local dùng bản quantized Q4_K_M. Cấu hình chi tiết xem [HOW_TO_RUN.md](HOW_TO_RUN.md).
+
+---
+
+## Benchmark & kiểm chứng
+
+| Nhóm | Chỉ số đo được | Artifact nguồn |
+|---|---|---|
+| Corpus | 5 văn bản · 287 trang · 111 bảng (111/111 đã rectify) | `data/benchmarks/ocr_comparison/benchmark_summary.json` |
+| OCR/VLM | 59 bảng Qwen3-VL-4B + 52 bảng Gemini auditor · 13.548 ô · `invalid_score_cells=0` | `benchmark_summary.json`, `data/benchmark_milestone3_report.json` |
+| Chunking | 6.786 node · 28 orphan (0,41%) · 0 node rỗng | `data/benchmark_milestone3_report.json` |
+| Retrieval (RAGAS M2) | 50 query · retrieval 96% · trích dẫn đúng 86% · faithfulness 82% · latency trung bình 12.720,9 ms | `data/benchmarks/ragas_milestone2_report.json` |
+| Index consistency | 7.259 / 7.259 / 7.259 (chunker / BM25 / Qdrant) · 0 breadcrumb `> DOCUMENT` | `docs/ai-context/KNOWN_TRAPS.md` §5 |
+| Serving (M3) | quality 100/100 · `eval_passed=true` · latency trích dẫn TB 5.290,4 ms | `data/benchmark_milestone3_report.json` |
+| HITL | 24 ngoại lệ điểm có `reason/reviewer/timestamp` · number-lock 0 breach | `KNOWN_TRAPS.md` §2, §6 |
+
+> **Caveat:** report RAGAS M2 là snapshot đã migrate schema (`migrated_from_legacy: true`), **không chạy lại LLM**. Report M3 có `overall_quality_score=100` nhưng `overall_passed=false` vì `citations_under_1s=false` — không diễn giải thành "mọi benchmark đều xanh". Các số trên là bằng chứng tại thời điểm tạo artifact, không phải cam kết trên dữ liệu mới.
+
+---
+
 ## Tech Stack
 
 | Thành phần | Công nghệ lựa chọn | Vai trò |
@@ -96,13 +134,13 @@ Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop c�
 | **PDF Processing** | PyMuPDF (fitz) | Đọc, phân tích, render PDF |
 | **Image Preprocessing**| OpenCV, Pillow | Deskew, Denoise, Binarization |
 | **OCR Engine** | PaddleOCR, Tesseract (baseline) | Nhận diện văn bản tiếng Việt & Layout |
-| **Table Extraction** | Docling / Table Transformer | Phân tích bảng biểu tiêu chuẩn sức khỏe |
+| **Table Extraction** | PaddleOCR layout + VLM rectifier (Docling: planned) | Phân tích bảng biểu tiêu chuẩn sức khỏe |
 | **Embeddings** | `multilingual-e5-small`, `BGE-M3` | Sinh vector ngữ nghĩa |
 | **Vector Database** | Qdrant | Lưu trữ và tìm kiếm vector |
-| **Relational Database**| PostgreSQL (Tách biệt Test & Prod DB) | Lưu metadata, versioning, logs, user |
+| **Relational Database**| PostgreSQL (Test/Prod) — **planned, chưa implement** | Dự định lưu metadata, versioning, logs, user |
 | **Local LLM** | LM Studio (`http://localhost:1234/v1`) | Chạy suy luận cục bộ bằng Qwen2.5 GGUF |
 | **Cloud LLM (Free)**| Groq API, OpenRouter (`:free`) | Suy luận đa tài liệu, reasoning miễn phí |
-| **Agent Framework** | LangGraph / LangChain | Workflow có trạng thái, routing, retry |
+| **Agent Framework** | Model router (đã implement) · LangGraph/LangChain (**planned**) | Routing local/cloud; agent workflow chưa implement |
 | **Evaluation** | RAGAS, Custom Evaluation Suite | Đánh giá CER, WER, Recall@K, Faithfulness |
 | **Frontend** | React + TypeScript (Vite, Tailwind) | Giao diện Chat, Review OCR, Dashboard |
 
@@ -113,6 +151,7 @@ Dự án được tối ưu hóa để chạy và thử nghiệm trên laptop c�
 ```text
 Scan2RAG/
 ├── README.md
+├── HOW_TO_RUN.md                       # Cài đặt, chạy, verify, regenerate demo
 ├── .gitignore
 ├── .env.example
 ├── docker-compose.yml
@@ -148,25 +187,17 @@ Scan2RAG/
 
 ---
 
-## Lộ trình triển khai rút gọn (Phased Milestones)
+## Giới hạn đã biết
 
-- [ ] **Milestone 1 (Data Pipeline & Ingestion MVP)**:
-  - Thu thập 4-5 văn bản quy định nghĩa vụ quân sự (TT 105/2023, TT 106/2025, VBHN 88, TT 68/2025).
-  - Hoàn thiện script tiền xử lý ảnh và chạy OCR qua PaddleOCR.
-  - Xây dựng parser bóc tách cấu trúc Chương - Điều - Khoản.
-- [ ] **Milestone 2 (Core RAG & Benchmark Suite)**:
-  - Tích hợp Qdrant + `multilingual-e5-small`.
-  - Triển khai Hybrid Retrieval (BM25 + Dense) + trích xuất trích dẫn (citations).
-  - Tích hợp Free Cloud LLM (Groq / OpenRouter) và Local LLM qua LM Studio (`Qwen2.5-1.5B`).
-  - Xây dựng bộ test 50 câu hỏi ground-truth, đo lường các chỉ số với RAGAS.
-- [ ] **Milestone 3 (Agentic Workflow, Frontend & Portfolio Showcase)**:
-  - Thiết lập LangGraph StateGraph hỗ trợ so sánh văn bản đa nguồn và kiểm tra bằng chứng.
-  - Xây dựng Web UI cho phép vừa chat tra cứu, vừa tra cứu chéo trang PDF gốc.
-  - Đóng gói Docker, viết tài liệu kỹ thuật hoàn chỉnh và quay video demo 3 phút.
+- **Phần cứng:** tối ưu cho laptop 4GB VRAM; không chạy đồng thời OCR + Embedding + Local LLM.
+- **Artifact dữ liệu:** `data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json` bị gitignore — clone sạch không có, phải tạo local (xem [HOW_TO_RUN.md](HOW_TO_RUN.md)).
+- **CI vs local:** CI chạy 5 gate không cần artifact; 11 gate (gồm corpus/score/vector/benchmark/backend-tests) chỉ chạy đủ trên máy có dữ liệu — xem `docs/ai-context/TESTING_GUIDE.md` §2.
+- **Demo PDF:** video/GIF quay bằng Chromium headless (không có plugin xem PDF) với file mock 1 trang → vùng xem PDF bị trắng; UI vẫn hiện metadata/breadcrumb và toolbar. Đây là giới hạn của khâu quay demo, không phải lỗi sản phẩm.
+- **Chưa implement (planned):** PostgreSQL, Docling, LangGraph agent workflow — đối chiếu `docs/ai-context/ARCHITECTURE.md`.
 
 ---
 
 ## Tài liệu kỹ thuật chi tiết
 
-Chi tiết đầy đủ về toàn bộ kiến trúc, bảng phân tích rủi ro, thông số metric và lộ trình 10 phase được lưu tại:  
- **[Tài liệu Đặc tả Kỹ thuật Toàn diện (Project Blueprint & Specs)](docs/project-blueprint-and-specs.md)**
+Kiến trúc, bảng phân tích rủi ro và thông số metric được lưu tại:  
+**[Tài liệu Đặc tả Kỹ thuật Toàn diện (Project Blueprint & Specs)](docs/project-blueprint-and-specs.md)** · **[docs/ai-context/](docs/ai-context/README.md)**

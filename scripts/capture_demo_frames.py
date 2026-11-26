@@ -14,6 +14,7 @@ FRONTEND = ROOT / "frontend"
 OUT = ROOT / "data" / "exports" / "demo" / "frames"
 OUT.mkdir(parents=True, exist_ok=True)
 PDF_PATH = OUT.parent / "mock_page.pdf"
+FONT_PATH = Path(r"C:\Windows\Fonts\segoeui.ttf")
 
 TABLE_ID = "thông_tư_105_table_p23"
 QUERY = "Cận thị từ -3D đến dưới -4D khám nghĩa vụ quân sự mấy điểm?"
@@ -66,12 +67,34 @@ TABLE_DETAIL = {
 def _make_pdf() -> None:
     doc = pymupdf.open()
     page = doc.new_page(width=1000, height=700)
-    page.insert_text((90, 120), "THONG TU 105 / 2023 / TT-BQP", fontsize=24)
-    page.insert_text((90, 180), "Phu luc: Tieu chuan phan loai suc khoe", fontsize=16)
-    page.insert_text((90, 240), "Trang 23 - Can thi tu -3D den duoi -4D: 3 diem", fontsize=14)
-    page.insert_text((90, 290), "Bang phu luc tieu chuan suc khoe (DEMODATA)", fontsize=14)
+    page.insert_font(fontname="segoeui", fontfile=str(FONT_PATH))
+    page.insert_text((90, 120), "THÔNG TƯ 105/2023/TT-BQP", fontsize=24, fontname="segoeui")
+    page.insert_text((90, 175), "Phụ lục: Tiêu chuẩn phân loại sức khỏe", fontsize=16, fontname="segoeui")
+    page.insert_text((90, 225), "Trang 23 — Cận thị từ -3D đến dưới -4D: 3 điểm", fontsize=14, fontname="segoeui")
+    page.insert_text((90, 275), "Bảng phụ lục tiêu chuẩn sức khỏe (DEMO DATA)", fontsize=14, fontname="segoeui")
+
+    rows = [
+        ("1", "Cận thị từ -3D đến dưới -4D", "3"),
+        ("2", "Viễn thị từ +3D đến dưới +5D", "2"),
+        ("3", "Loạn thị", "1"),
+    ]
+    for index, (number, condition, score) in enumerate(rows):
+        top = 320 + index * 36
+        page.draw_rect(pymupdf.Rect(90, top, 900, top + 36), color=(0.45, 0.45, 0.45), width=0.6)
+        page.insert_text((100, top + 23), number, fontsize=12, fontname="segoeui")
+        page.insert_text((170, top + 23), condition, fontsize=12, fontname="segoeui")
+        page.insert_text((820, top + 23), score, fontsize=12, fontname="segoeui")
     doc.save(str(PDF_PATH))
     doc.close()
+
+
+def render_pdf_page_png() -> bytes:
+    # Prefer the real scanned TT105 page 23 from data/raw (gitignored, local only).
+    real_pdf = next((ROOT / "data/raw").glob("*105*.pdf"), None)
+    source = real_pdf or PDF_PATH
+    with pymupdf.open(source) as document:
+        page_index = 22 if real_pdf and len(document) > 22 else 0
+        return document[page_index].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).tobytes("png")
 
 
 def _start_vite() -> subprocess.Popen:
@@ -131,7 +154,9 @@ def main() -> None:
                 elif "/api/v1/ocr/tables" in url:
                     route.fulfill(status=200, content_type="application/json", body=json.dumps([TABLE_SUMMARY], ensure_ascii=False))
                 elif "/api/v1/documents/" in url and url.endswith("/pdf"):
-                    route.fulfill(status=200, content_type="application/pdf", path=str(PDF_PATH))
+                    # Headless Chromium has no PDF viewer plugin: serve a rendered
+                    # page image so the iframe paints deterministic demo content.
+                    route.fulfill(status=200, content_type="image/png", body=render_pdf_page_png())
                 elif "/api/v1/documents/" in url:
                     route.fulfill(status=200, content_type="application/json", body=json.dumps({
                         "id": "thông_tư_105", "title": "Thông tư 105/2023/TT-BQP", "effective_date": "2024-01-01",
