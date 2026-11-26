@@ -7,7 +7,6 @@ interface PdfCanvasProps {
   docId: string;
   page: number;
   pdfUrl: string;
-  zoomLevel: number;
   activeCitation?: Citation | null;
 }
 
@@ -15,13 +14,12 @@ export const PdfCanvas: React.FC<PdfCanvasProps> = ({
   docId,
   page,
   pdfUrl,
-  zoomLevel,
   activeCitation,
 }) => {
   const [embedError, setEmbedError] = useState(false);
 
-  // Construct iframe/embed URL with page anchor
-  const viewerUrl = `${pdfUrl}#page=${page}&zoom=${zoomLevel}`;
+  // Chrome's built-in PDF viewer handles zoom, download and print.
+  const viewerUrl = `${pdfUrl}#page=${page}`;
 
   return (
     <div className="relative flex-1 h-full w-full bg-muted/20 overflow-hidden flex flex-col">
@@ -52,7 +50,7 @@ export const PdfCanvas: React.FC<PdfCanvasProps> = ({
       {/* Main PDF Viewer (native modern browser PDF object) */}
       {!embedError ? (
         <iframe
-          key={`${docId}-${page}-${zoomLevel}`}
+          key={`${docId}-${page}`}
           src={viewerUrl}
           title={`PDF Viewer - ${docId} (Trang ${page})`}
           className="h-full w-full border-0"

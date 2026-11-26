@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Square, CornerDownLeft, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SuggestionStrip } from './suggestion-strip';
 
 interface ChatInputProps {
   onSendMessage: (
@@ -56,21 +57,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   return (
     <div className="space-y-2.5">
       {/* Sample Query Prompts */}
-      <div className="hidden sm:flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs text-muted-foreground no-scrollbar">
-        <span className="shrink-0 text-[11px] font-medium">Gợi ý câu hỏi:</span>
-        {SAMPLE_QUERIES.map((sample, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => {
-              setInput(sample);
-              textareaRef.current?.focus();
-            }}
-            className="shrink-0 rounded-full border bg-muted/40 px-2.5 py-0.5 text-[11px] text-foreground hover:bg-muted hover:border-primary/40 transition-colors"
-          >
-            {sample}
-          </button>
-        ))}
+      <div className="hidden sm:block">
+        <SuggestionStrip
+          queries={SAMPLE_QUERIES}
+          onPick={(sample) => {
+            setInput(sample);
+            textareaRef.current?.focus();
+          }}
+        />
       </div>
 
       {/* Main Form Box */}

@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { PaneToggle } from './pane-toggle';
 
 interface SplitPaneProps {
   leftPane: React.ReactNode;
@@ -33,36 +32,17 @@ export const SplitPane: React.FC<SplitPaneProps> = ({
       {/* Toggle Button when Pane is Closed */}
       {!isRightPaneOpen && (
         <div className="absolute right-4 top-4 z-30">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToggleRightPane}
-            className="shadow-sm bg-background/90 backdrop-blur text-xs"
-          >
-            <FileText className="h-3.5 w-3.5 mr-1.5 text-primary" />
-            <span>Mở PDF đối soát</span>
-            <PanelLeftOpen className="h-3.5 w-3.5 ml-1.5 opacity-70" />
-          </Button>
+          <PaneToggle isOpen={false} onToggle={onToggleRightPane} />
         </div>
       )}
 
       {/* Right Synchronized PDF Pane (Desktop side-by-side + Mobile full-screen overlay) */}
       {isRightPaneOpen && (
         <div className="fixed inset-0 z-40 flex flex-col bg-background lg:static lg:z-auto lg:flex-1">
-          <div className="absolute right-2 top-2 z-50">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onToggleRightPane}
-              aria-label="Đóng khung PDF"
-              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground bg-background/90 backdrop-blur"
-              title="Đóng khung PDF"
-            >
-              <PanelLeftClose className="h-4 w-4 lg:mr-0 mr-1" />
-              <span className="lg:hidden">Đóng PDF</span>
-            </Button>
+          <div className="flex h-9 shrink-0 items-center justify-end border-b px-2">
+            <PaneToggle isOpen onToggle={onToggleRightPane} />
           </div>
-          {rightPane}
+          <div className="min-h-0 flex-1">{rightPane}</div>
         </div>
       )}
     </div>

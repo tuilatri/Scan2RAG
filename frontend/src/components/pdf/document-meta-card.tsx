@@ -54,7 +54,7 @@ export const DocumentMetaCard: React.FC<DocumentMetaCardProps> = ({ docId }) => 
   const isSuperseded = meta?.is_superseded === true;
 
   return (
-    <div className="border-b bg-muted/30 px-3 py-2 text-xs" aria-busy={isLoading}>
+    <div className="border-b bg-muted/30 px-3 py-2 pr-4 text-xs" aria-busy={isLoading}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-1.5 overflow-hidden">
           <FileText className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />

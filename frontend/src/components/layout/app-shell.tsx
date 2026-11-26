@@ -3,8 +3,8 @@ import { Navbar } from "./navbar"
 
 interface AppShellProps {
   children: React.ReactNode
-  activeTab: "chat" | "ocr" | "compare"
-  onTabChange: (tab: "chat" | "ocr" | "compare") => void
+  activeTab: "chat" | "ocr"
+  onTabChange: (tab: "chat" | "ocr") => void
 }
 
 export const AppShell: React.FC<AppShellProps> = ({

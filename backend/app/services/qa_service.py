@@ -29,6 +29,14 @@ def resolve_page_number(chunk: dict[str, Any]) -> int:
     return int(page_num)
 
 
+REFUSAL_PHRASE = "Văn bản hiện tại không quy định về trường hợp này."
+
+
+def needs_grounded_retry(answer: str, chunks: list[dict[str, Any]]) -> bool:
+    """A blanket refusal is wrong when relevant chunks were actually retrieved."""
+    return bool(chunks) and REFUSAL_PHRASE in answer
+
+
 class GroundedQAService:
     """End-to-end question answering pipeline with rigorous grounding and citations."""
 
@@ -109,6 +117,17 @@ class GroundedQAService:
             complexity=complexity,
             temperature=0.0,
         )
+        if needs_grounded_retry(llm_result.get("content", ""), top_chunks):
+            retry_prompt = user_prompt + (
+                "\n\nCác đoạn trên có chứa dữ liệu liên quan. Hãy nêu giá trị cụ thể "
+                "từ bảng hoặc điều khoản và trích dẫn; nếu vẫn thiếu, nêu rõ phần nào thiếu."
+            )
+            llm_result = self.model_router.generate(
+                prompt=retry_prompt,
+                system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
+                complexity=complexity,
+                temperature=0.0,
+            )
 
         latency_total_ms = (time.time() - t_start) * 1000
 

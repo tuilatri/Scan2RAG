@@ -10,7 +10,6 @@
 | Header Navigation | `frontend/src/components/layout/navbar.tsx` | Top header with logo, version tag, backend status, and tab switcher |
 | Dual-Pane Splitter | `frontend/src/components/layout/split-pane.tsx` | Responsive 2-column flex pane (Chat left, PDF right) with collapse trigger |
 | RAG Chat Interface | `frontend/src/components/chat/chat-container.tsx` | Chat stream container with message list, suggestions, and auto-scroll |
-| Compare View | `frontend/src/components/chat/compare-container.tsx` | JSON compare form + answer, citations, evidence table, verification warning and version notes; shares the PDF pane |
 | Synchronized PDF Viewer | `frontend/src/components/pdf/pdf-viewer-panel.tsx` | PDF toolbar, canvas iframe, and document metadata summary |
 | OCR HITL Review | `frontend/src/components/ocr/ocr-review-container.tsx` | Table sidebar (111 tables), interactive grid editor, diff view, and PDF page preview |
 
@@ -55,7 +54,6 @@
 
 ## 4. State & Data Patterns
 - **`useChatStream` (`src/hooks/use-chat-stream.ts`)**: Custom React hook managing Server-Sent Events (SSE) from `POST /api/v1/query/stream`. Handles `status` event for immediate UI feedback (< 1.0s TTFT), `citations` event after retrieval/rerank (~1.5–3s warm on CPU), token-by-token streaming, and 65s timeout watchdog (65000ms inactivity).
-- **`useCompare` (`src/hooks/use-compare.ts`)**: POST JSON to `POST /api/v1/query/compare` with `apiHeaders`, optional `thread_id`, 120s timeout/abort; returns `{result, isLoading, error, send, reset}`.
-- **`usePdfViewer` (`src/hooks/use-pdf-viewer.ts`)**: Manages active document ID, current page, zoom level, and click-to-sync from chat and compare citations.
+- **`usePdfViewer` (`src/hooks/use-pdf-viewer.ts`)**: Manages active document ID, current page, zoom level, and click-to-sync from chat citations.
 - **`useOcrAudit` (`src/hooks/use-ocr-audit.ts`)**: Manages 111 table nodes, active table detail, cell matrix editing, Undo/Redo, and atomic backend saves.
 - **`markdown-table-parser.ts` (`src/lib/markdown-table-parser.ts`)**: Bi-directional parser converting between Markdown Table string and 2D Array matrix.
