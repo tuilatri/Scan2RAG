@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from app.llm.router import ModelRouter
 
@@ -36,3 +36,23 @@ def test_deterministic_offline_fallback():
             assert res["provider"] == "deterministic_offline"
             assert res["model"] == "rule-based-fallback"
             assert "Hệ thống tạm thời không thể kết nối" in res["content"]
+
+
+def test_prefer_local_complex_uses_local(monkeypatch):
+    monkeypatch.setenv("PREFER_LOCAL", "true")
+    router = ModelRouter()
+    with patch.object(router, "is_local_available", return_value=True), patch.object(
+        router, "_call_provider", return_value="local answer"
+    ):
+        result = router.generate("Câu hỏi kiểm tra", "System prompt", complexity="complex")
+    assert result["provider"] == "lm_studio_local"
+    assert result["complexity"] == "complex"
+
+
+def test_complex_without_prefer_local_uses_cloud(monkeypatch):
+    monkeypatch.delenv("PREFER_LOCAL", raising=False)
+    router = ModelRouter()
+    router.cloud_clients = {"groq": Mock()}
+    with patch.object(router, "_call_provider", return_value="cloud answer"):
+        result = router.generate("Câu hỏi kiểm tra", "System prompt", complexity="complex")
+    assert result["provider"] == "groq_cloud"

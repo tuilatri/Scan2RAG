@@ -7,6 +7,15 @@ interface ModelBadgeProps {
   model?: string;
 }
 
+const cloudProviderLabel = (provider?: string): string => {
+  const value = (provider || '').toLowerCase();
+  if (value.includes('groq')) return 'Groq';
+  if (value.includes('openrouter')) return 'OpenRouter';
+  if (value.includes('gemini')) return 'Gemini';
+  if (value.includes('offline')) return 'Offline';
+  return 'Cloud';
+};
+
 export const ModelBadge: React.FC<ModelBadgeProps> = ({ provider, model }) => {
   if (!provider && !model) return null;
 
@@ -27,7 +36,7 @@ export const ModelBadge: React.FC<ModelBadgeProps> = ({ provider, model }) => {
           <Cloud className="h-3 w-3 text-blue-600 dark:text-blue-400" />
           <span className="font-mono text-[11px]">Cloud: {model || 'LLaMA-3.3-70B'}</span>
           <Badge variant="outline" className="text-[9px] py-0 px-1 border-blue-500/30 text-blue-600">
-            Groq
+            {cloudProviderLabel(provider)}
           </Badge>
         </>
       )}

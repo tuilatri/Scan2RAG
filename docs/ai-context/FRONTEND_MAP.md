@@ -29,7 +29,7 @@
   - `chat-message.tsx`: Markdown rendered bubble with avatar and model router badge.
   - `chat-input.tsx`: Auto-resizing textarea with sample prompt quick buttons and filter switch.
   - `citation-list.tsx` & `citation-card.tsx`: Grounded citations with Amber Warning Badge for superseded laws.
-  - `model-badge.tsx`: Visual tag distinguishing Local Qwen2.5 vs cloud (Groq `qwen/qwen3.8-27b`, OpenRouter Gemma 4, Gemini 3.5 Flash Lite).
+  - `model-badge.tsx`: Visual tag distinguishing Local Qwen2.5 vs cloud. Cloud label is derived from the SSE `provider` string (`groq_cloud`→Groq, `openrouter_cloud`→OpenRouter, `gemini_cloud`→Gemini, `deterministic_offline`→Offline) — not hardcoded.
   - `stream-indicator.tsx`: Live SSE streaming status indicator.
 
 - **`src/components/pdf/` (Document Preview):**

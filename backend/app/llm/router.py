@@ -39,6 +39,7 @@ class ModelRouter:
         self.local_base_url = local_base_url or os.getenv("LM_STUDIO_BASE_URL", "http://localhost:1234/v1")
         self.local_model = local_model or os.getenv("LOCAL_LLM_MODEL", "qwen2.5-1.5b-instruct")
         self.default_cloud_provider = (default_cloud_provider or os.getenv("DEFAULT_CLOUD_PROVIDER", "groq")).lower().strip()
+        self.prefer_local = os.getenv("PREFER_LOCAL", "").strip().lower() in {"1", "true", "yes", "on"}
 
         # Backward compatibility for legacy tests
         if "groq_api_key" in kwargs and kwargs["groq_api_key"] is None:
@@ -153,9 +154,9 @@ class ModelRouter:
         ]
 
         # 1. Local attempt for simple queries
-        if complexity == "simple" and self.is_local_available():
+        if (complexity == "simple" or self.prefer_local) and self.is_local_available():
             try:
-                meta = {"provider": "lm_studio_local", "model": self.local_model, "complexity": "simple"}
+                meta = {"provider": "lm_studio_local", "model": self.local_model, "complexity": complexity}
                 for tok in self._call_provider_stream(self.local_client, self.local_model, messages, temperature):
                     yield tok, meta
                 return
@@ -218,14 +219,14 @@ class ModelRouter:
         ]
 
         # 1. Local attempt for simple queries
-        if complexity == "simple" and self.is_local_available():
+        if (complexity == "simple" or self.prefer_local) and self.is_local_available():
             try:
                 content = self._call_provider(self.local_client, self.local_model, messages, temperature)
                 return {
                     "content": content,
                     "provider": "lm_studio_local",
                     "model": self.local_model,
-                    "complexity": "simple",
+                    "complexity": complexity,
                 }
             except Exception:
                 pass  # Fall through to cloud
