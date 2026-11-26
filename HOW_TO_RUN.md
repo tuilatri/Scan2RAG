@@ -46,6 +46,8 @@ Về lựa chọn model: `PREFER_LOCAL=true` (đang bật trong `.env` của b�
 
 Planner cho endpoint so sánh: `PLANNER_LLM=false` (mặc định). Đặt `true` nếu muốn LLM chọn văn bản và sinh câu hỏi con — tốn đúng 1 lượt LLM, tự fallback về luật deterministic nếu JSON sai hoặc LLM lỗi.
 
+Multi-turn: `COMPARE_MEMORY=false` (mặc định, stateless). Đặt `true` rồi gửi `thread_id` trong body `/api/v1/query/compare` để hỏi tiếp trong cùng ngữ cảnh. Lịch sử (chỉ câu hỏi + nguồn planner) nằm ở `data/compare_checkpoints.sqlite` (đã gitignore) — đừng commit file này.
+
 **Bước 2 — Cài backend**
 
 ```powershell

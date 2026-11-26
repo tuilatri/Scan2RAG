@@ -35,6 +35,7 @@ def build_compare_graph(
     top_k_retrieval: int = 15,
     top_k_rerank: int = 5,
     planner_enabled: bool = False,
+    checkpointer: Any = None,
 ):
     def retrieve_for(sub_query: str, limit: int, document_id: str | None = None):
         candidates = hybrid_searcher.search(
@@ -63,12 +64,15 @@ def build_compare_graph(
             if documents
             else []
         )
+        history = list(state.get("history", []))
+        history.append({"query": state["query"], "plan_source": source})
         return {
             "target_docs": documents,
             "sub_queries": sub_queries,
             "sub_query_docs": sub_query_docs,
             "plan_source": source,
             "retry_count": 0,
+            "history": history,
         }
 
     def retrieve(state: CompareState):
@@ -220,4 +224,4 @@ def build_compare_graph(
     graph.add_conditional_edges(
         "verify_answer", route_verify, {"synthesize": "synthesize", "end": END}
     )
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer) if checkpointer else graph.compile()
