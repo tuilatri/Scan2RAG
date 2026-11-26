@@ -27,16 +27,17 @@ node scripts/verify.mjs            # full gate set — use before claiming done
 
 ### CI vs local gates
 
-GitHub Actions (`.github/workflows/ci.yml`) chạy 6 gate không cần artifact tạo ở máy local:
-`doc-truth`, `backend-lint`, `backend-tests`, `frontend-tests`, `security-audit`, `test-truth`.
+GitHub Actions (`.github/workflows/ci.yml`) chạy 5 gate không cần artifact tạo ở máy local:
+`doc-truth`, `backend-lint`, `frontend-tests`, `security-audit`, `test-truth`.
 
-5 gate dữ liệu bị skip trên CI vì cần artifact bị gitignore (`data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json`):
+6 gate bị skip trên CI vì cần artifact bị gitignore (`data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json`):
 
 - `corpus-audit`
 - `score-review`
 - `vector-audit`
 - `index-consistency`
 - `benchmark-truth`
+- `backend-tests` — 101/113 test chạy được, nhưng 12 test đọc PDF/corpus (`test_document_endpoints`, `test_ocr_endpoints`, `test_security`, `test_backend_audit_hardening`, `test_semantic_chunker`) nên chỉ chạy đủ ở local.
 
 Chạy đủ **11 gate** trên máy có artifact — đây là gate bắt buộc trước khi tuyên bố hoàn thành milestone:
 

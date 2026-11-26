@@ -32,13 +32,14 @@ jobs:
         run: npm ci
 
       - name: Run verify gates (code-only)
-        # The 5 data gates below need gitignored artifacts (data/raw PDFs,
+        # These gates need gitignored artifacts (data/raw PDFs,
         # data/processed JSON, bm25_index.json) that a fresh checkout cannot
-        # produce. They still run locally via: node scripts/verify.mjs
+        # produce. All 11 still run locally via: node scripts/verify.mjs
         run: |
           node scripts/verify.mjs \
             --skip corpus-audit \
             --skip score-review \
             --skip vector-audit \
             --skip index-consistency \
-            --skip benchmark-truth
+            --skip benchmark-truth \
+            --skip backend-tests
