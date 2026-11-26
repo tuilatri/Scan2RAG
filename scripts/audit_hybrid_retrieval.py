@@ -19,14 +19,15 @@ backend_path = Path(__file__).resolve().parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
 from app.chunking.semantic_chunker import SemanticLegalChunker
+from app.core.paths import PROCESSED_DIR
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.hybrid_searcher import LegalHybridSearcher
 from app.retrieval.qdrant_client import LegalVectorStore
 from app.retrieval.reranker import LegalReranker
 
 
-def load_all_corpus_chunks():
-    data_dir = Path("data/processed")
+def load_all_corpus_chunks(data_dir: Path | None = None):
+    data_dir = data_dir or PROCESSED_DIR
     chunker = SemanticLegalChunker()
     all_chunks = []
     for f in sorted(data_dir.glob("*.json")):

@@ -16,6 +16,8 @@ from typing import Any
 
 from rank_bm25 import BM25Okapi
 
+from app.core.paths import BM25_INDEX
+
 
 class LegalBM25Searcher:
     """Sparse keyword searcher leveraging BM25Okapi tailored for Vietnamese legal text."""
@@ -33,7 +35,7 @@ class LegalBM25Searcher:
         re.UNICODE
     )
 
-    def __init__(self, index_path: str = "data/bm25_index.json"):
+    def __init__(self, index_path: str | Path = BM25_INDEX):
         self.index_path = Path(index_path)
         self.bm25: BM25Okapi | None = None
         self.corpus_chunks: list[dict[str, Any]] = []

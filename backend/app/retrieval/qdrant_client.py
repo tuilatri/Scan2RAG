@@ -7,11 +7,13 @@ Supports both:
 
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, Filter, PointStruct, VectorParams
 
+from app.core.paths import QDRANT_DB
 from app.models.chunk_schema import LegalChunk
 
 logger = logging.getLogger(__name__)
@@ -24,7 +26,7 @@ class LegalVectorStore:
         self,
         collection_name: str = "vietnamese_legal_docs",
         vector_dim: int = 384,
-        db_path: str = "data/qdrant_db"
+        db_path: str | Path = QDRANT_DB
     ):
         self.collection_name = collection_name
         self.vector_dim = vector_dim

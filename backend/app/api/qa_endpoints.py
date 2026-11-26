@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from app.core.paths import PROCESSED_DIR
 from app.core.security import verify_api_key
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.hybrid_searcher import LegalHybridSearcher
@@ -75,7 +76,7 @@ def get_qa_service() -> GroundedQAService:
                     if str(root_dir) not in sys.path:
                         sys.path.insert(0, str(root_dir))
                     from scripts.audit_hybrid_retrieval import load_all_corpus_chunks
-                    chunks = load_all_corpus_chunks()
+                    chunks = load_all_corpus_chunks(PROCESSED_DIR)
                     bm25_searcher.fit_from_chunks(chunks)
                     bm25_searcher.save()
 

@@ -12,6 +12,8 @@ from typing import Any
 import requests
 from dotenv import dotenv_values
 
+from app.core.paths import ENV_FILE
+
 
 class VLMVerifier:
     """Verifies and rectifies OCR-extracted text against original page images using VLM."""
@@ -31,7 +33,7 @@ class VLMVerifier:
         model_name: str | None = None,
         timeout: int = 180,
     ):
-        env = dotenv_values(".env")
+        env = dotenv_values(str(ENV_FILE))
         self.base_url = (base_url or env.get("LM_STUDIO_BASE_URL") or "http://localhost:1234/v1").rstrip("/")
         self.api_key = api_key or env.get("LM_STUDIO_API_KEY") or "lm-studio"
         self.model_name = model_name or env.get("LOCAL_VLM_MODEL") or "qwen/qwen3-vl-4b"

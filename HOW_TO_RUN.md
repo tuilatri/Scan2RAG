@@ -87,6 +87,8 @@ npm run dev
 
 Xong. Vào `http://localhost:5173`. Kiểm tra API tại `http://localhost:8000/api/v1/health`.
 
+> Đường dẫn dữ liệu (`data/processed`, `data/bm25_index.json`) đã được resolve từ gốc repo, nên lệnh trên chạy đúng dù bạn `cd backend` hay đứng ở thư mục khác — **không cần `PYTHONPATH`**.
+
 > Lúc này UI chạy được nhưng **chưa trả lời câu hỏi** vì chưa có dữ liệu. Làm mục 2 tiếp.
 
 ---
