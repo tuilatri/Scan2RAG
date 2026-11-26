@@ -70,6 +70,12 @@ class EvidenceItem(BaseModel):
     citation_ids: list[str | None]
 
 
+class VerificationItem(BaseModel):
+    passed: bool
+    unsupported_numbers: dict[str, int]
+    checked_numbers: int
+
+
 class CompareResponse(BaseModel):
     query: str
     answer: str
@@ -78,6 +84,7 @@ class CompareResponse(BaseModel):
     retry_count: int
     provider: str
     model: str
+    verification: VerificationItem
 
 
 # Dependency Injection for Singleton QAService (thread-safe double-checked locking)
@@ -188,6 +195,7 @@ def compare_legal_documents(
     """Additive LangGraph workflow for multi-document comparison."""
     try:
         result = graph.invoke({"query": payload.query})
+        verification = result.get("verification") or {}
         return CompareResponse(
             query=payload.query,
             answer=result.get("answer", ""),
@@ -196,6 +204,11 @@ def compare_legal_documents(
             retry_count=result.get("retry_count", 0),
             provider=result.get("provider", "unknown"),
             model=result.get("model", "unknown"),
+            verification=VerificationItem(
+                passed=verification.get("passed", True),
+                unsupported_numbers=verification.get("unsupported_numbers", {}),
+                checked_numbers=verification.get("checked_numbers", 0),
+            ),
         )
     except Exception:
         logger.exception("Compare pipeline failure")
