@@ -5,10 +5,12 @@ from typing import Any
 from langgraph.graph import END, StateGraph
 
 from app.agents.state import CompareState
+from app.agents.verification import extract_numbers, unsupported_numbers
 from app.llm.prompt_templates import STRICT_LEGAL_SYSTEM_PROMPT, GroundedPromptBuilder
 from app.services.qa_service import resolve_page_number
 
 MAX_RETRIES = 1
+MAX_VERIFY_RETRIES = 1
 DOCUMENT_TOKENS = (
     ("105", "thông_tư_105"),
     ("106", "thông_tư_106"),
@@ -110,6 +112,11 @@ def build_compare_graph(
     def synthesize(state: CompareState):
         chunks = [chunk for item in state["evidence"] for chunk in item["chunks"]]
         prompt = GroundedPromptBuilder.build_qa_prompt(state["query"], chunks)
+        if state.get("verify_count", 0) > 0:
+            prompt += (
+                "\n\nCHỈ dùng số liệu có trong các đoạn trích trên. "
+                "Nếu không có dữ liệu, hãy nói rõ là không có."
+            )
         result = model_router.generate(
             prompt=prompt,
             system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
@@ -131,12 +138,36 @@ def build_compare_graph(
             "evidence_summary": summary,
         }
 
+    def verify_answer(state: CompareState):
+        # Use the same full chunk content the LLM saw in the prompt, not the
+        # 250-char citation snippets (which would flag valid numbers as hallucinations).
+        evidence_text = state["query"] + " " + " ".join(
+            str(chunk.get("content", ""))
+            for item in state["evidence"]
+            for chunk in item["chunks"]
+        )
+        unsupported = unsupported_numbers(state["answer"], evidence_text)
+        return {
+            "verification": {
+                "passed": not unsupported,
+                "unsupported_numbers": unsupported,
+                "checked_numbers": len(extract_numbers(state["answer"])),
+            },
+            "verify_count": state.get("verify_count", 0) + 1,
+        }
+
+    def route_verify(state: CompareState):
+        if not state["verification"]["passed"] and state["verify_count"] <= MAX_VERIFY_RETRIES:
+            return "synthesize"
+        return "end"
+
     graph = StateGraph(CompareState)
     graph.add_node("plan", plan)
     graph.add_node("retrieve", retrieve)
     graph.add_node("evidence_check", evidence_check)
     graph.add_node("retry", retry)
     graph.add_node("synthesize", synthesize)
+    graph.add_node("verify_answer", verify_answer)
     graph.set_entry_point("plan")
     graph.add_edge("plan", "retrieve")
     graph.add_edge("retrieve", "evidence_check")
@@ -144,5 +175,8 @@ def build_compare_graph(
         "evidence_check", route, {"retry": "retry", "synthesize": "synthesize"}
     )
     graph.add_edge("retry", "evidence_check")
-    graph.add_edge("synthesize", END)
+    graph.add_edge("synthesize", "verify_answer")
+    graph.add_conditional_edges(
+        "verify_answer", route_verify, {"synthesize": "synthesize", "end": END}
+    )
     return graph.compile()

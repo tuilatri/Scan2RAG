@@ -15,3 +15,5 @@ class CompareState(TypedDict, total=False):
     answer: str
     provider: str
     model: str
+    verification: dict[str, Any]
+    verify_count: int
