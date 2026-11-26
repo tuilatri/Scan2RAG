@@ -242,6 +242,7 @@ class GroundedQAService:
         user_prompt = GroundedPromptBuilder.build_qa_prompt(query, top_chunks)
 
         last_meta = {}
+        emitted_stages: set[str] = set()
         try:
             for tok, meta in self.model_router.generate_stream(
                 prompt=user_prompt,
@@ -250,6 +251,10 @@ class GroundedQAService:
                 temperature=0.0,
             ):
                 last_meta = meta
+                stage = meta.get("stage")
+                if stage and stage not in emitted_stages:
+                    emitted_stages.add(stage)
+                    yield f"data: {json.dumps({'event': 'status', 'status': stage}, ensure_ascii=False)}\n\n"
                 yield f"data: {json.dumps({'event': 'token', 'token': tok}, ensure_ascii=False)}\n\n"
         except Exception:
             yield f"data: {json.dumps({'event': 'error', 'message': 'Đã xảy ra lỗi khi sinh câu trả lời.'}, ensure_ascii=False)}\n\n"

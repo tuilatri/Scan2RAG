@@ -31,7 +31,7 @@
   - `chat-input.tsx`: Auto-resizing textarea, `suggestion-strip.tsx` (thin horizontal scroller) and filter switch.
   - `citation-list.tsx` & `citation-card.tsx`: Grounded citations with Amber Warning Badge for superseded laws.
   - `model-badge.tsx`: Visual tag distinguishing Local Qwen2.5 vs cloud. Cloud label is derived from the SSE `provider` string (`groq_cloud`→Groq, `openrouter_cloud`→OpenRouter, `gemini_cloud`→Gemini, `deterministic_offline`→Offline) — not hardcoded.
-  - `stream-indicator.tsx`: Live SSE streaming status indicator.
+  - `stream-indicator.tsx`: Live SSE status; maps `cloud_failed` / `local_fallback` / `offline` stages from the router to plain Vietnamese labels.
 
 - **`src/components/pdf/` (Document Preview):**
   - `pdf-viewer-panel.tsx`: Metadata, open-tab action and inline iframe canvas.

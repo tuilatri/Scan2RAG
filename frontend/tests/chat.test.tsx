@@ -291,4 +291,11 @@ describe('useChatStream Hook Tests', () => {
     expect(result.current.error).toBeNull();
     vi.unstubAllGlobals();
   });
+
+  it('shows local fallback status in StreamIndicator', () => {
+    render(
+      <StreamIndicator isStreaming={true} citationCount={5} streamStatus="local_fallback" />
+    );
+    expect(screen.getByText(/Đang dùng model local/i)).toBeInTheDocument();
+  });
 });
