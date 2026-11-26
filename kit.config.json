@@ -116,6 +116,21 @@
       "optional": false
     },
     {
+      "id": "benchmark-truth",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_benchmark_truth.py"],
+      "cwd": ".",
+      "tags": ["audit", "benchmark"],
+      "requires": [
+        "data/benchmarks/ragas_milestone2_report.json",
+        "data/benchmark_milestone3_report.json",
+        "data/benchmarks/ocr_comparison/qwen3_vl_4b_report.json",
+        "data/benchmarks/ocr_comparison/gemini_auditor_report.json"
+      ],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-tests",
       "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],

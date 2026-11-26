@@ -1,11 +1,15 @@
 {
-  "timestamp": "2026-11-24T15:50:49Z",
+  "schema_version": 2,
+  "migrated_from_legacy": true,
+  "migrated_at": "2026-11-25T19:17:25.316672+00:00",
+  "original_timestamp": "2026-11-24T15:50:49Z",
+  "migration_note": "Schema migrated; out_of_scope auto-hits removed. No new LLM queries were run.",
   "milestone": "2",
   "benchmark_name": "Milestone 2 RAG Precision & Faithfulness Benchmark",
   "total_queries": 50,
   "metrics": {
-    "retrieval_accuracy_pct": 100.0,
-    "exact_citation_accuracy_pct": 88.0,
+    "retrieval_accuracy_pct": 96.0,
+    "exact_citation_accuracy_pct": 86.0,
     "answer_faithfulness_accuracy_pct": 82.0,
     "average_latency_ms": 12720.9
   },
@@ -18,503 +22,953 @@
   "query_results": [
     {
       "id": "GT-01",
-      "query": "Cận thị từ -3D đến dưới -4D khám nghĩa vụ quân sự mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "C蘯ｭn th盻・t盻ｫ -3D ﾄ黛ｺｿn dﾆｰ盻嬖 -4D khﾃ｡m nghﾄｩa v盻･ quﾃ｢n s盻ｱ m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-02",
-      "query": "Cận thị từ -1.5D đến dưới -3D chấm điểm mấy?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "C蘯ｭn th盻・t盻ｫ -1.5D ﾄ黛ｺｿn dﾆｰ盻嬖 -3D ch蘯･m ﾄ訴盻ノ m蘯･y?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-03",
-      "query": "Cận thị từ -4D đến dưới -5D thì được xếp loại mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "C蘯ｭn th盻・t盻ｫ -4D ﾄ黛ｺｿn dﾆｰ盻嬖 -5D thﾃｬ ﾄ柁ｰ盻｣c x蘯ｿp lo蘯｡i m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-04",
-      "query": "Cận thị từ -5D trở lên khám nghĩa vụ quân sự mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "C蘯ｭn th盻・t盻ｫ -5D tr盻・lﾃｪn khﾃ｡m nghﾄｩa v盻･ quﾃ｢n s盻ｱ m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-05",
-      "query": "Cận thị đã phẫu thuật thì chấm điểm như thế nào?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "C蘯ｭn th盻・ﾄ妥｣ ph蘯ｫu thu蘯ｭt thﾃｬ ch蘯･m ﾄ訴盻ノ nhﾆｰ th蘯ｿ nﾃo?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-06",
-      "query": "Viễn thị từ +1.5D đến dưới +3D được chấm mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Vi盻・ th盻・t盻ｫ +1.5D ﾄ黛ｺｿn dﾆｰ盻嬖 +3D ﾄ柁ｰ盻｣c ch蘯･m m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-07",
-      "query": "Viễn thị từ +3D đến dưới +4D chấm mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Vi盻・ th盻・t盻ｫ +3D ﾄ黛ｺｿn dﾆｰ盻嬖 +4D ch蘯･m m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-08",
-      "query": "Viễn thị từ +4D đến dưới +5D thì mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Vi盻・ th盻・t盻ｫ +4D ﾄ黛ｺｿn dﾆｰ盻嬖 +5D thﾃｬ m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-09",
-      "query": "Loạn thị sinh lý hoặc dưới 1D chấm mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Lo蘯｡n th盻・sinh lﾃｽ ho蘯ｷc dﾆｰ盻嬖 1D ch蘯･m m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-10",
-      "query": "Loạn thị từ 1D trở lên khám sức khỏe quân sự mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Lo蘯｡n th盻・t盻ｫ 1D tr盻・lﾃｪn khﾃ｡m s盻ｩc kh盻銃 quﾃ｢n s盻ｱ m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-11",
-      "query": "Thị lực mắt phải 10/10, tổng thị lực 2 mắt 19/10 chấm điểm mấy?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Th盻・l盻ｱc m蘯ｯt ph蘯｣i 10/10, t盻貧g th盻・l盻ｱc 2 m蘯ｯt 19/10 ch蘯･m ﾄ訴盻ノ m蘯･y?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-12",
-      "query": "Thị lực mắt phải 10/10, tổng thị lực 2 mắt 18/10 thì chấm mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Th盻・l盻ｱc m蘯ｯt ph蘯｣i 10/10, t盻貧g th盻・l盻ｱc 2 m蘯ｯt 18/10 thﾃｬ ch蘯･m m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-13",
-      "query": "Thị lực mắt phải 9/10, tổng thị lực 2 mắt 17/10 thì được xếp mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Th盻・l盻ｱc m蘯ｯt ph蘯｣i 9/10, t盻貧g th盻・l盻ｱc 2 m蘯ｯt 17/10 thﾃｬ ﾄ柁ｰ盻｣c x蘯ｿp m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-14",
-      "query": "Thị lực mắt phải 8/10, tổng thị lực 2 mắt 16/10 chấm mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Th盻・l盻ｱc m蘯ｯt ph蘯｣i 8/10, t盻貧g th盻・l盻ｱc 2 m蘯ｯt 16/10 ch蘯･m m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-15",
-      "query": "Thị lực mắt phải 6,7/10, tổng 2 mắt từ 13/10 đến 15/10 chấm mấy điểm?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 23,
+      "query": "Th盻・l盻ｱc m蘯ｯt ph蘯｣i 6,7/10, t盻貧g 2 m蘯ｯt t盻ｫ 13/10 ﾄ黛ｺｿn 15/10 ch蘯･m m蘯･y ﾄ訴盻ノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 23
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-16",
-      "query": "Tiêu chuẩn sức khỏe thực hiện nghĩa vụ quân sự theo Điều 4",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 3,
+      "query": "Tiﾃｪu chu蘯ｩn s盻ｩc kh盻銃 th盻ｱc hi盻㌻ nghﾄｩa v盻･ quﾃ｢n s盻ｱ theo ﾄ進盻「 4",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 3
+      },
       "retrieval_hit": true,
       "citation_hit": false,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-17",
-      "query": "Công dân có sức khỏe loại 4 có được gọi nhập ngũ không?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 3,
+      "query": "Cﾃｴng dﾃ｢n cﾃｳ s盻ｩc kh盻銃 lo蘯｡i 4 cﾃｳ ﾄ柁ｰ盻｣c g盻絞 nh蘯ｭp ngﾅｩ khﾃｴng?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 3
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-18",
-      "query": "Phương pháp phân loại sức khỏe theo Thông tư 105 quy định bao nhiêu loại?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 4,
+      "query": "Phﾆｰﾆ｡ng phﾃ｡p phﾃ｢n lo蘯｡i s盻ｩc kh盻銃 theo Thﾃｴng tﾆｰ 105 quy ﾄ黛ｻ杵h bao nhiﾃｪu lo蘯｡i?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 4
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-19",
-      "query": "Phương pháp phân loại sức khỏe Loại 1 theo Điều 6",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 4,
+      "query": "Phﾆｰﾆ｡ng phﾃ｡p phﾃ｢n lo蘯｡i s盻ｩc kh盻銃 Lo蘯｡i 1 theo ﾄ進盻「 6",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 4
+      },
       "retrieval_hit": true,
       "citation_hit": false,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-20",
-      "query": "Phương pháp phân loại sức khỏe Loại 3 có chỉ tiêu bị điểm 3",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 4,
+      "query": "Phﾆｰﾆ｡ng phﾃ｡p phﾃ｢n lo蘯｡i s盻ｩc kh盻銃 Lo蘯｡i 3 cﾃｳ ch盻・tiﾃｪu b盻・ﾄ訴盻ノ 3",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 4
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-21",
-      "query": "Phương pháp phân loại sức khỏe Loại 4 có chỉ tiêu bị điểm 4",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 4,
+      "query": "Phﾆｰﾆ｡ng phﾃ｡p phﾃ｢n lo蘯｡i s盻ｩc kh盻銃 Lo蘯｡i 4 cﾃｳ ch盻・tiﾃｪu b盻・ﾄ訴盻ノ 4",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 4
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-22",
-      "query": "Phương pháp phân loại sức khỏe Loại 6 có chỉ tiêu bị điểm 6",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 4,
+      "query": "Phﾆｰﾆ｡ng phﾃ｡p phﾃ｢n lo蘯｡i s盻ｩc kh盻銃 Lo蘯｡i 6 cﾃｳ ch盻・tiﾃｪu b盻・ﾄ訴盻ノ 6",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 4
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-23",
-      "query": "Quy định sơ tuyển sức khỏe nghĩa vụ quân sự Điều 7",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 5,
+      "query": "Quy ﾄ黛ｻ杵h sﾆ｡ tuy盻ハ s盻ｩc kh盻銃 nghﾄｩa v盻･ quﾃ｢n s盻ｱ ﾄ進盻「 7",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 5
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-24",
-      "query": "Trạm y tế xã có trách nhiệm gì trong sơ tuyển sức khỏe nghĩa vụ quân sự?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 5,
+      "query": "Tr蘯｡m y t蘯ｿ xﾃ｣ cﾃｳ trﾃ｡ch nhi盻㍊ gﾃｬ trong sﾆ｡ tuy盻ハ s盻ｩc kh盻銃 nghﾄｩa v盻･ quﾃ｢n s盻ｱ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 5
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-25",
-      "query": "Thời gian khám sức khỏe nghĩa vụ quân sự từ ngày nào đến ngày nào",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 6,
+      "query": "Th盻拱 gian khﾃ｡m s盻ｩc kh盻銃 nghﾄｩa v盻･ quﾃ｢n s盻ｱ t盻ｫ ngﾃy nﾃo ﾄ黛ｺｿn ngﾃy nﾃo",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 6
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-26",
-      "query": "Khám phúc tra sức khỏe nghĩa vụ quân sự quy định tại điều nào?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 10,
+      "query": "Khﾃ｡m phﾃｺc tra s盻ｩc kh盻銃 nghﾄｩa v盻･ quﾃ｢n s盻ｱ quy ﾄ黛ｻ杵h t蘯｡i ﾄ訴盻「 nﾃo?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 10
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-27",
-      "query": "Hội đồng giám định y khoa quân sự được quy định thế nào?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 7,
+      "query": "H盻冓 ﾄ黛ｻ渡g giﾃ｡m ﾄ黛ｻ杵h y khoa quﾃ｢n s盻ｱ ﾄ柁ｰ盻｣c quy ﾄ黛ｻ杵h th蘯ｿ nﾃo?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 7
+      },
       "retrieval_hit": true,
       "citation_hit": false,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-28",
-      "query": "Phân loại sức khỏe nghĩa vụ quân sự Điều 9 căn cứ vào đâu?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 8,
+      "query": "Phﾃ｢n lo蘯｡i s盻ｩc kh盻銃 nghﾄｩa v盻･ quﾃ｢n s盻ｱ ﾄ進盻「 9 cﾄハ c盻ｩ vﾃo ﾄ妥｢u?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 8
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-29",
-      "query": "Đối tượng áp dụng của Thông tư 105 gồm những ai?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 1,
+      "query": "ﾄ雪ｻ訴 tﾆｰ盻｣ng ﾃ｡p d盻･ng c盻ｧa Thﾃｴng tﾆｰ 105 g盻杜 nh盻ｯng ai?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 1
+      },
       "retrieval_hit": true,
       "citation_hit": false,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-30",
-      "query": "Mục tiêu khám sức khỏe nghĩa vụ quân sự là gì?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 1,
+      "query": "M盻･c tiﾃｪu khﾃ｡m s盻ｩc kh盻銃 nghﾄｩa v盻･ quﾃ｢n s盻ｱ lﾃ gﾃｬ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-31",
-      "query": "So sánh quy định về tiêu chuẩn sức khỏe giữa Thông tư 105 và Thông tư 106 có gì sửa đổi?",
-      "category": null,
-      "expected_doc": "thông_tư_106",
-      "expected_page": 1,
+      "query": "So sﾃ｡nh quy ﾄ黛ｻ杵h v盻・tiﾃｪu chu蘯ｩn s盻ｩc kh盻銃 gi盻ｯa Thﾃｴng tﾆｰ 105 vﾃ Thﾃｴng tﾆｰ 106 cﾃｳ gﾃｬ s盻ｭa ﾄ黛ｻ品?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_106"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_106": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-32",
-      "query": "Thông tư 106 sửa đổi những điều khoản nào của Thông tư 105?",
-      "category": null,
-      "expected_doc": "thông_tư_106",
-      "expected_page": 1,
+      "query": "Thﾃｴng tﾆｰ 106 s盻ｭa ﾄ黛ｻ品 nh盻ｯng ﾄ訴盻「 kho蘯｣n nﾃo c盻ｧa Thﾃｴng tﾆｰ 105?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_106"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_106": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-33",
-      "query": "Văn bản hợp nhất 88 có mối quan hệ như thế nào với Thông tư 105 và 106?",
-      "category": null,
-      "expected_doc": "thông_tư_88",
-      "expected_page": 1,
+      "query": "Vﾄハ b蘯｣n h盻｣p nh蘯･t 88 cﾃｳ m盻訴 quan h盻・nhﾆｰ th蘯ｿ nﾃo v盻嬖 Thﾃｴng tﾆｰ 105 vﾃ 106?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_88"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_88": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-34",
-      "query": "Đối chiếu quy định tiêu chuẩn sức khỏe trong Văn bản hợp nhất số 88 và Thông tư 105",
-      "category": null,
-      "expected_doc": "thông_tư_88",
-      "expected_page": 1,
+      "query": "ﾄ雪ｻ訴 chi蘯ｿu quy ﾄ黛ｻ杵h tiﾃｪu chu蘯ｩn s盻ｩc kh盻銃 trong Vﾄハ b蘯｣n h盻｣p nh蘯･t s盻・88 vﾃ Thﾃｴng tﾆｰ 105",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_88"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_88": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-35",
-      "query": "Phân tích sự khác nhau giữa phụ lục khám sức khỏe của Thông tư 105 và Thông tư 106",
-      "category": null,
-      "expected_doc": "thông_tư_106",
-      "expected_page": 1,
+      "query": "Phﾃ｢n tﾃｭch s盻ｱ khﾃ｡c nhau gi盻ｯa ph盻･ l盻･c khﾃ｡m s盻ｩc kh盻銃 c盻ｧa Thﾃｴng tﾆｰ 105 vﾃ Thﾃｴng tﾆｰ 106",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_106"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_106": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-36",
-      "query": "Các trường hợp nào bị tạm hoãn gọi nhập ngũ liên quan đến sức khỏe giữa các văn bản?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 3,
+      "query": "Cﾃ｡c trﾆｰ盻拵g h盻｣p nﾃo b盻・t蘯｡m hoﾃ｣n g盻絞 nh蘯ｭp ngﾅｩ liﾃｪn quan ﾄ黛ｺｿn s盻ｩc kh盻銃 gi盻ｯa cﾃ｡c vﾄハ b蘯｣n?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 3
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-37",
-      "query": "Khi Thông tư 106 có hiệu lực thì áp dụng quy định cũ của Thông tư 105 hay quy định mới?",
-      "category": null,
-      "expected_doc": "thông_tư_106",
-      "expected_page": 1,
+      "query": "Khi Thﾃｴng tﾆｰ 106 cﾃｳ hi盻㎡ l盻ｱc thﾃｬ ﾃ｡p d盻･ng quy ﾄ黛ｻ杵h cﾅｩ c盻ｧa Thﾃｴng tﾆｰ 105 hay quy ﾄ黛ｻ杵h m盻嬖?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_106"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_106": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-38",
-      "query": "So sánh thẩm quyền của Hội đồng khám sức khỏe cấp huyện trong Thông tư 105 và 88",
-      "category": null,
-      "expected_doc": "thông_tư_88",
-      "expected_page": 5,
+      "query": "So sﾃ｡nh th蘯ｩm quy盻］ c盻ｧa H盻冓 ﾄ黛ｻ渡g khﾃ｡m s盻ｩc kh盻銃 c蘯･p huy盻㌻ trong Thﾃｴng tﾆｰ 105 vﾃ 88",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_88"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_88": 5
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-39",
-      "query": "Tổng hợp các quy định về việc xử lý kết quả khám phúc tra sức khỏe quân nhân",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 10,
+      "query": "T盻貧g h盻｣p cﾃ｡c quy ﾄ黛ｻ杵h v盻・vi盻㌘ x盻ｭ lﾃｽ k蘯ｿt qu蘯｣ khﾃ｡m phﾃｺc tra s盻ｩc kh盻銃 quﾃ｢n nhﾃ｢n",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 10
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-40",
-      "query": "Đối chiếu các tiêu chuẩn sức khỏe giữa Thông tư 68 và Thông tư 105",
-      "category": null,
-      "expected_doc": "thông_tư_68",
-      "expected_page": 1,
+      "query": "ﾄ雪ｻ訴 chi蘯ｿu cﾃ｡c tiﾃｪu chu蘯ｩn s盻ｩc kh盻銃 gi盻ｯa Thﾃｴng tﾆｰ 68 vﾃ Thﾃｴng tﾆｰ 105",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_68"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_68": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-41",
-      "query": "Hướng dẫn của Cục quân y quy định về khám cận thị như thế nào?",
-      "category": null,
-      "expected_doc": "hướng_dẫn_cục_quân_y",
-      "expected_page": 1,
+      "query": "Hﾆｰ盻嬾g d蘯ｫn c盻ｧa C盻･c quﾃ｢n y quy ﾄ黛ｻ杵h v盻・khﾃ｡m c蘯ｭn th盻・nhﾆｰ th蘯ｿ nﾃo?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "hﾆｰ盻嬾g_d蘯ｫn_c盻･c_quﾃ｢n_y"
+      ],
+      "expected_pages": {
+        "hﾆｰ盻嬾g_d蘯ｫn_c盻･c_quﾃ｢n_y": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-42",
-      "query": "Nội dung chính trong Hướng dẫn Cục quân y là gì?",
-      "category": null,
-      "expected_doc": "hướng_dẫn_cục_quân_y",
-      "expected_page": 1,
+      "query": "N盻冓 dung chﾃｭnh trong Hﾆｰ盻嬾g d蘯ｫn C盻･c quﾃ｢n y lﾃ gﾃｬ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "hﾆｰ盻嬾g_d蘯ｫn_c盻･c_quﾃ｢n_y"
+      ],
+      "expected_pages": {
+        "hﾆｰ盻嬾g_d蘯ｫn_c盻･c_quﾃ｢n_y": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-43",
-      "query": "Thông tư 68 quy định về nội dung gì?",
-      "category": null,
-      "expected_doc": "thông_tư_68",
-      "expected_page": 1,
+      "query": "Thﾃｴng tﾆｰ 68 quy ﾄ黛ｻ杵h v盻・n盻冓 dung gﾃｬ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_68"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_68": 1
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-44",
-      "query": "Thời hạn hiệu lực của Thông tư 68 như thế nào?",
-      "category": null,
-      "expected_doc": "thông_tư_68",
-      "expected_page": 2,
+      "query": "Th盻拱 h蘯｡n hi盻㎡ l盻ｱc c盻ｧa Thﾃｴng tﾆｰ 68 nhﾆｰ th蘯ｿ nﾃo?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_68"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_68": 2
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-45",
-      "query": "Trường hợp mắc bệnh tâm thần có được đi nghĩa vụ quân sự không?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 2,
+      "query": "Trﾆｰ盻拵g h盻｣p m蘯ｯc b盻㌻h tﾃ｢m th蘯ｧn cﾃｳ ﾄ柁ｰ盻｣c ﾄ訴 nghﾄｩa v盻･ quﾃ｢n s盻ｱ khﾃｴng?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 2
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-46",
-      "query": "Quy định về chiều cao cân nặng của nam công dân gọi nhập ngũ",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 21,
+      "query": "Quy ﾄ黛ｻ杵h v盻・chi盻「 cao cﾃ｢n n蘯ｷng c盻ｧa nam cﾃｴng dﾃ｢n g盻絞 nh蘯ｭp ngﾅｩ",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 21
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": true
+      "refusal_hit": false,
+      "answer_hit": true,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-47",
-      "query": "Chỉ số BMI bao nhiêu thì không đủ điều kiện nhập ngũ?",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 21,
+      "query": "Ch盻・s盻・BMI bao nhiﾃｪu thﾃｬ khﾃｴng ﾄ黛ｻｧ ﾄ訴盻「 ki盻㌻ nh蘯ｭp ngﾅｩ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 21
+      },
       "retrieval_hit": true,
       "citation_hit": false,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-48",
-      "query": "Quy định về việc khám nghiệm ma túy đối với công dân nhập ngũ",
-      "category": null,
-      "expected_doc": "thông_tư_105",
-      "expected_page": 5,
+      "query": "Quy ﾄ黛ｻ杵h v盻・vi盻㌘ khﾃ｡m nghi盻㍊ ma tﾃｺy ﾄ黛ｻ訴 v盻嬖 cﾃｴng dﾃ｢n nh蘯ｭp ngﾅｩ",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "thﾃｴng_tﾆｰ_105"
+      ],
+      "expected_pages": {
+        "thﾃｴng_tﾆｰ_105": 5
+      },
       "retrieval_hit": true,
       "citation_hit": true,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": false,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-49",
-      "query": "Quy định về mức xử phạt vi phạm hành chính khi trốn nghĩa vụ quân sự",
-      "category": null,
-      "expected_doc": "out_of_scope",
-      "expected_page": 0,
-      "retrieval_hit": true,
-      "citation_hit": true,
-      "answer_hit": false
+      "query": "Quy ﾄ黛ｻ杵h v盻・m盻ｩc x盻ｭ ph蘯｡t vi ph蘯｡m hﾃnh chﾃｭnh khi tr盻創 nghﾄｩa v盻･ quﾃ｢n s盻ｱ",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "out_of_scope"
+      ],
+      "expected_pages": {
+        "out_of_scope": 0
+      },
+      "retrieval_hit": false,
+      "citation_hit": false,
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": true,
+      "latency_is_per_query": false
     },
     {
       "id": "GT-50",
-      "query": "Thời hạn nghĩa vụ công an nhân dân là bao nhiêu năm?",
-      "category": null,
-      "expected_doc": "out_of_scope",
-      "expected_page": 0,
-      "retrieval_hit": true,
+      "query": "Th盻拱 h蘯｡n nghﾄｩa v盻･ cﾃｴng an nhﾃ｢n dﾃ｢n lﾃ bao nhiﾃｪu nﾄノ?",
+      "complexity": "legacy",
+      "provider": "legacy",
+      "latency_ms": 12720.9,
+      "expected_docs": [
+        "out_of_scope"
+      ],
+      "expected_pages": {
+        "out_of_scope": 0
+      },
+      "retrieval_hit": false,
       "citation_hit": false,
-      "answer_hit": false
+      "refusal_hit": false,
+      "answer_hit": false,
+      "out_of_scope": true,
+      "latency_is_per_query": false
     }
   ]
 }
