@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.agents.compare_graph import build_compare_graph
+from app.agents.planner import planner_enabled
 from app.core.paths import PROCESSED_DIR
 from app.core.security import verify_api_key
 from app.retrieval.bm25_searcher import LegalBM25Searcher
@@ -93,6 +94,8 @@ class CompareResponse(BaseModel):
     model: str
     verification: VerificationItem
     version_notes: list[VersionNote]
+    plan_source: str = "deterministic"
+    sub_queries: list[str] = []
 
 
 # Dependency Injection for Singleton QAService (thread-safe double-checked locking)
@@ -145,6 +148,7 @@ def get_compare_graph() -> Any:
                     hybrid_searcher=qa_service.hybrid_searcher,
                     reranker=qa_service.reranker,
                     model_router=qa_service.model_router,
+                    planner_enabled=planner_enabled(),
                 )
     return _compare_graph_instance
 
@@ -220,6 +224,8 @@ def compare_legal_documents(
             version_notes=[
                 VersionNote(**note) for note in result.get("version_notes", [])
             ],
+            plan_source=result.get("plan_source", "deterministic"),
+            sub_queries=result.get("sub_queries", []),
         )
     except Exception:
         logger.exception("Compare pipeline failure")

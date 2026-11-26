@@ -44,6 +44,8 @@ Nếu bạn đặt `SCAN2RAG_API_KEY`, thì `VITE_API_KEY` trong `frontend/.env.
 
 Về lựa chọn model: `PREFER_LOCAL=true` (đang bật trong `.env` của bạn) giúp LM Studio được thử **trước cả khi câu hỏi bị xếp `complex`**. Đặt `false` nếu muốn ưu tiên cloud như hành vi mặc định (`.env.example` dùng `false`). Fallback cloud → local → offline vẫn giữ nguyên trong mọi trường hợp.
 
+Planner cho endpoint so sánh: `PLANNER_LLM=false` (mặc định). Đặt `true` nếu muốn LLM chọn văn bản và sinh câu hỏi con — tốn đúng 1 lượt LLM, tự fallback về luật deterministic nếu JSON sai hoặc LLM lỗi.
+
 **Bước 2 — Cài backend**
 
 ```powershell

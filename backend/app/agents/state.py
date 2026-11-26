@@ -6,7 +6,9 @@ from typing import Any, TypedDict
 class CompareState(TypedDict, total=False):
     query: str
     sub_queries: list[str]
+    sub_query_docs: list[str | None]
     target_docs: list[str]
+    plan_source: str
     evidence: list[dict[str, Any]]
     citations: list[dict[str, Any]]
     evidence_summary: list[dict[str, Any]]
