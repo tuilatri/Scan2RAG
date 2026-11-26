@@ -18,6 +18,7 @@ requests>=2.31.0
 qdrant-client>=1.7.0
 paddlepaddle==3.3.1
 paddleocr==3.7.0
+langgraph>=1.0,<2
 sentence-transformers>=2.2.0
 ruff>=0.4.0
 pytest>=8.0.0

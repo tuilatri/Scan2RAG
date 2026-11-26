@@ -23,7 +23,7 @@ Hệ thống cung cấp:
 - Tách biệt môi trường cơ sở dữ liệu quan hệ (**PostgreSQL Test & Production** — planned, chỉ có placeholder trong `.env`) ngay từ tầng cấu hình.
 - Agentic RAG (LangGraph) hỗ trợ tra cứu đa tài liệu, kiểm tra chứng cứ và hạn chế hallucination.
 
-> **Trạng thái triển khai (cập nhật 2026-11-26):** PostgreSQL và LangGraph ở trên là **thiết kế planned, chưa implement**. Hiện tại metadata/versioning nằm trong file JSON + Qdrant; routing chạy bằng `ModelRouter` dạng rule-based. Nguồn truth: `docs/ai-context/ARCHITECTURE.md`.
+> **Trạng thái triển khai (cập nhật 2026-11-26):** PostgreSQL vẫn là **planned, chưa implement** (metadata nằm trong JSON + Qdrant). LangGraph đã có dạng **additive** tại `POST /api/v1/query/compare`; chat thường vẫn dùng `ModelRouter` rule-based. Nguồn truth: `docs/ai-context/ARCHITECTURE.md`.
 - Mọi câu trả lời bắt buộc có **trích dẫn nguồn gốc (Grounded Citations)**: Tên văn bản, số Điều/Khoản, số trang PDF scan.
 
 ### 1.2. Hai mục tiêu chiến lược
@@ -78,7 +78,7 @@ Hệ thống được tách làm 2 pipeline độc lập:
          ▼                                        ▼
  [Simple / Metadata]                     [Complex / Multi-doc]
          │                                        │
- [Database Lookup / Dense]               [Model Router (hiện tại) / LangGraph — planned]
+ [Database Lookup / Dense]               [Model Router (default) / LangGraph compare (additive)]
          │                                        │
          │                              ┌─────────┴─────────┐
          │                              ▼                   ▼
@@ -161,7 +161,7 @@ Hệ thống được tách làm 2 pipeline độc lập:
 - **Cơ chế Routing**:
   - Dựa trên độ phức tạp của câu hỏi, số lượng chunks liên quan và loại truy vấn (factual đơn giản -> LM Studio; suy luận so sánh nhiều văn bản -> Groq/OpenRouter).
 
-### 4.6. Agentic Workflow (LangGraph — planned, chưa implement)
+### 4.6. Agentic Workflow (LangGraph — additive, đã implement)
 - Xử lý các câu hỏi đa bước (Multi-hop), ví dụ: *"Theo Thông tư 106 mới thì quy định về độ cận thị đã thay đổi như thế nào so với Thông tư 105?"*.
 - Agent nodes:
   1. `Query Planner`: Bóc tách thành các câu hỏi con.
@@ -250,6 +250,6 @@ Vietnamese Document Intelligence — Hybrid Local/Cloud Agentic RAG System
 - Engineered a document ingestion pipeline using OpenCV for preprocessing (deskew, denoise) and PaddleOCR for Vietnamese text extraction, coupled with a human-in-the-loop correction workflow.
 - Implemented structure-aware hierarchical chunking (Chapter-Article-Clause-Point) and hybrid retrieval (Dense + BM25) reranked with cross-encoders in Qdrant.
 - Designed a hybrid local/cloud routing architecture: running lightweight quantized models (Qwen2.5 1.5B) locally via LM Studio under 4GB VRAM constraint, falling back to free high-speed Cloud LLMs (Groq, OpenRouter) for complex multi-hop reasoning.
-- Designed (planned) an Agentic RAG workflow with LangGraph for cross-statute comparison, temporal versioning resolution, and grounded citation verification down to PDF page numbers. Hiện tại: ModelRouter rule-based + hybrid retrieval + trích dẫn trang PDF.
+- Implemented an additive LangGraph compare workflow (plan → retrieve → evidence_check → bounded retry → synthesize) for cross-statute comparison with grounded PDF citations; default chat remains a rule-based ModelRouter.
 - Benchmarked OCR (CER/WER) and RAG generation metrics (Faithfulness, Context Recall) using RAGAS across a 50+ ground-truth Q&A dataset.
 ```
