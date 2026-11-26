@@ -2,15 +2,24 @@ import React, { useState } from 'react';
 import { Navbar } from '@/components/layout/navbar';
 import { SplitPane } from '@/components/layout/split-pane';
 import { ChatContainer } from '@/components/chat/chat-container';
+import { CompareContainer } from '@/components/chat/compare-container';
 import { PdfViewerPanel } from '@/components/pdf/pdf-viewer-panel';
 import { OcrReviewContainer } from '@/components/ocr/ocr-review-container';
 import { useChatStream } from '@/hooks/use-chat-stream';
+import { useCompare } from '@/hooks/use-compare';
 import { usePdfViewer } from '@/hooks/use-pdf-viewer';
 import { useBackendHealth } from '@/hooks/use-backend-health';
 import { Citation } from '@/types/chat';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'chat' | 'ocr'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'ocr' | 'compare'>('chat');
+
+  const {
+    result: compareResult,
+    isLoading: isComparing,
+    error: compareError,
+    send: sendCompare,
+  } = useCompare();
   const { status: backendStatus } = useBackendHealth();
 
   // Streaming Hook
@@ -54,7 +63,33 @@ export const App: React.FC = () => {
 
       {/* Main Dual-Pane Area */}
       <main className="flex-1 overflow-hidden">
-        {activeTab === 'chat' ? (
+        {activeTab === 'compare' ? (
+          <SplitPane
+            isRightPaneOpen={isSidebarOpen}
+            onToggleRightPane={toggleSidebar}
+            leftPane={
+              <CompareContainer
+                result={compareResult}
+                isLoading={isComparing}
+                error={compareError}
+                onSend={sendCompare}
+                onCitationSelect={handleCitationSelect}
+              />
+            }
+            rightPane={
+              <PdfViewerPanel
+                activeDocId={activeDocId}
+                activePage={activePage}
+                activeCitation={activeCitation}
+                zoomLevel={zoomLevel}
+                onPageChange={jumpToPage}
+                onZoomIn={zoomIn}
+                onZoomOut={zoomOut}
+                onResetZoom={resetZoom}
+              />
+            }
+          />
+        ) : activeTab === 'chat' ? (
           <SplitPane
             isRightPaneOpen={isSidebarOpen}
             onToggleRightPane={toggleSidebar}
