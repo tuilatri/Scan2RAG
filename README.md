@@ -75,7 +75,7 @@ Dự án ban đầu tập trung vào bộ corpus **pháp luật về khám sức
 - **Query Analyzer & Router**: Phân loại ý định (metadata search, factual single-hop, hay multi-document comparison).
 - **Retrieval Engine**: Hybrid search (BM25 + Dense) kết hợp RRF (Reciprocal Rank Fusion) và Reranker.
 - **Model Router (đã implement)**: Chọn local/cloud theo độ phức tạp — giữ làm default cho chat.
-- **LangGraph Compare Workflow (additive)**: `POST /api/v1/query/compare` — so sánh đa văn bản qua 6 node `plan → retrieve → evidence_check → retry → synthesize → verify_answer`; retry và regenerate đều tối đa 1 lần, `verification` báo số liệu không có trong trích dẫn.
+- **LangGraph Compare Workflow (additive)**: `POST /api/v1/query/compare` — so sánh đa văn bản qua 7 node `plan → retrieve → evidence_check → retry → resolve_versions → synthesize → verify_answer`; `version_notes` ghi ngày hiệu lực + TT105 bị TT106 thay thế, `verification` báo số liệu không có trong trích dẫn. Retry/regenerate đều tối đa 1 lần.
 - **Citation Validator**: Đảm bảo mọi câu trả lời đều có trích dẫn chính xác đến `Tên văn bản`, `Điều/Khoản` và `Số trang PDF`.
 
 ---

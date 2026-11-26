@@ -14,7 +14,7 @@
 - `ingestion/`: PDF inspector, image preprocessing (deskew, denoise), OCR extraction, OCR review interface.
 - `chunking/`: Structure-aware (Chương - Điều - Khoản - Điểm) & Parent-Child chunking.
 - `embeddings/` & `retrieval/`: `multilingual-e5-small` / `BGE-M3`, BM25 sparse search, RRF fusion, Cross-Encoder reranker.
-- `llm/`: Model router (implemented, default cho chat). `agents/`: LangGraph compare workflow (implemented dạng **additive** tại `POST /api/v1/query/compare`) gồm `plan → retrieve → evidence_check → retry → synthesize → verify_answer`; node cuối đối chiếu số liệu trong answer với chunk đã trích dẫn. Default chat vẫn rule-based. PostgreSQL vẫn planned.
+- `llm/`: Model router (implemented, default cho chat). `agents/`: LangGraph compare workflow (implemented dạng **additive** tại `POST /api/v1/query/compare`) gồm `plan → retrieve → evidence_check → retry → resolve_versions → synthesize → verify_answer`; `resolve_versions` gắn ngày hiệu lực từ `SemanticLegalChunker.OFFICIAL_EFFECTIVE_DATES` và ghi chú TT105 bị TT106 thay thế / ưu tiên VBHN 88; `verify_answer` đối chiếu số liệu trong answer với chunk đã trích dẫn. Default chat vẫn rule-based. PostgreSQL vẫn planned.
 
 ## 3. Data Layer (schema, DB convention)
 - PostgreSQL (planned, not implemented): `documents`, `document_relationships`, `document_pages`, `ocr_results`, `ocr_corrections`, `conversations`.

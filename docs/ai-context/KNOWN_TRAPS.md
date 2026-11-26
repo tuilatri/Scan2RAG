@@ -16,6 +16,7 @@
 - **Symptom**: LLM cites obsolete regulations from TT 105 instead of amended rules from TT 106.
 - **Root cause**: Naive similarity search retrieves both documents without version context.
 - **Fix**: Primary search targets Consolidated Document (VBHN 88); tag chunks with `is_superseded` and `effective_date` metadata.
+- **Cập nhật 2026-11-26**: compare graph có node `resolve_versions` — gắn ngày hiệu lực từ `SemanticLegalChunker.OFFICIAL_EFFECTIVE_DATES` (corpus `effective_date` hiện `None` cho mọi node), ghi chú TT105 bị TT106 thay thế và ưu tiên VBHN 88. Chưa sửa corpus/retrieval toàn cục. ⚠️ `document_endpoints.py:31` ghi TT88 = `2023-12-31`, khác chunker (`2024-12-24`) — chưa đối chiếu trong đợt này.
 
 ## 4. Toy Test vs Real Corpus Safeguard Trap
 - **Symptom**: Safeguard pass 100% in unit tests but lets 7/13 tables lose numbers in production corpus.
