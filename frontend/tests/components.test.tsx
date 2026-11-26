@@ -60,7 +60,7 @@ describe('Accessibility', () => {
     render(<Navbar activeTab="chat" onTabChange={() => {}} backendStatus="connected" />);
 
     const tabs = screen.getAllByRole('tab');
-    expect(tabs).toHaveLength(2);
+    expect(tabs).toHaveLength(3);
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     expect(tabs[0]).toHaveAttribute('aria-current', 'page');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
