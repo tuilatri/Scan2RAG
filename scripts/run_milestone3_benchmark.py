@@ -109,12 +109,18 @@ def run_benchmark():
     # 3. Save Milestone 3 Report
     print("\n[3/3] Saving Milestone 3 Report Artifact...")
     report = {
+        "schema_version": 2,
+        "migrated_from_legacy": False,
         "milestone": "Milestone 3",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "summary": {
             "overall_quality_score": eval_results["overall_quality_score"],
             "eval_passed": eval_results["overall_passed"],
-            "overall_passed": eval_results["overall_passed"] and (avg_ttft < 1000.0),
+            "overall_passed": (
+                eval_results["overall_passed"]
+                and avg_ttft < 1000.0
+                and avg_citations_ms < 1000.0
+            ),
             "avg_ttft_status_ms": avg_ttft,
             "avg_citations_latency_ms": avg_citations_ms,
             "status_ttft_under_1s": avg_ttft < 1000.0,

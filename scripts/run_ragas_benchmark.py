@@ -60,11 +60,14 @@ def run_benchmark():
         # Check retrieval & citation accuracy
         retrieval_hit = False
         citation_hit = False
+        refusal_hit = False
         expected_docs = item.get("expected_docs", [expected_doc])
         expected_pages_map = item.get("expected_pages", {})
         if "out_of_scope" in expected_docs:
-            retrieval_hit = True
-            citation_hit = True
+            refusal_hit = any(
+                neg in answer.lower()
+                for neg in ["không quy định", "không thuộc phạm vi", "chưa tìm thấy"]
+            )
         else:
             for c in citations:
                 doc_id = c.get("document_id")
@@ -77,8 +80,8 @@ def run_benchmark():
 
         # Check answer keywords
         answer_hit = any(kw.lower() in answer.lower() for kw in expected_keywords)
-        if "out_of_scope" in expected_docs and any(neg in answer.lower() for neg in ["không quy định", "không thuộc phạm vi", "chưa tìm thấy"]):
-            answer_hit = True
+        if "out_of_scope" in expected_docs:
+            answer_hit = refusal_hit
 
         if retrieval_hit:
             passed_retrieval += 1
@@ -100,7 +103,11 @@ def run_benchmark():
             "latency_ms": round(latency, 1),
             "retrieval_hit": retrieval_hit,
             "citation_hit": citation_hit,
+            "refusal_hit": refusal_hit,
             "answer_hit": answer_hit,
+            "expected_docs": expected_docs,
+            "expected_pages": expected_pages_map,
+            "out_of_scope": "out_of_scope" in expected_docs,
         })
 
     # Summary Statistics
@@ -119,10 +126,17 @@ def run_benchmark():
     print(f"• Average E2E Latency     : {avg_latency:.1f} ms")
     print("=" * 80)
 
+    # Invariant assertions MUST run before the artifact is written
+    assert retrieval_acc >= 85.0, f"Retrieval accuracy below threshold: {retrieval_acc:.1f}%"
+    assert citation_acc >= 80.0, f"Citation accuracy below threshold: {citation_acc:.1f}%"
+    assert answer_acc >= 75.0, f"Faithfulness accuracy below threshold: {answer_acc:.1f}%"
+
     passed_all = retrieval_acc >= 85.0 and citation_acc >= 80.0 and answer_acc >= 75.0
 
     # Save Benchmark Report Artifact
     report_data = {
+        "schema_version": 2,
+        "migrated_from_legacy": False,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "milestone": "2",
         "benchmark_name": "Milestone 2 RAG Precision & Faithfulness Benchmark",
@@ -148,12 +162,6 @@ def run_benchmark():
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report_data, f, ensure_ascii=False, indent=2)
     print(f"✓ Saved benchmark report artifact to: {report_path}")
-
-    # Invariant assertions
-    assert retrieval_acc >= 85.0, f"Retrieval accuracy below threshold: {retrieval_acc:.1f}%"
-    assert citation_acc >= 80.0, f"Citation accuracy below threshold: {citation_acc:.1f}%"
-    assert answer_acc >= 75.0, f"Faithfulness accuracy below threshold: {answer_acc:.1f}%"
-
     print("\n🎉 MILESTONE 2 BENCHMARK GATE: ALL PASS (High Precision & Faithfulness Validated)")
 
 

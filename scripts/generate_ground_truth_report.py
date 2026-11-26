@@ -1,63 +1,76 @@
-import glob
+"""Generate OCR rectification report from the processed corpus (no hardcoded claims)."""
+
 import json
 import os
+from collections import Counter
+from pathlib import Path
 
-os.makedirs('data/benchmarks/ocr_comparison', exist_ok=True)
+ROOT = Path(__file__).resolve().parent.parent
+PROCESSED_DIR = ROOT / "data" / "processed"
+OUT_PATH = ROOT / "data" / "benchmarks" / "ocr_comparison" / "qwen3_vl_4b_report.json"
 
-files = sorted(glob.glob('data/processed/*.json'))
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from audit_processed_data import check_number_lock  # noqa: E402
+
+files = sorted(PROCESSED_DIR.glob("*.json"))
 report = {
-    'model': 'qwen3-vl-4b',
-    'total_documents': len(files),
-    'documents': {}
+    "description": "Aggregated OCR rectification report for all processed documents",
+    "total_documents": len(files),
+    "documents": {},
 }
 
 total_tables = 0
 total_rectified = 0
 total_rejected = 0
+model_counts: Counter[str] = Counter()
+safeguard_breaches = 0
 
-for f in files:
-    doc_name = os.path.basename(f)
-    with open(f, 'r', encoding='utf-8') as fp:
-        data = json.load(fp)
-    nodes = data.get('nodes', [])
-    tbls = [n for n in nodes if str(n.get('level', '')).lower() == 'table']
-    rect = [t for t in tbls if t.get('metadata', {}).get('vlm_rectified')]
-    rej = [t for t in tbls if not t.get('metadata', {}).get('vlm_rectified')]
-    
-    total_tables += len(tbls)
-    total_rectified += len(rect)
-    total_rejected += len(rej)
-    
-    report['documents'][doc_name] = {
-        'total_tables': len(tbls),
-        'rectified_count': len(rect),
-        'rejected_count': len(rej),
-        'rectified_ids': [t['id'] for t in rect],
-        'rejected_details': [
-            {'id': t['id'], 'page': t.get('page_number'), 'error': t.get('metadata', {}).get('vlm_error')}
-            for t in rej
-        ]
+for file_path in files:
+    with open(file_path, encoding="utf-8") as handle:
+        data = json.load(handle)
+    nodes = data.get("nodes", [])
+    tables = [node for node in nodes if str(node.get("level", "")).lower() == "table"]
+    rectified = [node for node in tables if node.get("metadata", {}).get("vlm_rectified")]
+    rejected = [node for node in tables if not node.get("metadata", {}).get("vlm_rectified")]
+
+    total_tables += len(tables)
+    total_rectified += len(rectified)
+    total_rejected += len(rejected)
+    for node in tables:
+        meta = node.get("metadata", {})
+        model_counts[str(meta.get("rectified_model", "unknown"))] += 1
+        ok, _reason = check_number_lock(meta.get("raw_content_backup"), node.get("content", ""))
+        if not ok:
+            safeguard_breaches += 1
+
+    report["documents"][file_path.name] = {
+        "total_tables": len(tables),
+        "rectified_count": len(rectified),
+        "rejected_count": len(rejected),
+        "rectified_ids": [node["id"] for node in rectified],
+        "rejected_details": [
+            {
+                "id": node["id"],
+                "page": node.get("page_number"),
+                "error": node.get("metadata", {}).get("vlm_error"),
+            }
+            for node in rejected
+        ],
     }
 
-safeguard_breaches = sum(
-    1
-    for fn in files
-    for t in json.load(open(f"data/processed/{fn}", encoding="utf-8")).get("nodes", [])
-    if t.get("level") == "TABLE" and t.get("metadata", {}).get("safeguard_passed") is False
-)
-
-report['summary'] = {
-    'total_tables': total_tables,
-    'total_rectified': total_rectified,
-    'total_rejected': total_rejected,
-    'rectified_rate_percent': round(total_rectified / total_tables * 100, 2) if total_tables else 0,
-    'rejected_rate_percent': round(total_rejected / total_tables * 100, 2) if total_tables else 0,
-    'safeguard_breaches_in_corpus': safeguard_breaches
+report["models"] = dict(model_counts)
+report["summary"] = {
+    "total_tables": total_tables,
+    "total_rectified": total_rectified,
+    "total_rejected": total_rejected,
+    "rectified_rate_percent": round(total_rectified / total_tables * 100, 2) if total_tables else 0,
+    "rejected_rate_percent": round(total_rejected / total_tables * 100, 2) if total_tables else 0,
+    "safeguard_breaches_in_corpus": safeguard_breaches,
 }
 
-out_path = 'data/benchmarks/ocr_comparison/qwen3_vl_4b_report.json'
-with open(out_path, 'w', encoding='utf-8') as fp:
-    json.dump(report, fp, ensure_ascii=False, indent=2)
-
-print(f"Saved report to {out_path}")
-print(f"Total tables: {total_tables} | Rectified: {total_rectified} ({report['summary']['rectified_rate_percent']}%) | Rejected: {total_rejected} ({report['summary']['rejected_rate_percent']}%)")
+OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+with open(OUT_PATH, "w", encoding="utf-8") as handle:
+    json.dump(report, handle, ensure_ascii=False, indent=2)
+print(f"Wrote {OUT_PATH.relative_to(ROOT)}: {total_rectified}/{total_tables}, breaches={safeguard_breaches}")

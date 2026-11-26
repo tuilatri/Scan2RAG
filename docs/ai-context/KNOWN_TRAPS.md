@@ -38,3 +38,8 @@
 - **Root cause**: dev convenience mode được dùng làm mặc định production; CORS từng cho phép `*` kèm credentials; lỗi được serialize trực tiếp từ exception.
 - **Fix**: fail-closed (`ENVIRONMENT=production` luôn yêu cầu key; dev override phải `ALLOW_UNAUTHENTICATED_DEV=true`), auth cho mọi route trừ `/health`, `verify_api_key_query` cho iframe PDF, rate limit middleware theo IP, redact lỗi + `logger.exception`. Gate `security-audit` kiểm tra ma trận 8 route, CORS explicit, middleware và fail-closed — không xanh giả (đã sửa lỗi traversal `_IncludedRouter`).
 
+## 8. Benchmark Artifact Tự Nhận PASS
+- **Symptom**: `qwen3_vl_4b_report.json` ghi 59/111 và model đơn trong khi corpus có 111/111 (59 Qwen + 52 Gemini); `gemini_auditor_report.json` nhận "1:1 Direct Ground-Truth Cross-Check" dù không script nào sinh; RAGAS ghi `"status":"PASS"` trước assert và tự cộng điểm cho `out_of_scope`; M3 `overall_passed` bỏ qua `citations_under_1s=false`.
+- **Root cause**: artifact được viết tay/kế thừa schema cũ; script ghi file trước khi assert; auto-hit làm metric phình; thiếu gate đối chiếu artifact↔corpus↔code.
+- **Fix**: script sinh report từ corpus (`check_number_lock`, đếm theo `rectified_model`), Gemini report chỉ nói numeric audit, RAGAS assert trước write + `refusal_hit`, migration giữ measurement cũ nhưng đánh dấu `schema_version:2/migrated_from_legacy`, M3 `overall_passed` tính cả citations latency. Gate `benchmark-truth` check schema/status/metric/count/claim — có negative test chống xanh giả.
+
