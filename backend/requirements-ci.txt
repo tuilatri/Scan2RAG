@@ -1,6 +1,6 @@
 # CPU-only dependency set for GitHub Actions verify gates.
-# Excludes paddlepaddle-gpu/paddleocr: their CUDA wheels cannot install on
-# ubuntu-latest, and no audit gate imports them.
+# Uses CPU wheels only: paddlepaddle (not paddlepaddle-gpu/CUDA) because
+# test_table_extractor.py imports ocr_engine at module level; no GPU is needed.
 # torch is installed separately from the CPU wheel index in ci.yml (Python 3.11);
 # sentence-transformers below then reuses that install.
 pymupdf>=1.24.0
@@ -14,7 +14,10 @@ python-dotenv>=1.0.1
 fastapi>=0.110.0
 uvicorn>=0.28.0
 httpx>=0.27.0
+requests>=2.31.0
 qdrant-client>=1.7.0
+paddlepaddle==3.3.1
+paddleocr==3.7.0
 sentence-transformers>=2.2.0
 ruff>=0.4.0
 pytest>=8.0.0
