@@ -74,7 +74,7 @@
     "top_k_rerank": 5
   }
   ```
-- **Response Body (`CompareResponse`):** `query`, `answer`, `citations` (same `CitationItem`), `evidence` (`document_id`, `chunk_count`, `citation_ids`), `retry_count` (0 hoặc 1), `provider`, `model`, `verification` (`passed`, `unsupported_numbers`, `checked_numbers`). Số trong `answer` không có trong `citations + query` bị đánh dấu và tạo lại câu trả lời tối đa 1 lần.
+- **Response Body (`CompareResponse`):** `query`, `answer`, `citations` (same `CitationItem`), `evidence` (`document_id`, `chunk_count`, `citation_ids`), `retry_count` (0 hoặc 1), `provider`, `model`, `verification` (`passed`, `unsupported_numbers`, `checked_numbers`), `version_notes` (`document_id`, `effective_date`, `superseded_by`, `note`). Số trong `answer` không có trong `citations + query` bị đánh dấu và tạo lại tối đa 1 lần; ngày hiệu lực lấy từ `SemanticLegalChunker.OFFICIAL_EFFECTIVE_DATES`.
 - **Note:** Endpoint bổ sung dùng LangGraph; `/query` và `/query/stream` vẫn là pipeline rule-based.
 
 ### `GET /api/v1/health`

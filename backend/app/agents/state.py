@@ -17,3 +17,4 @@ class CompareState(TypedDict, total=False):
     model: str
     verification: dict[str, Any]
     verify_count: int
+    version_notes: list[dict[str, Any]]

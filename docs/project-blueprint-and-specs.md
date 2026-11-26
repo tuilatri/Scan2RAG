@@ -250,6 +250,6 @@ Vietnamese Document Intelligence — Hybrid Local/Cloud Agentic RAG System
 - Engineered a document ingestion pipeline using OpenCV for preprocessing (deskew, denoise) and PaddleOCR for Vietnamese text extraction, coupled with a human-in-the-loop correction workflow.
 - Implemented structure-aware hierarchical chunking (Chapter-Article-Clause-Point) and hybrid retrieval (Dense + BM25) reranked with cross-encoders in Qdrant.
 - Designed a hybrid local/cloud routing architecture: running lightweight quantized models (Qwen2.5 1.5B) locally via LM Studio under 4GB VRAM constraint, falling back to free high-speed Cloud LLMs (Groq, OpenRouter) for complex multi-hop reasoning.
-- Implemented an additive LangGraph compare workflow (plan → retrieve → evidence_check → bounded retry → synthesize) for cross-statute comparison with grounded PDF citations; default chat remains a rule-based ModelRouter.
+- Implemented an additive, version-aware LangGraph compare workflow (plan → retrieve → evidence_check → bounded retry → resolve_versions → synthesize → verify_answer) for cross-statute comparison with grounded PDF citations; default chat remains a rule-based ModelRouter.
 - Benchmarked OCR (CER/WER) and RAG generation metrics (Faithfulness, Context Recall) using RAGAS across a 50+ ground-truth Q&A dataset.
 ```

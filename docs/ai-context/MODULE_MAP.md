@@ -23,9 +23,9 @@
 | File | Lines | Role |
 |---|---:|---|
 | `backend/app/agents/__init__.py` | 1 | Package marker for additive agentic workflows |
-| `backend/app/agents/state.py` | 16 | `CompareState` TypedDict for the compare graph |
+| `backend/app/agents/state.py` | 17 | `CompareState` TypedDict for the compare graph |
 | `backend/app/agents/verification.py` | 13 | Numeric grounding: reject numbers in answer absent from cited evidence |
-| `backend/app/agents/compare_graph.py` | 159 | Graph: plan → retrieve → evidence_check → retry → synthesize → verify_answer |
+| `backend/app/agents/compare_graph.py` | 202 | Graph: plan → retrieve → evidence_check → retry → resolve_versions → synthesize → verify_answer |
 
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).

@@ -76,6 +76,13 @@ class VerificationItem(BaseModel):
     checked_numbers: int
 
 
+class VersionNote(BaseModel):
+    document_id: str
+    effective_date: str | None = None
+    superseded_by: str | None = None
+    note: str = ""
+
+
 class CompareResponse(BaseModel):
     query: str
     answer: str
@@ -85,6 +92,7 @@ class CompareResponse(BaseModel):
     provider: str
     model: str
     verification: VerificationItem
+    version_notes: list[VersionNote]
 
 
 # Dependency Injection for Singleton QAService (thread-safe double-checked locking)
@@ -209,6 +217,9 @@ def compare_legal_documents(
                 unsupported_numbers=verification.get("unsupported_numbers", {}),
                 checked_numbers=verification.get("checked_numbers", 0),
             ),
+            version_notes=[
+                VersionNote(**note) for note in result.get("version_notes", [])
+            ],
         )
     except Exception:
         logger.exception("Compare pipeline failure")
