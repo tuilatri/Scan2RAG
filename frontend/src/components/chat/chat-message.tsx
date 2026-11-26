@@ -65,11 +65,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           {message.content ? (
             message.content
           ) : message.isStreaming ? (
-            <div className="flex items-center space-x-1.5 py-1 text-muted-foreground italic">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:0.2s]" />
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:0.4s]" />
-              <span className="text-xs ml-1 font-sans">Đang soạn thảo câu trả lời...</span>
+            <div
+              className="flex items-center py-1 text-muted-foreground"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="text-xs font-sans">Đang soạn thảo câu trả lời...</span>
             </div>
           ) : (
             <span className="text-muted-foreground italic">Không có nội dung phản hồi.</span>

@@ -236,6 +236,9 @@ def rectify_ocr_table(node_id: str, payload: RectifyRequest) -> dict[str, Any]:
             ) as tmp_f:
                 tmp_path = Path(tmp_f.name)
                 json.dump(target_data, tmp_f, ensure_ascii=False, indent=2)
+                tmp_f.flush()
+                os.fsync(tmp_f.fileno())
+            os.chmod(tmp_path, 0o600)
             os.replace(tmp_path, target_file)
         except Exception:
             if tmp_path and tmp_path.exists():

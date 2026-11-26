@@ -1,5 +1,5 @@
 import React from "react"
-import { ShieldCheck, FileText, Bot, RefreshCw } from "lucide-react"
+import { ShieldCheck, FileText, Bot } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
@@ -38,10 +38,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex items-center space-x-1 bg-muted p-0.5 rounded-lg border">
+        <div
+          className="flex items-center space-x-1 bg-muted p-0.5 rounded-lg border"
+          role="tablist"
+          aria-label="Chế độ xem"
+        >
           <Button
             size="sm"
             variant={activeTab === "chat" ? "default" : "ghost"}
+            role="tab"
+            aria-selected={activeTab === "chat"}
+            aria-current={activeTab === "chat" ? "page" : undefined}
             className="h-8 text-xs font-medium px-3"
             onClick={() => onTabChange("chat")}
           >
@@ -51,6 +58,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           <Button
             size="sm"
             variant={activeTab === "ocr" ? "default" : "ghost"}
+            role="tab"
+            aria-selected={activeTab === "ocr"}
+            aria-current={activeTab === "ocr" ? "page" : undefined}
             className="h-8 text-xs font-medium px-3"
             onClick={() => onTabChange("ocr")}
           >
@@ -60,12 +70,20 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* System Health Status */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3" role="status" aria-live="polite">
           <div className="flex items-center space-x-1.5">
             <span
+              role="img"
+              aria-label={
+                backendStatus === "connected"
+                  ? "Backend sẵn sàng"
+                  : backendStatus === "connecting"
+                  ? "Đang kết nối backend"
+                  : "Mất kết nối backend"
+              }
               className={`h-2 w-2 rounded-full ${
                 backendStatus === "connected"
-                  ? "bg-emerald-500 animate-pulse"
+                  ? "bg-emerald-500"
                   : backendStatus === "connecting"
                   ? "bg-amber-500"
                   : "bg-destructive"

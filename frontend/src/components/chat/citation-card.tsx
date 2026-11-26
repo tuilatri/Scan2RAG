@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, AlertTriangle, Table as TableIcon, ArrowRight } from 'lucide-react';
+import { AlertTriangle, Table as TableIcon, ArrowRight } from 'lucide-react';
 import { Citation } from '@/types/chat';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -17,8 +17,7 @@ export const CitationCard: React.FC<CitationCardProps> = ({
   isSelected = false,
   onSelect,
 }) => {
-  const isSuperseded =
-    citation.is_superseded === true || citation.document_id === 'thông_tư_105';
+  const isSuperseded = citation.is_superseded === true;
 
   return (
     <div

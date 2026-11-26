@@ -75,7 +75,7 @@ class LegalDomainAuditor:
             qdrant_superseded = 0
             qdrant_error = str(e)
 
-        has_tt105_superseded = (superseded_nodes > 0 or qdrant_superseded > 0) and qdrant_error is None
+        has_tt105_superseded = qdrant_error is None and superseded_nodes > 0
         has_tt88_valid = doc_legal_stats.get("thông_tư_88", {}).get("superseded_count", 0) == 0
 
         score = 100.0

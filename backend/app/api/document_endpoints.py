@@ -157,12 +157,22 @@ def stream_document_pdf(
             },
         )
 
-    # Parse Range: bytes=start-end
+    # Parse Range: bytes=start-end | bytes=start- | bytes=-suffix
     try:
-        range_val = range.strip().replace("bytes=", "")
-        parts = range_val.split("-")
-        start = int(parts[0]) if parts[0] else 0
-        end = int(parts[1]) if len(parts) > 1 and parts[1] else file_size - 1
+        range_val = range.strip().removeprefix("bytes=").strip()
+        start_str, sep, end_str = range_val.partition("-")
+        if not sep or (not start_str and not end_str):
+            raise ValueError("Malformed Range header")
+
+        if not start_str:
+            suffix_length = int(end_str)
+            if suffix_length <= 0:
+                raise ValueError("Range suffix must be positive")
+            start = max(file_size - suffix_length, 0)
+            end = file_size - 1
+        else:
+            start = int(start_str)
+            end = int(end_str) if end_str else file_size - 1
 
         if start >= file_size or end >= file_size or start > end:
             return Response(

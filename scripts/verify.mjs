@@ -5,7 +5,7 @@
  * Gates are NOT hardcoded: they live in kit.config.json (array "gates");
  * full field reference: kit.config.schema.json. Flags:
  *   --list            print the gate table (id, cwd, tags) and exit 0
- *   --fast            skip gates tagged "slow"
+ *   --fast            skip gates tagged "slow" if any (warns with skipped ids)
  *   --only <id>       run a single gate
  *   --skip <id>       skip a gate (repeatable)
  *   --help | -h       this help
@@ -154,7 +154,7 @@ ${bold('verify.mjs')} — run every gate declared in kit.config.json (serial, fa
 ${bold('Usage:')}
   node scripts/verify.mjs              Run all gates (stop at the first failure)
   node scripts/verify.mjs --list       Print the gate table (id · cwd · tags) and exit
-  node scripts/verify.mjs --fast       Skip gates tagged "slow"
+  node scripts/verify.mjs --fast       Skip gates tagged "slow" if any (warns and lists them)
   node scripts/verify.mjs --only <id>  Run only gate <id>
   node scripts/verify.mjs --skip <id>  Skip gate <id> (repeatable: --skip a --skip b)
   node scripts/verify.mjs --help       This help
@@ -240,6 +240,17 @@ Full schema (every field documented): ${bold('kit.config.schema.json')}`);
   }
 
   const gates = filterGates(allGates, flags);
+
+  // --fast must never silently drop a gate (any gate tagged "slow").
+  // Print exactly what was filtered so a "fast PASS" cannot be mistaken for a full run.
+  if (flags.fast && !flags.only) {
+    const skippedFast = allGates.filter((g) => g.tags.includes('slow') && !flags.skip.includes(g.id));
+    if (skippedFast.length) {
+      console.log(yellow(`  ⚠ --fast skipped ${skippedFast.length} gate(s) tagged "slow": ${skippedFast.map((g) => g.id).join(', ')}`));
+      console.log(dim('    These gates were NOT run — use `node scripts/verify.mjs` for the full gate set.'));
+      console.log();
+    }
+  }
 
   // ---- 0 gates after filtering -> warning + exit 0 (safe-by-default: a fresh
   //      install with an unfilled config must never fail)

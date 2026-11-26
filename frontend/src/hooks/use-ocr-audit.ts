@@ -24,25 +24,37 @@ export function useOcrAudit({
   const [filterDocId, setFilterDocId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const detailAbortRef = useRef<AbortController | null>(null);
+  const tablesAbortRef = useRef<AbortController | null>(null);
 
-  // Fetch list of tables
+  // Fetch list of tables; abort any superseded request to avoid stale writes.
   const fetchTables = useCallback(async () => {
+    tablesAbortRef.current?.abort();
+    const controller = new AbortController();
+    tablesAbortRef.current = controller;
+
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables`, { headers: apiHeaders() });
+      const res = await fetch(`${apiBaseUrl}/api/v1/ocr/tables`, {
+        headers: apiHeaders(),
+        signal: controller.signal,
+      });
       if (!res.ok) throw new Error(`Lỗi tải danh mục bảng: ${res.statusText}`);
       const data: TableSummary[] = await res.json();
+      if (controller.signal.aborted) return;
       setTables(data);
-      if (data.length > 0 && !selectedTableId) {
-        setSelectedTableId(data[0].id);
-      }
+      setSelectedTableId((current) => current ?? data[0]?.id ?? null);
     } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : 'Không thể kết nối API bảng OCR.');
     } finally {
-      setIsLoading(false);
+      if (tablesAbortRef.current === controller) {
+        setIsLoading(false);
+      }
     }
-  }, [apiBaseUrl, selectedTableId]);
+  }, [apiBaseUrl]);
+
+  useEffect(() => () => tablesAbortRef.current?.abort(), []);
 
   // Fetch detail when selectedTableId changes (with AbortController to prevent stale race)
   const fetchTableDetail = useCallback(
@@ -94,45 +106,36 @@ export function useOcrAudit({
 
   const pushHistory = useCallback(
     (nextHeaders: string[], nextRows: string[][]) => {
-      setHistory((prev) => {
-        const sliced = prev.slice(0, historyIdx + 1);
-        return [...sliced, { headers: [...nextHeaders], rows: nextRows.map((r) => [...r]) }];
-      });
-      setHistoryIdx((prev) => prev + 1);
+      setHistory((prev) => [
+        ...prev.slice(0, historyIdx + 1),
+        { headers: [...nextHeaders], rows: nextRows.map((r) => [...r]) },
+      ]);
+      setHistoryIdx(historyIdx + 1);
     },
     [historyIdx]
   );
 
-  // Update a single cell
+  // Update a single cell — state updates stay pure so StrictMode cannot double-record history
   const updateCell = useCallback(
     (rowIndex: number, colIndex: number, value: string) => {
-      setEditableRows((prev) => {
-        const updated = prev.map((row, rIdx) => {
-          if (rIdx === rowIndex) {
-            const newRow = [...row];
-            newRow[colIndex] = value;
-            return newRow;
-          }
-          return row;
-        });
-        pushHistory(editableHeaders, updated);
-        return updated;
-      });
+      const updated = editableRows.map((row, rIdx) =>
+        rIdx === rowIndex ? row.map((cell, cIdx) => (cIdx === colIndex ? value : cell)) : row
+      );
+      setEditableRows(updated);
+      pushHistory(editableHeaders, updated);
     },
-    [editableHeaders, pushHistory]
+    [editableHeaders, editableRows, pushHistory]
   );
 
   // Update a header cell
   const updateHeader = useCallback(
     (colIndex: number, value: string) => {
-      setEditableHeaders((prev) => {
-        const updated = [...prev];
-        updated[colIndex] = value;
-        pushHistory(updated, editableRows);
-        return updated;
-      });
+      const updated = [...editableHeaders];
+      updated[colIndex] = value;
+      setEditableHeaders(updated);
+      pushHistory(updated, editableRows);
     },
-    [editableRows, pushHistory]
+    [editableHeaders, editableRows, pushHistory]
   );
 
   const canUndo = historyIdx > 0;
@@ -184,7 +187,11 @@ export function useOcrAudit({
           throw new Error(errorData?.detail || 'Lưu bảng thất bại.');
         }
 
-        setSuccessMessage('Đã lưu và phê duyệt bảng thành công!');
+        setSuccessMessage(
+          approved
+            ? 'Đã lưu và phê duyệt bảng thành công'
+            : 'Đã lưu thay đổi bảng, chưa phê duyệt'
+        );
         // Refresh detail and tables list
         await fetchTables();
         if (tableDetail) {

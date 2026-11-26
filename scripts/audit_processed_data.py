@@ -73,6 +73,8 @@ def audit_corpus():
     total_articles = 0
     total_clauses = 0
     total_points = 0
+    total_superseded = 0
+    total_consolidated = 0
     total_orphans = 0
     total_short_nodes = 0
     total_table_cells = 0
@@ -120,6 +122,10 @@ def audit_corpus():
         doc_orphans = 0
         doc_short_nodes = 0
         for n in parsed.nodes:
+            if n.metadata.get("is_superseded"):
+                total_superseded += 1
+            if n.metadata.get("is_consolidated"):
+                total_consolidated += 1
             if n.level not in (HierarchyLevel.DOCUMENT, HierarchyLevel.CHAPTER):
                 if not n.parent_id:
                     doc_orphans += 1
@@ -131,7 +137,7 @@ def audit_corpus():
                 lines = [line.strip() for line in n.content.split("\n") if line.strip().startswith("|")]
                 col_counts = set()
                 for line in lines:
-                    if re.match(r"^\|[\s\-:|]+\|$", line):
+                    if re.match(r"^\|[\s:|-]*-+[\s:|-]*\|$", line):
                         continue
                     cells = [c.strip() for c in line.strip("|").split("|")]
                     col_counts.add(len(cells))
@@ -204,7 +210,7 @@ def audit_corpus():
     )
     print(f"  • Tables Extracted    : {total_tables} Markdown Tables")
     orphan_rate = (total_orphans / max(total_nodes, 1)) * 100
-    print(f"  • Orphan Node Ratio   : {total_orphans}/{total_nodes} ({orphan_rate:.1f}%) [Threshold <= 25%]")
+    print(f"  • Orphan Node Ratio   : {total_orphans}/{total_nodes} ({orphan_rate:.1f}%) [Threshold <= 1%]")
     print(f"  • Short Noise Nodes   : {total_short_nodes} (< 5 chars)")
 
     empty_cell_rate = (total_empty_cells / max(total_table_cells, 1)) * 100 if total_table_cells else 0.0
@@ -217,10 +223,14 @@ def audit_corpus():
         errors.append("Critical Error: No tables extracted in processed documents!")
     if total_chapters == 0:
         errors.append("Critical Error: 0 Chapter nodes found across corpus!")
-    if orphan_rate > 25.0:
-        errors.append(f"Structural Debt Warning: Orphan rate {orphan_rate:.1f}% exceeds 25% limit")
+    if orphan_rate > 1.0:
+        errors.append(f"Structural Debt Warning: Orphan rate {orphan_rate:.1f}% exceeds 1% limit")
     if empty_cell_rate > 50.0:
         errors.append(f"Table Debt Warning: Empty cell rate {empty_cell_rate:.1f}% exceeds 50% limit")
+    if total_superseded == 0:
+        errors.append("Temporal Debt: 0 superseded nodes found despite TT105 amendments")
+    if total_consolidated == 0:
+        errors.append("Temporal Debt: 0 consolidated nodes found (VBHN 88)")
     if rectified_tables_safeguard_failures > 0:
         errors.append(f"Safeguard Critical Failure: {rectified_tables_safeguard_failures} rectified tables failed 100% number lock")
 

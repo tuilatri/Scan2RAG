@@ -31,6 +31,7 @@ class LegalChunk(BaseModel):
     )
     article_id: str | None = Field(default=None, description="Enclosing article ID if applicable")
     is_superseded: bool = Field(default=False, description="Whether this legal text is superseded")
+    is_consolidated: bool = Field(default=False, description="Whether this chunk is from a consolidated document (VBHN 88)")
     superseded_by: str | None = Field(default=None, description="Document ID that amends/supersedes this chunk")
     effective_date: str | None = Field(default=None, description="Effective legal date (YYYY-MM-DD)")
     metadata: dict[str, Any] = Field(

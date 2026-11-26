@@ -7,7 +7,9 @@ Features:
 """
 
 import json
+import os
 import re
+import tempfile
 import unicodedata
 from pathlib import Path
 from typing import Any
@@ -60,15 +62,33 @@ class LegalBM25Searcher:
         self.bm25 = BM25Okapi(tokenized_corpus)
 
     def save(self, path: str = None) -> None:
-        """Persist BM25 tokenized corpus and chunk metadata to disk as safe JSON."""
+        """Persist BM25 index atomically with fsync and 0600 permissions."""
         save_path = Path(path) if path else self.index_path
         save_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(save_path, "w", encoding="utf-8") as f:
-            json.dump(
-                {"corpus_chunks": self.corpus_chunks, "tokenized_corpus": self._tokenized_corpus},
-                f,
-                ensure_ascii=False,
-            )
+        tmp_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=save_path.parent,
+                prefix=f".{save_path.stem}_",
+                suffix=".tmp",
+                delete=False,
+            ) as tmp_f:
+                tmp_path = Path(tmp_f.name)
+                json.dump(
+                    {"corpus_chunks": self.corpus_chunks, "tokenized_corpus": self._tokenized_corpus},
+                    tmp_f,
+                    ensure_ascii=False,
+                )
+                tmp_f.flush()
+                os.fsync(tmp_f.fileno())
+            os.chmod(tmp_path, 0o600)
+            os.replace(tmp_path, save_path)
+        except Exception:
+            if tmp_path and tmp_path.exists():
+                tmp_path.unlink()
+            raise
 
     def load(self, path: str = None) -> bool:
         """Load BM25 index from safe JSON on disk if exists."""

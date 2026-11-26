@@ -31,8 +31,8 @@ export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
             {editableRows.length} hàng × {editableHeaders.length} cột
           </p>
         </div>
-        <div className="text-[11px] text-muted-foreground italic">
-          Bấm vào ô bất kỳ để sửa nội dung
+        <div className="text-[11px] text-muted-foreground">
+          Bấm hoặc nhấn Enter trên ô để sửa nội dung
         </div>
       </div>
 
@@ -40,13 +40,19 @@ export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
       <ScrollArea className="flex-1 p-4">
         <div className="rounded-lg border bg-card shadow-sm overflow-x-auto">
           <table className="w-full text-left border-collapse">
+            <caption className="sr-only">
+              Bảng dữ liệu có thể chỉnh sửa: {tableDetail.title || tableDetail.id}
+            </caption>
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="w-10 px-2 py-2 text-[10px] font-mono text-muted-foreground text-center border-r">
+                <th
+                  scope="col"
+                  className="w-10 px-2 py-2 text-[10px] font-mono text-muted-foreground text-center border-r"
+                >
                   #
                 </th>
                 {editableHeaders.map((header, colIdx) => (
-                  <th key={colIdx} className="border-r last:border-r-0 p-1">
+                  <th key={colIdx} scope="col" className="border-r last:border-r-0 p-1">
                     <TableCellEditor
                       value={header}
                       rowIndex={-1}
@@ -64,9 +70,12 @@ export const TableEditorPanel: React.FC<TableEditorPanelProps> = ({
                   key={rowIdx}
                   className="border-b last:border-b-0 hover:bg-muted/10 transition-colors"
                 >
-                  <td className="px-2 py-1 text-[10px] font-mono text-muted-foreground text-center border-r bg-muted/20 select-none">
+                  <th
+                    scope="row"
+                    className="px-2 py-1 text-[10px] font-mono text-muted-foreground text-center border-r bg-muted/20 select-none"
+                  >
                     {rowIdx + 1}
-                  </td>
+                  </th>
                   {row.map((cellValue, colIdx) => (
                     <td key={colIdx} className="border-r last:border-r-0 p-1">
                       <TableCellEditor

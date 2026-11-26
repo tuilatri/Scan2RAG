@@ -11,6 +11,7 @@ DECISIONS_PATH = Path(__file__).resolve().parents[3] / "docs" / "quality" / "sco
 SCORE_LIKE_PATTERN = re.compile(r"^[1-6](?:[Tt])?$")
 SCORE_HEADER_TERMS = ("điểm", "phân loại", "chỉ số điểm")
 ID_HEADER_TERMS = ("stt", "tt", "số thứ tự", "no.", "id")
+NON_SCORE_HEADER_TERMS = ("định mức", "số lượng", "đơn vị tính", "số tt")
 SHIFTED_SCORE_PENALTY = 1.0
 
 
@@ -98,6 +99,7 @@ class OcrVisionAuditor:
                 score_col_indices = [
                     i for i, h in enumerate(headers)
                     if any(term in h.lower() for term in SCORE_HEADER_TERMS)
+                    and not any(term in h.lower() for term in NON_SCORE_HEADER_TERMS)
                 ]
                 id_col_indices = [
                     i for i, h in enumerate(headers)
@@ -113,7 +115,7 @@ class OcrVisionAuditor:
                         i for row in body_rows for i, c in enumerate(row)
                         if i not in id_col_indices and self._is_score_like(c)
                     }
-                    if expected_cols >= 3 and len(score_like_cols) <= 2:
+                    if score_like_cols and expected_cols >= 3 and len(score_like_cols) <= 2:
                         score_col_indices = [expected_cols - 1]
 
                 sep_count = 0

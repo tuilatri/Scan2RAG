@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { useChatStream } from '@/hooks/use-chat-stream';
 import { ModelBadge } from '@/components/chat/model-badge';
 import { StreamIndicator } from '@/components/chat/stream-indicator';
@@ -9,6 +9,10 @@ import { PdfToolbar } from '@/components/pdf/pdf-toolbar';
 import { Citation } from '@/types/chat';
 
 describe('Chat Components Unit Tests', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('renders ModelBadge with Local Qwen2.5 correctly', () => {
     render(<ModelBadge provider="lm_studio_local" model="qwen2.5-1.5b" />);
     expect(screen.getByText(/Local: qwen2.5-1.5b/i)).toBeInTheDocument();
@@ -60,13 +64,14 @@ describe('Chat Components Unit Tests', () => {
     }
   });
 
-  it('displays warning badge on CitationCard for superseded documents', () => {
+  it('displays warning badge on CitationCard when backend marks it superseded', () => {
     const supersededCitation: Citation = {
       id: 'cit_old',
       document_id: 'thông_tư_105',
       document_name: 'Thông tư số 105/2023/TT-BQP',
       page_number: 10,
       rerank_score: 0.75,
+      is_superseded: true,
     };
 
     render(
@@ -79,13 +84,71 @@ describe('Chat Components Unit Tests', () => {
 
     expect(screen.getByText(/Quy định đã được sửa đổi\/thay thế/i)).toBeInTheDocument();
   });
+
+  it('does not warn for TT105 when backend reports is_superseded false', () => {
+    const currentCitation: Citation = {
+      id: 'cit_current',
+      document_id: 'thông_tư_105',
+      document_name: 'Thông tư số 105/2023/TT-BQP',
+      page_number: 10,
+      is_superseded: false,
+    };
+
+    render(<CitationCard citation={currentCitation} index={1} onSelect={() => {}} />);
+
+    expect(screen.queryByText(/Quy định đã được sửa đổi\/thay thế/i)).not.toBeInTheDocument();
+  });
 });
 
 describe('PDF Components Unit Tests', () => {
-  it('renders DocumentMetaCard with accurate metadata', () => {
+  it('renders DocumentMetaCard with metadata fetched from the document API', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 'thông_tư_88',
+            title: 'Thông tư số 88/VBHN-BQP',
+            effective_date: '2023-12-31',
+            is_superseded: false,
+            description: 'Văn bản hợp nhất quy định tiêu chuẩn sức khỏe.',
+          }),
+      })
+    );
+
     render(<DocumentMetaCard docId="thông_tư_88" />);
-    expect(screen.getByText('Thông tư số 88/VBHN-BQP')).toBeInTheDocument();
+
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/v1/documents/'),
+      expect.anything()
+    );
+    expect(await screen.findByText('Thông tư số 88/VBHN-BQP')).toBeInTheDocument();
     expect(screen.getByText('Hiệu lực')).toBeInTheDocument();
+    expect(screen.getByText(/31\/12\/2023/)).toBeInTheDocument();
+  });
+
+  it('shows the superseded note only when the document API says so', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 'thông_tư_105',
+            title: 'Thông tư số 105/2023/TT-BQP',
+            effective_date: '2023-12-06',
+            is_superseded: true,
+            superseded_by: 'Thông tư 106 & VBHN 88',
+            description: 'Quy định đã được sửa đổi.',
+          }),
+      })
+    );
+
+    render(<DocumentMetaCard docId="thông_tư_105" />);
+
+    expect(await screen.findByText('Đã sửa đổi')).toBeInTheDocument();
+    expect(screen.getByText(/Thông tư 106 & VBHN 88/)).toBeInTheDocument();
   });
 
   it('renders PdfToolbar and interacts with page and zoom buttons', () => {
@@ -184,6 +247,48 @@ describe('useChatStream Hook Tests', () => {
     expect(result.current.error).toContain('ngắt giữa chừng');
     const lastMsg = result.current.messages[result.current.messages.length - 1];
     expect(lastMsg.isStreaming).toBe(false);
+    vi.unstubAllGlobals();
+  });
+
+  it('flushes a final SSE event and reassembles UTF-8 split across chunks', async () => {
+    const encoder = new TextEncoder();
+    const payload =
+      'data: {"event":"token","token":"Tiêu chuẩn"}\n\n' +
+      'data: {"event":"done","provider":"groq_cloud","model":"qwen2.5-1.5b","latency_total_ms":1200}';
+    const bytes = encoder.encode(payload);
+
+    // Split inside the two-byte "ê" and again between the two SSE events.
+    const utf8Split = bytes.indexOf(encoder.encode('ê')[0]) + 1;
+    const doneEventByteOffset = encoder.encode(
+      payload.slice(0, payload.indexOf('data: {"event":"done"'))
+    ).length;
+
+    const fragmentedStream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(bytes.slice(0, utf8Split));
+        controller.enqueue(bytes.slice(utf8Split, doneEventByteOffset));
+        controller.enqueue(bytes.slice(doneEventByteOffset));
+        controller.close();
+      },
+    });
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, body: fragmentedStream })
+    );
+
+    const { result } = renderHook(() => useChatStream());
+    await act(async () => {
+      await result.current.sendMessage('Test SSE fragmentation');
+    });
+
+    const lastMsg = result.current.messages[result.current.messages.length - 1];
+    expect(lastMsg.content).toBe('Tiêu chuẩn');
+    expect(lastMsg.provider).toBe('groq_cloud');
+    expect(lastMsg.latency_total_ms).toBe(1200);
+    expect(lastMsg.isStreaming).toBe(false);
+    expect(result.current.streamStatus).toBeNull();
+    expect(result.current.error).toBeNull();
     vi.unstubAllGlobals();
   });
 });

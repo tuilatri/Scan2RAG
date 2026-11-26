@@ -89,6 +89,7 @@ def ingest_corpus_to_qdrant(batch_size: int = 100):
                     "page_numbers": c.page_numbers,
                     "article_id": c.article_id or "",
                     "is_superseded": c.is_superseded,
+                    "is_consolidated": bool(c.metadata.get("is_consolidated", False)),
                     "superseded_by": c.superseded_by,
                     "effective_date": c.effective_date,
                 }

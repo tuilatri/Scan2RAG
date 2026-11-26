@@ -16,6 +16,19 @@ from app.retrieval.hybrid_searcher import LegalHybridSearcher
 from app.retrieval.reranker import LegalReranker
 
 
+def resolve_page_number(chunk: dict[str, Any]) -> int:
+    """Resolve PDF page from metadata, falling back to '(Trang X)' in breadcrumb."""
+    page_num = chunk.get("page_number") or 0
+    if not page_num:
+        page_nums = chunk.get("page_numbers", []) or []
+        page_num = page_nums[0] if page_nums else 0
+    if not page_num:
+        match = re.search(r"Trang\s+(\d+)", chunk.get("breadcrumb", "") or "")
+        if match:
+            page_num = match.group(1)
+    return int(page_num)
+
+
 class GroundedQAService:
     """End-to-end question answering pipeline with rigorous grounding and citations."""
 
@@ -74,15 +87,7 @@ class GroundedQAService:
         # 3. Format Structured Citations
         citations = []
         for c in top_chunks:
-            p_num = c.get("page_number", 0)
-            if not p_num:
-                p_nums = c.get("page_numbers", [])
-                p_num = p_nums[0] if p_nums else 0
-            if not p_num:
-                # Fallback: extract page number from breadcrumb, e.g. "(Trang 23)"
-                m = re.search(r"Trang\s+(\d+)", c.get("breadcrumb", "") or "")
-                if m:
-                    p_num = int(m.group(1))
+            p_num = resolve_page_number(c)
 
             citations.append({
                 "id": c.get("id"),
@@ -154,10 +159,7 @@ class GroundedQAService:
         # 3. Format Citations
         citations = []
         for c in top_chunks:
-            p_num = c.get("page_number", 0)
-            if not p_num:
-                p_nums = c.get("page_numbers", [])
-                p_num = p_nums[0] if p_nums else 0
+            p_num = resolve_page_number(c)
 
             citations.append({
                 "id": c.get("id"),

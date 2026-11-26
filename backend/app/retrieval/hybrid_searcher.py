@@ -7,11 +7,16 @@ Combines:
 4. Metadata Validity Filter: 'filter_superseded=True' deprioritizes or excludes superseded documents.
 """
 
+import logging
 from typing import Any
+
+from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from app.embeddings.embedder import LegalEmbedder
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.qdrant_client import LegalVectorStore
+
+logger = logging.getLogger(__name__)
 
 
 class LegalHybridSearcher:
@@ -36,16 +41,43 @@ class LegalHybridSearcher:
         filter_superseded: bool = True,
         document_id: str | None = None,
     ) -> list[dict[str, Any]]:
-        # 1. Fetch Dense Results from Qdrant
+        # 1. Fetch Dense Results from Qdrant with metadata filters applied BEFORE RRF.
         query_vector = self.embedder.embed_text(query, is_query=True)
-        raw_dense_points = self.vector_store.search(
-            query_vector=query_vector,
-            limit=top_k * 2,
-        )
+        conditions: list[FieldCondition] = []
+        if document_id:
+            conditions.append(FieldCondition(key="document_id", match=MatchValue(value=document_id)))
+        if filter_superseded:
+            conditions.append(FieldCondition(key="is_superseded", match=MatchValue(value=False)))
+        dense_filter = Filter(must=conditions) if conditions else None
+
+        dense_post_filter = False
+        try:
+            raw_dense_points = self.vector_store.search(
+                query_vector=query_vector,
+                limit=top_k * 2,
+                query_filter=dense_filter,
+            )
+        except Exception:
+            logger.warning(
+                "Qdrant rejected payload filter %s; using unfiltered fetch + post-filter "
+                "(top-k may be starved)",
+                dense_filter,
+                exc_info=True,
+            )
+            dense_post_filter = True
+            raw_dense_points = self.vector_store.search(
+                query_vector=query_vector,
+                limit=max(top_k * 4, 50),
+            )
 
         dense_results = []
         for p in raw_dense_points:
             payload = p.get("payload", {})
+            if dense_post_filter:
+                if document_id and payload.get("document_id") != document_id:
+                    continue
+                if filter_superseded and payload.get("is_superseded"):
+                    continue
             # Resolve chunk id: prioritize chunk_id/id from payload, fallback to point id
             chunk_id = payload.get("chunk_id") or payload.get("id") or str(p.get("id"))
 
@@ -68,10 +100,10 @@ class LegalHybridSearcher:
                 "score": p.get("score"),
             })
 
-        # 2. Fetch Sparse Results from BM25
+        # 2. Fetch Sparse Results from BM25 (widen when filtering by document afterwards)
         sparse_results = self.bm25_searcher.search(
             query=query,
-            top_k=top_k * 2,
+            top_k=top_k * 4 if document_id else top_k * 2,
         )
 
         # 3. Fuse via Reciprocal Rank Fusion (RRF)
@@ -141,11 +173,7 @@ class LegalHybridSearcher:
         if document_id:
             candidates = [c for c in candidates if c.get("document_id") == document_id]
         if filter_superseded:
-            candidates = [
-                item
-                for item in candidates
-                if not (item.get("is_superseded") and item.get("document_id") != "thông_tư_88")
-            ]
+            candidates = [item for item in candidates if not item.get("is_superseded")]
         for item in candidates:
             if item.get("document_id") == "thông_tư_88":
                 item["rrf_score"] *= 1.15

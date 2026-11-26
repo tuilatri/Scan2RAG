@@ -135,9 +135,19 @@
       "cmd": ".venv/Scripts/python.exe",
       "args": ["-m", "pytest", "tests/", "-q"],
       "cwd": "backend",
-      "tags": ["slow", "backend"],
+      "tags": ["backend"],
       "requires": ["backend/tests"],
       "env": { "PYTHONUTF8": "1" }
+    },
+    {
+      "id": "test-truth",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_test_truth.py"],
+      "cwd": ".",
+      "tags": ["audit", "docs"],
+      "requires": ["docs/ai-context/TESTING_GUIDE.md", "backend/tests", "frontend/tests"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
     },
     {
       "id": "frontend-tests",
