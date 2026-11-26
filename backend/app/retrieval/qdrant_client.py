@@ -5,13 +5,16 @@ Supports both:
 2. Remote/Docker Qdrant server (`http://localhost:6333`)
 """
 
+import logging
 import os
 from typing import Any
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, Filter, PointStruct, VectorParams
 
 from app.models.chunk_schema import LegalChunk
+
+logger = logging.getLogger(__name__)
 
 
 class LegalVectorStore:
@@ -27,23 +30,37 @@ class LegalVectorStore:
         self.vector_dim = vector_dim
         self.db_path = db_path
         self._client = None
+        self._degraded_mode = False
+
+    @property
+    def degraded_mode(self) -> bool:
+        """True when the configured remote Qdrant is unreachable and local disk storage is used."""
+        return self._degraded_mode
 
     @property
     def client(self) -> QdrantClient:
-        """Initialize client: prefers local disk storage if server is unavailable."""
+        """Initialize client: prefers local disk storage if server is unavailable, but fails loudly."""
         if self._client is None:
             qdrant_host = os.getenv("QDRANT_HOST", "localhost")
             qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
 
-            # Check if remote server is up
             try:
                 remote_client = QdrantClient(host=qdrant_host, port=qdrant_port, timeout=2.0)
                 remote_client.get_collections()
                 self._client = remote_client
-            except Exception:
-                # Fallback to local persistent disk storage
+            except Exception as exc:
+                self._degraded_mode = True
+                logger.warning(
+                    "Remote Qdrant at %s:%s unavailable (%s). Falling back to local disk store '%s' "
+                    "— running in DEGRADED mode; results may be empty or stale.",
+                    qdrant_host, qdrant_port, exc, self.db_path,
+                )
                 os.makedirs(self.db_path, exist_ok=True)
-                self._client = QdrantClient(path=self.db_path)
+                try:
+                    self._client = QdrantClient(path=self.db_path)
+                except Exception:
+                    logger.exception("Local Qdrant fallback at '%s' also failed", self.db_path)
+                    raise
 
         return self._client
 
@@ -101,11 +118,17 @@ class LegalVectorStore:
 
         return len(points)
 
-    def search(self, query_vector: list[float], limit: int = 5) -> list[dict[str, Any]]:
-        """Search top-k chunks by cosine similarity."""
+    def search(
+        self,
+        query_vector: list[float],
+        limit: int = 5,
+        query_filter: Filter | None = None,
+    ) -> list[dict[str, Any]]:
+        """Search top-k chunks by cosine similarity, optionally filtering payload metadata."""
         results = self.client.query_points(
             collection_name=self.collection_name,
             query=query_vector,
+            query_filter=query_filter,
             limit=limit
         ).points
 

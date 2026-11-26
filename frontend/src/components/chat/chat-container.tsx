@@ -5,7 +5,7 @@ import { ChatMessage } from './chat-message';
 import { ChatInput } from './chat-input';
 import { StreamIndicator } from './stream-indicator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ShieldCheck, Sparkles } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 interface ChatContainerProps {
   messages: Message[];
@@ -54,13 +54,13 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2 max-w-lg">
               <span className="inline-flex items-center text-[11px] text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border">
-                <Sparkles className="h-3 w-3 mr-1 text-primary" /> VBHN 88/VBHN-BQP
+                VBHN 88/VBHN-BQP
               </span>
               <span className="inline-flex items-center text-[11px] text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border">
-                <Sparkles className="h-3 w-3 mr-1 text-primary" /> Thông tư 105 & 106
+                Thông tư 105 và 106
               </span>
               <span className="inline-flex items-center text-[11px] text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full border">
-                <Sparkles className="h-3 w-3 mr-1 text-primary" /> Bảng điểm mắt, thể lực, nội - ngoại khoa
+                Bảng điểm mắt, thể lực, nội - ngoại khoa
               </span>
             </div>
           </div>

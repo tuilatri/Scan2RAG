@@ -1,0 +1,86 @@
+{
+  "status": "not_verified",
+  "reason": "No cloud verification run in this audit; count is deterministic pattern scan only.",
+  "patterns": [
+    "Đi tưng",
+    "Gii thích",
+    "đnh",
+    "thuc",
+    "mc 1"
+  ],
+  "hits": 347,
+  "affected_nodes": 283,
+  "samples": [
+    {
+      "node_id": "thông_tư_105_clause_39",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_text_40",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_clause_42",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_art_48",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_text_50",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_art_52",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_text_63",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_text_100",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_clause_101",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    },
+    {
+      "node_id": "thông_tư_105_text_178",
+      "patterns": [
+        "Đi tưng",
+        "Gii thích"
+      ]
+    }
+  ],
+  "timestamp": "2026-11-26T06:25:10.846628+00:00"
+}

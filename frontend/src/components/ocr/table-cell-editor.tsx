@@ -34,6 +34,13 @@ export const TableCellEditor: React.FC<TableCellEditorProps> = React.memo(
       }
     };
 
+    const handleCellKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setIsEditing(true);
+      }
+    };
+
     // Sub-header row detection (row where subsequent cells are empty)
     const isSubHeader = !isHeader && colIndex === 0 && (/^\d+(\.\d+)?\./.test(value) || value.includes('TIÊU CHUẨN'));
 
@@ -51,21 +58,34 @@ export const TableCellEditor: React.FC<TableCellEditorProps> = React.memo(
           onChange={(e) => setLocalValue(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          className="w-full bg-background border border-primary px-2 py-1 text-xs focus:outline-none rounded"
+          aria-label={
+            isHeader
+              ? `Chỉnh sửa tiêu đề cột ${colIndex + 1}`
+              : `Chỉnh sửa ô hàng ${rowIndex + 1} cột ${colIndex + 1}`
+          }
+          className="w-full bg-background border border-primary px-2 py-1 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
         />
       );
     }
 
     return (
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={
+          isHeader
+            ? `Chỉnh sửa tiêu đề cột ${colIndex + 1}`
+            : `Chỉnh sửa ô hàng ${rowIndex + 1} cột ${colIndex + 1}`
+        }
         onClick={() => setIsEditing(true)}
+        onKeyDown={handleCellKeyDown}
         className={cn(
-          'min-h-[28px] px-2.5 py-1 text-xs cursor-text rounded transition-colors break-words',
+          'min-h-[28px] px-2.5 py-1 text-xs cursor-text rounded transition-colors break-words focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           isHeader ? 'font-semibold text-foreground bg-muted/40' : 'hover:bg-muted/30 text-foreground',
           isSubHeader && 'font-semibold text-primary/90 bg-primary/5',
           isInvalidScore && 'bg-destructive/15 text-destructive border border-destructive/30 font-bold'
         )}
-        title="Bấm để chỉnh sửa ô"
+        title="Bấm hoặc nhấn Enter để chỉnh sửa ô"
       >
         {value || <span className="text-muted-foreground/40 italic">--</span>}
       </div>

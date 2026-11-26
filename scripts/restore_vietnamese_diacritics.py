@@ -2,7 +2,7 @@
 
 Workflow:
 1. Local-First (--mode local): LM Studio qwen3-vl-4b (http://localhost:1234/v1) + dictionary.
-2. Cloud-Verify (--mode groq): Groq llama-3.3-70b-versatile for remaining flagged nodes.
+2. Cloud-Verify (--mode groq): Groq qwen/qwen3.8-27b for remaining flagged nodes.
 3. Strict Guards: 100% number-lock + word-count tolerance + SequenceMatcher similarity >= 0.80.
 """
 
@@ -20,7 +20,7 @@ PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
 LM_STUDIO_URL = "http://localhost:1234/v1/chat/completions"
 LOCAL_MODEL = "qwen3-vl-4b"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "qwen/qwen3.8-27b"
 
 DICTIONARY_FIXES = {
     "Phm vi Điều chnh": "Phạm vi điều chỉnh",

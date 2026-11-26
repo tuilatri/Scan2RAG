@@ -50,7 +50,7 @@ class ModelRouter:
             "gemini": {
                 "base_url": os.getenv("GEMINI_URL", "https://generativelanguage.googleapis.com/v1beta/openai"),
                 "api_key": os.getenv("GEMINI_API_KEY"),
-                "model": os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+                "model": os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
             },
             "groq": {
                 "base_url": os.getenv("GROQ_URL", "https://api.groq.com/openai/v1"),

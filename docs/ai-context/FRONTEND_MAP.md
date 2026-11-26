@@ -29,7 +29,7 @@
   - `chat-message.tsx`: Markdown rendered bubble with avatar and model router badge.
   - `chat-input.tsx`: Auto-resizing textarea with sample prompt quick buttons and filter switch.
   - `citation-list.tsx` & `citation-card.tsx`: Grounded citations with Amber Warning Badge for superseded laws.
-  - `model-badge.tsx`: Visual tag distinguishing Local Qwen2.5 vs Groq LLaMA-3.3-70B.
+  - `model-badge.tsx`: Visual tag distinguishing Local Qwen2.5 vs cloud (Groq `qwen/qwen3.8-27b`, OpenRouter Gemma 4, Gemini 3.5 Flash Lite).
   - `stream-indicator.tsx`: Live SSE streaming status indicator.
 
 - **`src/components/pdf/` (Document Preview):**
@@ -53,7 +53,7 @@
 - **Responsiveness**: Dual-Pane split on desktop (`>= 1024px`), collapsible full-width pane on mobile/tablet.
 
 ## 4. State & Data Patterns
-- **`useChatStream` (`src/hooks/use-chat-stream.ts`)**: Custom React hook managing Server-Sent Events (SSE) from `POST /api/v1/query/stream`. Handles `status` event for immediate UI feedback (< 1.0s TTFT), `citations` event after retrieval/rerank (~1.5–3s warm on CPU), token-by-token streaming, and 30s timeout watchdog.
+- **`useChatStream` (`src/hooks/use-chat-stream.ts`)**: Custom React hook managing Server-Sent Events (SSE) from `POST /api/v1/query/stream`. Handles `status` event for immediate UI feedback (< 1.0s TTFT), `citations` event after retrieval/rerank (~1.5–3s warm on CPU), token-by-token streaming, and 65s timeout watchdog (65000ms inactivity).
 - **`usePdfViewer` (`src/hooks/use-pdf-viewer.ts`)**: Manages active document ID, current page, zoom level, and click-to-sync from chat citations.
 - **`useOcrAudit` (`src/hooks/use-ocr-audit.ts`)**: Manages 111 table nodes, active table detail, cell matrix editing, Undo/Redo, and atomic backend saves.
 - **`markdown-table-parser.ts` (`src/lib/markdown-table-parser.ts`)**: Bi-directional parser converting between Markdown Table string and 2D Array matrix.

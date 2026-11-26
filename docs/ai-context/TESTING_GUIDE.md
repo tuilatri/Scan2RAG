@@ -6,9 +6,9 @@
 
 | Metric | Measured Value |
 |---|---|
-| Collected pytest items | 93 |
-| Backend test files | 21 |
-| Frontend Vitest items | 21 |
+| Collected pytest items | 113 |
+| Backend test files | 23 |
+| Frontend Vitest items | 31 |
 | Frontend test files | 4 |
 | Lines in test_vlm_rectifier.py | 59 (non-empty) |
 
@@ -19,10 +19,11 @@
 backend/.venv/Scripts/python.exe -m pytest backend/tests/ -q
 ```
 
-### Fast verification gate
+### Verification gates
 ```bash
-node scripts/verify.mjs --fast
+node scripts/verify.mjs            # full gate set — use before claiming done
 ```
+`node scripts/verify.mjs --fast` chỉ dùng cho quick iteration: nó lọc gate có tag `slow`, hiện tại không còn gate nào bị lọc; nếu có, lệnh in rõ ID gate bị bỏ qua.
 
 ## 3. Test-writing conventions
 - Deterministic numerical tests with `collections.Counter`.

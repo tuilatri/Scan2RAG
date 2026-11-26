@@ -141,63 +141,75 @@ export function useChatStream({
         let streamErrorMsg: string | null = null;
         let lineBuffer = '';
 
+        const processLine = (line: string) => {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) return;
+
+          const jsonStr = trimmed.replace(/^data:\s*/, '');
+          if (!jsonStr) return;
+
+          try {
+            const event: StreamEvent = JSON.parse(jsonStr);
+
+            if (event.event === 'status') {
+              setStreamStatus(event.status || 'retrieving');
+            } else if (event.event === 'citations') {
+              setStreamStatus('generating');
+              citationsReceived = event.citations || [];
+              setCurrentCitations(citationsReceived);
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, citations: citationsReceived }
+                    : msg
+                )
+              );
+            } else if (event.event === 'token') {
+              accumulatedText += event.token || '';
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, content: accumulatedText }
+                    : msg
+                )
+              );
+            } else if (event.event === 'done') {
+              receivedDone = true;
+              providerName = event.provider || '';
+              modelName = event.model || '';
+              latencyTotal = event.latency_total_ms || 0;
+              setStreamStatus(null);
+            } else if (event.event === 'error') {
+              streamErrorMsg = event.message || 'Lỗi từ máy chủ trong quá trình sinh câu trả lời.';
+              setError(streamErrorMsg);
+              setStreamStatus(null);
+            }
+          } catch {
+            // Ignore malformed JSON chunk line safely
+          }
+        };
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           resetWatchdog();
 
-          const chunk = decoder.decode(value, { stream: true });
-          lineBuffer += chunk;
+          lineBuffer += decoder.decode(value, { stream: true });
 
           const lines = lineBuffer.split('\n');
           // Keep trailing non-newline data in buffer
           lineBuffer = lines.pop() || '';
 
           for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed.startsWith('data:')) continue;
-
-            const jsonStr = trimmed.replace(/^data:\s*/, '');
-            if (!jsonStr) continue;
-
-            try {
-              const event: StreamEvent = JSON.parse(jsonStr);
-
-              if (event.event === 'status') {
-                setStreamStatus(event.status || 'retrieving');
-              } else if (event.event === 'citations') {
-                setStreamStatus('generating');
-                citationsReceived = event.citations || [];
-                setCurrentCitations(citationsReceived);
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, citations: citationsReceived }
-                      : msg
-                  )
-                );
-              } else if (event.event === 'token') {
-                accumulatedText += event.token || '';
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, content: accumulatedText }
-                      : msg
-                  )
-                );
-              } else if (event.event === 'done') {
-                receivedDone = true;
-                providerName = event.provider || '';
-                modelName = event.model || '';
-                latencyTotal = event.latency_total_ms || 0;
-              } else if (event.event === 'error') {
-                streamErrorMsg = event.message || 'Lỗi từ máy chủ trong quá trình sinh câu trả lời.';
-                setError(streamErrorMsg);
-              }
-            } catch {
-              // Ignore malformed JSON chunk line safely
-            }
+            processLine(line);
           }
+        }
+
+        // Flush pending UTF-8 bytes and a final SSE event with no trailing newline.
+        lineBuffer += decoder.decode();
+        if (lineBuffer.trim()) {
+          processLine(lineBuffer);
+          lineBuffer = '';
         }
 
         clearTimeout(timeoutId);
@@ -255,6 +267,7 @@ export function useChatStream({
         );
       } finally {
         setIsStreaming(false);
+        setStreamStatus(null);
         abortControllerRef.current = null;
       }
     },

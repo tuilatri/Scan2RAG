@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Square, CornerDownLeft, Sparkles, Filter } from 'lucide-react';
+import { Square, CornerDownLeft, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -57,7 +57,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     <div className="space-y-2.5">
       {/* Sample Query Prompts */}
       <div className="hidden sm:flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs text-muted-foreground no-scrollbar">
-        <Sparkles className="h-3 w-3 shrink-0 text-primary" />
         <span className="shrink-0 text-[11px] font-medium">Gợi ý câu hỏi:</span>
         {SAMPLE_QUERIES.map((sample, idx) => (
           <button
@@ -95,6 +94,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <div className="flex items-center space-x-2">
             <button
               type="button"
+              aria-pressed={filterSuperseded}
               onClick={() => setFilterSuperseded((prev) => !prev)}
               className="inline-flex items-center space-x-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             >

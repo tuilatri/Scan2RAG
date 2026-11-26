@@ -1,96 +1,109 @@
-import React from 'react';
-import { ShieldCheck, AlertTriangle, FileText, Calendar } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AlertTriangle, Calendar, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { API_BASE_URL, apiHeaders } from '@/lib/api-config';
 
 interface DocumentMetaCardProps {
   docId: string;
 }
 
-const DOCUMENT_INFO_MAP: Record<
-  string,
-  {
-    title: string;
-    effectiveDate: string;
-    isSuperseded: boolean;
-    supersededBy?: string;
-    description: string;
-  }
-> = {
-  thông_tư_88: {
-    title: 'Thông tư số 88/VBHN-BQP',
-    effectiveDate: '31/12/2023',
-    isSuperseded: false,
-    description:
-      'Văn bản hợp nhất quy định tiêu chuẩn sức khỏe, khám sức khỏe thực hiện nghĩa vụ quân sự (Hiệu lực cao nhất hiện hành).',
-  },
-  thông_tư_105: {
-    title: 'Thông tư số 105/2023/TT-BQP',
-    effectiveDate: '06/12/2023',
-    isSuperseded: true,
-    supersededBy: 'Thông tư 106 & VBHN 88',
-    description:
-      'Quy định tiêu chuẩn sức khỏe, khám sức khỏe thực hiện nghĩa vụ quân sự (Một số điều đã được sửa đổi).',
-  },
-  thông_tư_106: {
-    title: 'Thông tư số 106/2024/TT-BQP',
-    effectiveDate: '15/05/2024',
-    isSuperseded: false,
-    description:
-      'Sửa đổi, bổ sung một số điều của Thông tư số 105/2023/TT-BQP về tiêu chuẩn sức khỏe nghĩa vụ quân sự.',
-  },
-  thông_tư_68: {
-    title: 'Thông tư số 68/2020/TT-BQP',
-    effectiveDate: '20/05/2020',
-    isSuperseded: false,
-    description: 'Quy định chi tiết việc thi hành một số điều của Luật Nghĩa vụ quân sự.',
-  },
-  hướng_dẫn_cục_quân_y: {
-    title: 'Hướng dẫn số 259/HD-QY Cục Quân Y',
-    effectiveDate: '10/01/2024',
-    isSuperseded: false,
-    description:
-      'Hướng dẫn chuyên môn về phân loại thể lực và khám bệnh chuyên khoa phục vụ tuyển quân.',
-  },
+interface DocumentMeta {
+  title: string;
+  effective_date: string;
+  is_superseded: boolean;
+  superseded_by?: string | null;
+  description: string;
+  pages_count?: number;
+}
+
+const formatDate = (value?: string) => {
+  if (!value) return 'Chưa cập nhật';
+  const [year, month, day] = value.split('-');
+  return year && month && day ? `${day}/${month}/${year}` : value;
 };
 
 export const DocumentMetaCard: React.FC<DocumentMetaCardProps> = ({ docId }) => {
-  const meta = DOCUMENT_INFO_MAP[docId] || {
-    title: docId,
-    effectiveDate: 'Chưa cập nhật',
-    isSuperseded: false,
-    description: 'Tài liệu quy phạm pháp luật trong cơ sở dữ liệu Scan2RAG.',
-  };
+  const [meta, setMeta] = useState<DocumentMeta | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setIsLoading(true);
+
+    fetch(`${API_BASE_URL}/api/v1/documents/${encodeURIComponent(docId)}`, {
+      headers: apiHeaders(),
+      signal: controller.signal,
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Lỗi tải thông tin văn bản: ${res.status}`);
+        return res.json() as Promise<DocumentMeta>;
+      })
+      .then((data) => {
+        if (!controller.signal.aborted) setMeta(data);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setMeta(null);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [docId]);
+
+  const isSuperseded = meta?.is_superseded === true;
 
   return (
-    <div className="border-b bg-muted/30 px-3 py-2 text-xs">
+    <div className="border-b bg-muted/30 px-3 py-2 text-xs" aria-busy={isLoading}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-1.5 overflow-hidden">
-          <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
-          <span className="font-semibold text-foreground truncate">{meta.title}</span>
+          <FileText className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />
+          <span className="font-semibold text-foreground truncate">{meta?.title || docId}</span>
         </div>
         <div className="shrink-0 flex items-center space-x-1">
-          {meta.isSuperseded ? (
+          {isLoading ? (
+            <span className="text-[10px] text-muted-foreground">Đang tải thông tin...</span>
+          ) : !meta ? (
+            <Badge variant="outline" className="h-4 px-1.5 text-[9px]">
+              Chưa có thông tin
+            </Badge>
+          ) : isSuperseded ? (
             <Badge variant="destructive" className="h-4 px-1.5 text-[9px]">
               Đã sửa đổi
             </Badge>
           ) : (
-            <Badge variant="outline" className="h-4 px-1.5 text-[9px] border-emerald-500/40 text-emerald-600 dark:text-emerald-400">
+            <Badge
+              variant="outline"
+              className="h-4 px-1.5 text-[9px] border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+            >
               Hiệu lực
             </Badge>
           )}
         </div>
       </div>
 
-      {meta.isSuperseded && meta.supersededBy && (
-        <div className="mt-1 flex items-center space-x-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-          <AlertTriangle className="h-3 w-3 shrink-0" />
-          <span>Lưu ý: Một số điều đã được sửa đổi bởi {meta.supersededBy}.</span>
+      {meta?.effective_date && (
+        <p className="mt-1 flex items-center text-[10px] text-muted-foreground">
+          <Calendar className="h-2.5 w-2.5 mr-1 shrink-0" aria-hidden="true" />
+          Hiệu lực từ {formatDate(meta.effective_date)}
+        </p>
+      )}
+
+      {isSuperseded && meta.superseded_by && (
+        <div
+          role="status"
+          className="mt-1 flex items-center space-x-1 text-[10px] text-amber-700 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20"
+        >
+          <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden="true" />
+          <span>Lưu ý: Một số điều đã được sửa đổi bởi {meta.superseded_by}.</span>
         </div>
       )}
 
-      <p className="mt-1 text-[11px] text-muted-foreground line-clamp-1 leading-snug">
-        {meta.description}
-      </p>
+      {meta?.description && (
+        <p className="mt-1 text-[11px] text-muted-foreground line-clamp-1 leading-snug">
+          {meta.description}
+        </p>
+      )}
     </div>
   );
 };

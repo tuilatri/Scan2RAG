@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **Scan2RAG** (1293 symbols, 2059 relationships, 60 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **Scan2RAG** (1461 symbols, 2479 relationships, 63 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -233,9 +233,9 @@ Tóm tắt 3 trap sống còn của Scan2RAG:
 |---|---|---|
 | Apps | `backend` (FastAPI/Python), `frontend` (React/TypeScript) | Cấu trúc repo |
 | Local LLM | LM Studio (`http://localhost:1234/v1`, Qwen2.5 1.5B/3B Q4_K_M) | Port local server |
-| Cloud LLM | Free Tier (Groq API: `llama-3.3-70b-versatile`, OpenRouter `:free`) | API calls |
+| Cloud LLM | Groq `qwen/qwen3.8-27b`, OpenRouter `google/gemma-4-26b-a4b-it:free`, Gemini `gemini-3.5-flash-lite` | API calls |
 | Ingestion & OCR | PyMuPDF, OpenCV (deskew, denoise), PaddleOCR (Vietnamese) | Pipeline module |
-| Vector & DB | Qdrant (Vector search), PostgreSQL (`DATABASE_URL_TEST` / `DATABASE_URL_PRODUCTION`) | Database layer |
+| Vector & DB | Qdrant (implemented); PostgreSQL (`DATABASE_URL_TEST` / `DATABASE_URL_PRODUCTION`) — planned, not implemented | Database layer |
 | Verification Gate | `node scripts/verify.mjs` | Gate runner |
 
 ---
