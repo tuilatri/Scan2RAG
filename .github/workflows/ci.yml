@@ -1,9 +1,7 @@
 name: verify
 
-# Generic bootstrap for adopting projects: runs the shipped verify gates on
-# push/PR. With a fresh kit.config.json (0 gates) this exits 0 with a warning —
-# add project gates (tests, build, doc-truth, skill integrity) in kit.config.json
-# and install their dependencies before relying on this workflow.
+# Runs the shipped verify gates on push/PR to main. Gates use the repo's
+# kit.config.json; Python deps are CPU-only here because ubuntu-latest has no CUDA.
 on:
   push:
     branches: [main]
@@ -18,5 +16,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run all verify gates
-        run: node scripts/verify.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies (CPU-only)
+        run: |
+          python -m venv backend/.venv
+          backend/.venv/bin/python -m pip install --upgrade pip
+          backend/.venv/bin/python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1+cpu"
+          backend/.venv/bin/python -m pip install -r backend/requirements-ci.txt
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run verify gates (code-only)
+        # The 5 data gates below need gitignored artifacts (data/raw PDFs,
+        # data/processed JSON, bm25_index.json) that a fresh checkout cannot
+        # produce. They still run locally via: node scripts/verify.mjs
+        run: |
+          node scripts/verify.mjs \
+            --skip corpus-audit \
+            --skip score-review \
+            --skip vector-audit \
+            --skip index-consistency \
+            --skip benchmark-truth

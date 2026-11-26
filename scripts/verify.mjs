@@ -50,9 +50,15 @@ process.on('SIGINT', () => {
   try { currentChild?.kill('SIGINT'); } catch { /* ignore */ }
 });
 
+function resolveCommand(cmd, isWindows) {
+  if (isWindows) return cmd;
+  return cmd.replace(/(^|\/)Scripts\//, '$1bin/').replace(/\.exe$/, '');
+}
+
 function runGate(gate, root) {
   return new Promise((resolve) => {
-    const ext = path.extname(gate.cmd).toLowerCase();
+    const resolved = resolveCommand(gate.cmd, IS_WIN);
+    const ext = path.extname(resolved).toLowerCase();
     // Windows: extension-less commands (npm, npx, python, node, git — bare or
     // scoped like scripts/x.cmd) and .cmd/.bat wrappers must run through
     // cmd.exe, which resolves PATHEXT (npm -> npm.cmd); anything with a concrete
@@ -61,7 +67,7 @@ function runGate(gate, root) {
     const useShell = IS_WIN && (ext === '' || ext === '.cmd' || ext === '.bat');
     // cmd.exe cannot resolve forward slashes in the command token ("scripts/x.cmd"
     // -> "'scripts' is not recognized"): normalize to backslashes when shelling.
-    const command = useShell && IS_WIN ? gate.cmd.replace(/\//g, '\\') : gate.cmd;
+    const command = useShell && IS_WIN ? resolved.replace(/\//g, '\\') : resolved;
     // With shell:true Node joins args unquoted — quote anything containing
     // whitespace ourselves. Gates are trusted repo config (same trust level as
     // npm scripts), so this is about correct quoting, not sanitization.
