@@ -88,9 +88,13 @@ def _make_pdf() -> None:
     doc.close()
 
 
-def render_pdf_page_png(path: Path) -> bytes:
-    with pymupdf.open(path) as document:
-        return document[0].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).tobytes("png")
+def render_pdf_page_png() -> bytes:
+    # Prefer the real scanned TT105 page 23 from data/raw (gitignored, local only).
+    real_pdf = next((ROOT / "data/raw").glob("*105*.pdf"), None)
+    source = real_pdf or PDF_PATH
+    with pymupdf.open(source) as document:
+        page_index = 22 if real_pdf and len(document) > 22 else 0
+        return document[page_index].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5)).tobytes("png")
 
 
 def _start_vite() -> subprocess.Popen:
@@ -152,7 +156,7 @@ def main() -> None:
                 elif "/api/v1/documents/" in url and url.endswith("/pdf"):
                     # Headless Chromium has no PDF viewer plugin: serve a rendered
                     # page image so the iframe paints deterministic demo content.
-                    route.fulfill(status=200, content_type="image/png", body=render_pdf_page_png(PDF_PATH))
+                    route.fulfill(status=200, content_type="image/png", body=render_pdf_page_png())
                 elif "/api/v1/documents/" in url:
                     route.fulfill(status=200, content_type="application/json", body=json.dumps({
                         "id": "thông_tư_105", "title": "Thông tư 105/2023/TT-BQP", "effective_date": "2024-01-01",

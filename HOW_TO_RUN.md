@@ -172,7 +172,7 @@ Lệnh check phải in `frames=7 transitions=6` và exit `0`.
 
 > `capture_demo_frames.py` cần `playwright` + `pymupdf` (`pip install playwright pymupdf` rồi `python -m playwright install chromium`). Script tự chạy Vite, tự chặn API bằng dữ liệu mẫu.
 >
-> **Vì sao vùng PDF trong demo có nội dung:** script trả một ảnh trang đã render bằng PyMuPDF thay vì file PDF — Chromium headless không có plugin xem PDF nên cách này hoạt động ổn định. Đây là dữ liệu **DEMO DATA**, không phải văn bản thật.
+> **Vì sao vùng PDF trong demo có nội dung:** script trả một ảnh trang đã render bằng PyMuPDF thay vì file PDF — Chromium headless không có plugin xem PDF nên cách này hoạt động ổn định. Nếu có `data/raw/*105*.pdf`, script ưu tiên **trang 23 thật** (ảnh scan); nếu không có thì dùng trang mock tự sinh. Caption video vẫn ghi **DEMO DATA** — câu trả lời và điểm số trong chat là dữ liệu mẫu, ngay cả khi trang PDF hiển thị là thật.
 
 ---
 
