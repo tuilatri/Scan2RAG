@@ -20,3 +20,4 @@ class CompareState(TypedDict, total=False):
     verification: dict[str, Any]
     verify_count: int
     version_notes: list[dict[str, Any]]
+    history: list[dict[str, Any]]

@@ -6,6 +6,8 @@ Endpoints:
 """
 
 import logging
+import os
+import sqlite3
 import threading
 from typing import Any
 
@@ -15,7 +17,7 @@ from pydantic import BaseModel, Field
 
 from app.agents.compare_graph import build_compare_graph
 from app.agents.planner import planner_enabled
-from app.core.paths import PROCESSED_DIR
+from app.core.paths import DATA_DIR, PROCESSED_DIR
 from app.core.security import verify_api_key
 from app.retrieval.bm25_searcher import LegalBM25Searcher
 from app.retrieval.hybrid_searcher import LegalHybridSearcher
@@ -24,6 +26,10 @@ from app.retrieval.reranker import LegalReranker
 from app.services.qa_service import GroundedQAService
 
 logger = logging.getLogger(__name__)
+
+
+def _compare_memory_enabled() -> bool:
+    return os.getenv("COMPARE_MEMORY", "").strip().lower() in {"1", "true", "yes", "on"}
 
 router = APIRouter(prefix="/api/v1", tags=["Question Answering"])
 
@@ -63,6 +69,7 @@ class CompareRequest(BaseModel):
     query: str = Field(..., min_length=2, max_length=1000, description="Multi-document comparison question")
     top_k_retrieval: int = Field(default=15, ge=1, le=50)
     top_k_rerank: int = Field(default=5, ge=1, le=10)
+    thread_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,64}$")
 
 
 class EvidenceItem(BaseModel):
@@ -96,6 +103,8 @@ class CompareResponse(BaseModel):
     version_notes: list[VersionNote]
     plan_source: str = "deterministic"
     sub_queries: list[str] = []
+    thread_id: str | None = None
+    history_len: int = 0
 
 
 # Dependency Injection for Singleton QAService (thread-safe double-checked locking)
@@ -144,11 +153,21 @@ def get_compare_graph() -> Any:
         with _compare_graph_lock:
             if _compare_graph_instance is None:
                 qa_service = get_qa_service()
+                checkpointer = None
+                if _compare_memory_enabled():
+                    from langgraph.checkpoint.sqlite import SqliteSaver
+
+                    checkpoint_path = DATA_DIR / "compare_checkpoints.sqlite"
+                    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+                    checkpointer = SqliteSaver(
+                        sqlite3.connect(str(checkpoint_path), check_same_thread=False)
+                    )
                 _compare_graph_instance = build_compare_graph(
                     hybrid_searcher=qa_service.hybrid_searcher,
                     reranker=qa_service.reranker,
                     model_router=qa_service.model_router,
                     planner_enabled=planner_enabled(),
+                    checkpointer=checkpointer,
                 )
     return _compare_graph_instance
 
@@ -206,7 +225,14 @@ def compare_legal_documents(
 ) -> CompareResponse:
     """Additive LangGraph workflow for multi-document comparison."""
     try:
-        result = graph.invoke({"query": payload.query})
+        config = None
+        if _compare_memory_enabled() and payload.thread_id:
+            config = {"configurable": {"thread_id": payload.thread_id}}
+        result = (
+            graph.invoke({"query": payload.query}, config=config)
+            if config
+            else graph.invoke({"query": payload.query})
+        )
         verification = result.get("verification") or {}
         return CompareResponse(
             query=payload.query,
@@ -226,6 +252,8 @@ def compare_legal_documents(
             ],
             plan_source=result.get("plan_source", "deterministic"),
             sub_queries=result.get("sub_queries", []),
+            thread_id=payload.thread_id,
+            history_len=len(result.get("history", [])),
         )
     except Exception:
         logger.exception("Compare pipeline failure")

@@ -71,10 +71,12 @@
   {
     "query": "So sánh quy định cận thị giữa Thông tư 105 và Thông tư 106",
     "top_k_retrieval": 15,
-    "top_k_rerank": 5
+    "top_k_rerank": 5,
+    "thread_id": "demo-thread-1"
   }
   ```
-- **Response Body (`CompareResponse`):** `query`, `answer`, `citations` (same `CitationItem`), `evidence` (`document_id`, `chunk_count`, `citation_ids`), `retry_count` (0 hoặc 1), `provider`, `model`, `verification` (`passed`, `unsupported_numbers`, `checked_numbers`), `version_notes` (`document_id`, `effective_date`, `superseded_by`, `note`), `plan_source` (`llm` / `deterministic`), `sub_queries`. Số trong `answer` không có trong `citations + query` bị đánh dấu và tạo lại tối đa 1 lần; ngày hiệu lực lấy từ `SemanticLegalChunker.OFFICIAL_EFFECTIVE_DATES`. Planner LLM chỉ chạy khi `PLANNER_LLM=true`.
+- `thread_id` tùy chọn, pattern `^[A-Za-z0-9_-]{1,64}$`; chỉ có tác dụng khi `COMPARE_MEMORY=true`.
+- **Response Body (`CompareResponse`):** `query`, `answer`, `citations` (same `CitationItem`), `evidence` (`document_id`, `chunk_count`, `citation_ids`), `retry_count` (0 hoặc 1), `provider`, `model`, `verification` (`passed`, `unsupported_numbers`, `checked_numbers`), `version_notes` (`document_id`, `effective_date`, `superseded_by`, `note`), `plan_source` (`llm` / `deterministic`), `sub_queries`, `thread_id`, `history_len`. Số trong `answer` không có trong `citations + query` bị đánh dấu và tạo lại tối đa 1 lần; ngày hiệu lực lấy từ `SemanticLegalChunker.OFFICIAL_EFFECTIVE_DATES`. Planner LLM chỉ chạy khi `PLANNER_LLM=true`; multi-turn chỉ chạy khi `COMPARE_MEMORY=true`.
 - **Note:** Endpoint bổ sung dùng LangGraph; `/query` và `/query/stream` vẫn là pipeline rule-based.
 
 ### `GET /api/v1/health`

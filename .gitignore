@@ -56,6 +56,8 @@ Thumbs.db
 
 # Database & Storage
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
 *.sqlite3
 *.db
 qdrant_storage/
