@@ -24,6 +24,9 @@ else:
     load_dotenv()
 
 
+CLOUD_TIMEOUT_DEFAULT = 5.0
+
+
 class ModelRouter:
     """Intelligent Model Router managing Local LM Studio and 3 Cloud Providers."""
 
@@ -36,6 +39,10 @@ class ModelRouter:
         **kwargs: Any,
     ):
         self.timeout = timeout
+        try:
+            self.cloud_timeout = max(0.1, float(os.getenv("LLM_CLOUD_TIMEOUT", CLOUD_TIMEOUT_DEFAULT)))
+        except ValueError:
+            self.cloud_timeout = CLOUD_TIMEOUT_DEFAULT
         self.local_base_url = local_base_url or os.getenv("LM_STUDIO_BASE_URL", "http://localhost:1234/v1")
         self.local_model = local_model or os.getenv("LOCAL_LLM_MODEL", "qwen2.5-1.5b-instruct")
         self.default_cloud_provider = (default_cloud_provider or os.getenv("DEFAULT_CLOUD_PROVIDER", "groq")).lower().strip()
@@ -128,14 +135,24 @@ class ModelRouter:
         )
         return response.choices[0].message.content or ""
 
-    def _call_provider_stream(self, client: OpenAI, model: str, messages: list[dict[str, str]], temperature: float) -> Any:
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=800,
-            stream=True,
-        )
+    def _call_provider_stream(
+        self,
+        client: OpenAI,
+        model: str,
+        messages: list[dict[str, str]],
+        temperature: float,
+        timeout: float | None = None,
+    ) -> Any:
+        options: dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": 800,
+            "stream": True,
+        }
+        if timeout is not None:
+            options["timeout"] = timeout
+        response = client.chat.completions.create(**options)
         for chunk in response:
             if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
@@ -169,22 +186,49 @@ class ModelRouter:
             if p not in cloud_order:
                 cloud_order.append(p)
 
-        for provider in cloud_order:
+        for index, provider in enumerate(cloud_order):
             client = self.cloud_clients.get(provider)
             cfg = self.cloud_configs.get(provider)
             if client and cfg and cfg["model"]:
                 try:
-                    meta = {"provider": f"{provider}_cloud", "model": cfg["model"], "complexity": complexity}
-                    for tok in self._call_provider_stream(client, cfg["model"], messages, temperature):
+                    meta = {
+                        "provider": f"{provider}_cloud",
+                        "model": cfg["model"],
+                        "complexity": complexity,
+                        "stage": "cloud_failed" if index > 0 else None,
+                    }
+                    for tok in self._call_provider_stream(
+                        client, cfg["model"], messages, temperature, timeout=self.cloud_timeout
+                    ):
                         yield tok, meta
                     return
                 except Exception:
+                    if index == 0 and self.is_local_available():
+                        try:
+                            meta = {
+                                "provider": "lm_studio_local",
+                                "model": self.local_model,
+                                "complexity": complexity,
+                                "stage": "local_fallback",
+                            }
+                            for tok in self._call_provider_stream(
+                                self.local_client, self.local_model, messages, temperature
+                            ):
+                                yield tok, meta
+                            return
+                        except Exception:
+                            pass
                     continue  # Try next cloud provider
 
         # 3. If cloud fails but local LM Studio is available
         if self.is_local_available():
             try:
-                meta = {"provider": "lm_studio_local", "model": self.local_model, "complexity": complexity}
+                meta = {
+                    "provider": "lm_studio_local",
+                    "model": self.local_model,
+                    "complexity": complexity,
+                    "stage": "local_fallback",
+                }
                 for tok in self._call_provider_stream(self.local_client, self.local_model, messages, temperature):
                     yield tok, meta
                 return
@@ -192,7 +236,12 @@ class ModelRouter:
                 pass
 
         # 4. Deterministic Offline Fallback if all else fails
-        offline_meta = {"provider": "deterministic_offline", "model": "rule-based-fallback", "complexity": complexity}
+        offline_meta = {
+            "provider": "deterministic_offline",
+            "model": "rule-based-fallback",
+            "complexity": complexity,
+            "stage": "offline",
+        }
         fallback_msg = (
             "Hệ thống tạm thời không thể kết nối tới các mô hình ngôn ngữ (Cloud Providers hoặc Local LM Studio) "
             "để phân tích câu trả lời chi tiết. Vui lòng tham khảo các đoạn trích dẫn pháp lý chính thức bên dưới."
