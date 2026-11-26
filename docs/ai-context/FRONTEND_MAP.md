@@ -23,19 +23,20 @@
   - `tabs.tsx`: Radix UI tab navigator.
   - `separator.tsx`: Layout divider.
   - `skeleton.tsx`: Loading shimmer placeholder.
+  - `thin-scroll-area.tsx`: Radix ScrollArea wrapper with a 6px thumb, transparent track and no arrow buttons.
 
 - **`src/components/chat/` (Conversational UI):**
   - `chat-container.tsx`: Main chat scroll area and input footer.
   - `chat-message.tsx`: Markdown rendered bubble with avatar and model router badge.
-  - `chat-input.tsx`: Auto-resizing textarea with sample prompt quick buttons and filter switch.
+  - `chat-input.tsx`: Auto-resizing textarea, `suggestion-strip.tsx` (thin horizontal scroller) and filter switch.
   - `citation-list.tsx` & `citation-card.tsx`: Grounded citations with Amber Warning Badge for superseded laws.
   - `model-badge.tsx`: Visual tag distinguishing Local Qwen2.5 vs cloud. Cloud label is derived from the SSE `provider` string (`groq_cloud`→Groq, `openrouter_cloud`→OpenRouter, `gemini_cloud`→Gemini, `deterministic_offline`→Offline) — not hardcoded.
   - `stream-indicator.tsx`: Live SSE streaming status indicator.
 
 - **`src/components/pdf/` (Document Preview):**
-  - `pdf-viewer-panel.tsx`: Combined layout for toolbar and canvas.
+  - `pdf-viewer-panel.tsx`: Metadata, open-tab action and inline iframe canvas.
   - `pdf-canvas.tsx`: Iframe viewer with page jump (`#page=N`) and text snippet highlight.
-  - `pdf-toolbar.tsx`: Zoom in/out, previous/next page, open in new tab.
+  - `pdf-open-tab-button.tsx`: Opens the PDF in a new Chrome tab for the full native toolbar (zoom, fit, rotate, download, print).
   - `document-meta-card.tsx`: Legal validity summary (VBHN 88 priority, TT 105 superseded note).
 
 - **`src/components/ocr/` (Human-in-the-Loop Rectification):**

@@ -1,6 +1,6 @@
 import React from 'react';
-import { ExternalLink, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { FileText } from 'lucide-react';
+import { PdfOpenTabButton } from '@/components/pdf/pdf-open-tab-button';
 import { API_BASE_URL, withApiKey } from '@/lib/api-config';
 
 interface PagePreviewCardProps {
@@ -23,14 +23,7 @@ export const PagePreviewCard: React.FC<PagePreviewCardProps> = ({
           <FileText className="h-3.5 w-3.5 text-primary" />
           <span>Trang gốc PDF (Trang {pageNumber})</span>
         </div>
-        <a
-          href={pdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-foreground inline-flex items-center"
-        >
-          <ExternalLink className="h-3 w-3" />
-        </a>
+        <PdfOpenTabButton pdfUrl={pdfUrl} label="Tab đầy đủ" />
       </div>
       <div className="flex-1 bg-muted/20 relative">
         <iframe
