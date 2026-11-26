@@ -1,32 +1,28 @@
 # HOW_TO_RUN — Scan2RAG
 
-Hướng dẫn chạy Scan2RAG từ một clone sạch. Đọc [README.md](README.md) để biết kiến trúc, model và benchmark.
+## Bạn muốn làm gì?
 
-> **Điều kiện tiên quyết quan trọng:** các artifact dữ liệu (`data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json`, `data/qdrant_db`) bị gitignore. Clone sạch **không có** chúng — phải có PDF gốc và chạy pipeline ở mục 3 để hệ thống trả lời được câu hỏi.
+| Việc bạn cần | Đọc mục này |
+|---|---|
+| Lần đầu, cài rồi chạy được giao diện | [1. Cài đặt rồi chạy](#1-cài-đặt-rồi-chạy) |
+| Nạp PDF / tạo corpus để hệ thống trả lời được | [2. Chuẩn bị dữ liệu](#2-chuẩn-bị-dữ-liệu) |
+| Kiểm tra dự án có lỗi không | [3. Chạy verify](#3-chạy-verify) |
+| Tạo lại video GIF demo | [4. Tạo lại demo](#4-tạo-lại-demo) |
+| Đang báo lỗi, cần cách sửa | [5. Lỗi thường gặp](#5-lỗi-thường-gặp) |
+| Máy yếu / 4GB VRAM | [6. Chạy trên máy 4GB VRAM](#6-chạy-trên-máy-4gb-vram) |
 
----
-
-## 1. Yêu cầu
-
-| Thành phần | Khuyến nghị | Ghi chú |
-|---|---|---|
-| Python | 3.10+ (đã test 3.11/3.12) | Dùng venv riêng trong `backend/.venv` |
-| Node | 22 (đúng bản CI) | `npm` đi kèm |
-| Qdrant | `localhost:6333` | `docker compose up -d qdrant` hoặc cài local |
-| LM Studio | `http://localhost:1234/v1` | **Tùy chọn** — chỉ cần cho LLM local |
-| GPU CUDA | RTX 3050 Ti 4GB (hoặc CPU) | `paddlepaddle-gpu==3.3.1` trong `requirements.txt` cần CUDA; dùng `requirements-ci.txt` nếu chỉ cần chạy gate CPU |
-| Docker | Tùy chọn | Chỉ cần nếu dùng Qdrant qua compose |
-
-Máy 4GB VRAM: **không** chạy OCR + Embedding + LLM cùng lúc. Xem mục 6.
+> Lần đầu: làm **mục 1**, sau đó làm **mục 2** để có dữ liệu, rồi **mục 3** để kiểm tra.
 
 ---
 
-## 2. Cài đặt
+## 1. Cài đặt rồi chạy
 
-### 2.1. Cấu hình môi trường
+Làm 4 bước này là mở được UI tại `http://localhost:5173`.
+
+**Bước 1 — Tạo file cấu hình** (chạy ở thư mục gốc repo)
 
 ```powershell
-# Windows (PowerShell)
+# Windows
 Copy-Item .env.example .env
 Copy-Item frontend\.env.example frontend\.env.local
 ```
@@ -37,25 +33,19 @@ cp .env.example .env
 cp frontend/.env.example frontend/.env.local
 ```
 
-Các biến cần chỉnh trước khi chạy:
+Mở `.env` và sửa 2 dòng này (các dòng khác giữ nguyên):
 
-| Biến | Ý nghĩa |
-|---|---|
-| `ENVIRONMENT` | `development` hoặc `production`. Ở production luôn yêu cầu API key (fail-closed). |
-| `SCAN2RAG_API_KEY` | Key bảo vệ API. `ALLOW_UNAUTHENTICATED_DEV=true` **chỉ** dùng khi dev local. |
-| `VITE_API_KEY` (frontend) | Phải khớp `SCAN2RAG_API_KEY` để iframe PDF và các request được authorize. |
-| `VITE_API_BASE_URL` | Mặc định `http://localhost:8000`. |
-| `GROQ_API_KEY` / `OPENROUTER_API_KEY` / `GEMINI_API_KEY` | Chỉ cần nếu dùng cloud LLM. |
-| `LOCAL_LLM_MODEL` | Tên model đã load trong LM Studio, mặc định `qwen2.5-1.5b-instruct`. |
-| `QDRANT_HOST` / `QDRANT_PORT` | Mặc định `localhost:6333`. |
+```ini
+ENVIRONMENT=development
+ALLOW_UNAUTHENTICATED_DEV=true
+```
 
-> Không commit `.env` hay `frontend/.env.local`. Xem `.env.example` cho danh sách đầy đủ (embedding, reranker, rate limit, Langfuse).
+Nếu bạn đặt `SCAN2RAG_API_KEY`, thì `VITE_API_KEY` trong `frontend/.env.local` phải **giống hệt**.
 
-### 2.2. Backend
+**Bước 2 — Cài backend**
 
 ```powershell
 python -m venv backend\.venv
-backend\.venv\Scripts\python.exe -m pip install --upgrade pip
 backend\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
 ```
 
@@ -64,25 +54,50 @@ python3 -m venv backend/.venv
 backend/.venv/bin/python -m pip install -r backend/requirements.txt
 ```
 
-> Chỉ cần chạy gate kiểm tra (không cần OCR GPU)? Dùng `backend/requirements-ci.txt` — bản CPU, đã loại `paddlepaddle-gpu`/CUDA.
-
-### 2.3. Frontend
+**Bước 3 — Cài frontend**
 
 ```powershell
-cd frontend
-npm install
-cd ..
+cd frontend; npm install; cd ..
 ```
 
 ```bash
 (cd frontend && npm install)
 ```
 
+**Bước 4 — Chạy 2 terminal**
+
+Terminal 1 (backend):
+
+```powershell
+cd backend
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+```
+
+```bash
+cd backend
+../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+```
+
+Terminal 2 (frontend):
+
+```bash
+cd frontend
+npm run dev
+```
+
+Xong. Vào `http://localhost:5173`. Kiểm tra API tại `http://localhost:8000/api/v1/health`.
+
+> Lúc này UI chạy được nhưng **chưa trả lời câu hỏi** vì chưa có dữ liệu. Làm mục 2 tiếp.
+
 ---
 
-## 3. Sinh artifact dữ liệu (bắt buộc để trả lời được)
+## 2. Chuẩn bị dữ liệu
 
-Đặt PDF gốc vào `data/raw/` (ví dụ `Thong_tu_105.pdf`, `Thong_tu_88.pdf`), rồi chạy lần lượt từ **root repo**:
+Clone sạch **không có** PDF và corpus — chúng bị gitignore. Bạn cần PDF gốc, rồi chạy 3 lệnh.
+
+**Bước 1 — Copy PDF vào** `data/raw/` (ví dụ `Thong_tu_105.pdf`, `Thong_tu_88.pdf`).
+
+**Bước 2 — Chạy lần lượt từ thư mục gốc:**
 
 ```powershell
 backend\.venv\Scripts\python.exe scripts\ingest_documents.py --all --skip-existing
@@ -96,101 +111,91 @@ backend/.venv/bin/python scripts/rebuild_bm25_index.py
 backend/.venv/bin/python scripts/ingest_chunks_to_qdrant.py
 ```
 
-| Script | Kết quả |
+| Lệnh | Tạo ra |
 |---|---|
-| `ingest_documents.py --all` | `data/processed/<tên_văn_bản>.json` (OCR, bảng, cấu trúc Chương/Điều/Khoản/Điểm) |
-| `rebuild_bm25_index.py` | `data/bm25_index.json` (~8 MB) từ corpus đã xử lý |
-| `ingest_chunks_to_qdrant.py` | Nạp chunk vào collection `vietnamese_legal_docs` (cần Qdrant đang chạy) |
+| `ingest_documents.py` | `data/processed/*.json` (OCR + cấu trúc Chương/Điều/Khoản/Điểm) |
+| `rebuild_bm25_index.py` | `data/bm25_index.json` |
+| `ingest_chunks_to_qdrant.py` | Dữ liệu trong Qdrant (cần Qdrant chạy ở `localhost:6333`) |
 
-`ingest_documents.py` nhận `--file <tên.pdf>` để xử lý một file, `--max-pages N` để giới hạn số trang (hữu ích khi thử nghiệm).
+Chạy Qdrant nếu chưa có: `docker compose up -d qdrant`.
 
-> Nếu thiếu corpus, các gate `corpus-audit`, `score-review`, `benchmark-truth`, `index-consistency`, `backend-tests` sẽ fail hoặc báo số bằng 0 — đây là nguyên nhân lỗi PREFLIGHT từng gặp trên CI.
+Chỉ muốn thử 1 văn bản / vài trang:
+
+```bash
+python scripts/ingest_documents.py --file Thong_tu_105.pdf --max-pages 5
+```
 
 ---
 
-## 4. Chạy ứng dụng
-
-Terminal 1 — backend:
-
-```powershell
-cd backend
-..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
-```
+## 3. Chạy verify
 
 ```bash
-cd backend
-../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
-```
-
-Terminal 2 — frontend:
-
-```powershell
-cd frontend
-npm run dev
-```
-
-```bash
-cd frontend
-npm run dev
-```
-
-- API health: `http://localhost:8000/api/v1/health`
-- UI: `http://localhost:5173`
-- Nếu dùng Docker: `docker compose up -d qdrant backend frontend` (compose cũng định nghĩa `postgres`, nhưng lớp PostgreSQL hiện **chưa được implement** trong app).
-
----
-
-## 5. Chạy verify
-
-```bash
-node scripts/verify.mjs          # FULL 11 gate — bắt buộc trước milestone
-node scripts/verify.mjs --fast   # Quick iteration (hiện không lọc gate nào)
+node scripts/verify.mjs           # đủ 11 gate — chạy trước khi báo "xong"
+node scripts/verify.mjs --fast    # nhanh hơn, dùng lúc đang code
 node scripts/verify.mjs --only doc-truth
 ```
 
-| Gate | Cần artifact không | Chạy ở đâu |
+| Gate | Cần dữ liệu không | Chạy ở đâu |
 |---|---|---|
-| `doc-truth`, `backend-lint`, `security-audit`, `frontend-tests`, `test-truth` | Không | CI + local |
-| `corpus-audit`, `score-review`, `vector-audit`, `index-consistency`, `benchmark-truth`, `backend-tests` | **Có** (PDF/corpus/BM25/Qdrant) | **Chỉ local** |
+| `doc-truth`, `backend-lint`, `security-audit`, `frontend-tests`, `test-truth` | Không | CI + máy bạn |
+| `corpus-audit`, `score-review`, `vector-audit`, `index-consistency`, `benchmark-truth`, `backend-tests` | **Có** | **Chỉ máy bạn** (đã làm mục 2) |
 
-CI trên GitHub chỉ chạy 5 gate đầu (xem `.github/workflows/ci.yml`). **CI xanh không có nghĩa là dữ liệu đúng** — xem `docs/ai-context/TESTING_GUIDE.md` §2.
-
----
-
-## 6. Tối ưu VRAM 4GB
-
-- Chạy **hai pha riêng**: Ingestion (OCR + Embedding) xong mới đến Serving (query + LLM).
-- Model local: `Qwen2.5-1.5B/3B` dạng GGUF `Q4_K_M` trong LM Studio, GPU offload một phần.
-- Reranker/Embedder mặc định chạy CPU (`EMBEDDER_DEVICE`, `RERANKER_DEVICE`); câu hỏi reasoning nặng chuyển sang Groq/OpenRouter/Gemini.
+CI trên GitHub chỉ chạy 5 gate đầu. **CI xanh không có nghĩa là dữ liệu đúng** — phải chạy lệnh 11 gate ở máy bạn.
 
 ---
 
-## 7. Tạo lại demo (GIF/MP4)
+## 4. Tạo lại demo
 
-```powershell
-backend\.venv\Scripts\python.exe -m pip install playwright
-backend\.venv\Scripts\python.exe -m playwright install chromium
-backend\.venv\Scripts\python.exe scripts\capture_demo_frames.py
-backend\.venv\Scripts\python.exe scripts\build_demo_video.py
-python scripts\build_demo_preview_gif.py --build
-python scripts\build_demo_preview_gif.py --check
+```bash
+python scripts/capture_demo_frames.py     # 7 ảnh trong data/exports/demo/frames/
+python scripts/build_demo_video.py        # data/exports/demo/scan2rag_demo.mp4
 ```
 
-`capture_demo_frames.py` tự chạy Vite, chặn API bằng dữ liệu stub và xuất 7 PNG tĩnh sang `data/exports/demo/frames/`. `build_demo_video.py` ghép thành MP4 (7 cảnh, ~3 phút, không âm thanh, có caption). `build_demo_preview_gif.py` lấy 7 mốc trong MP4 để ra GIF 7 frame cho README.
+Copy video sang chỗ README dùng:
 
-### Vì sao vùng xem PDF trong demo bị trắng?
+```powershell
+Copy-Item data\exports\demo\scan2rag_demo.mp4 docs\assets\scan2rag_demo.mp4 -Force
+```
 
-Không phải lỗi sản phẩm. script quay dùng `mock_page.pdf` **1 trang, 1,4 KB** do chính nó sinh ra (PDF gốc ~78 MB bị gitignore), rồi nhúng qua `<iframe src="...pdf#page=...">`. Chromium **headless** của Playwright không có plugin PDF viewer nên iframe tải được file nhưng không vẽ. Toolbar/breadcrumb/trích dẫn vẫn hiện vì đến từ dữ liệu stub. Trình duyệt thường (có PDF viewer) với file PDF thật sẽ hiển thị bình thường.
+```bash
+cp data/exports/demo/scan2rag_demo.mp4 docs/assets/scan2rag_demo.mp4
+```
+
+Rồi tạo GIF và kiểm tra:
+
+```bash
+python scripts/build_demo_preview_gif.py --build
+python scripts/build_demo_preview_gif.py --check
+```
+
+Lệnh check phải in `frames=7 transitions=6` và exit `0`.
+
+> `capture_demo_frames.py` cần `playwright` + `pymupdf` (`pip install playwright pymupdf` rồi `python -m playwright install chromium`). Script tự chạy Vite, tự chặn API bằng dữ liệu mẫu.
+>
+> **Vì sao vùng PDF trong demo có nội dung:** script trả một ảnh trang đã render bằng PyMuPDF thay vì file PDF — Chromium headless không có plugin xem PDF nên cách này hoạt động ổn định. Đây là dữ liệu **DEMO DATA**, không phải văn bản thật.
 
 ---
 
-## 8. Sự cố thường gặp
+## 5. Lỗi thường gặp
 
-| Triệu chứng | Nguyên nhân / cách xử lý |
+| Bạn thấy | Nguyên nhân / làm gì |
 |---|---|
-| `PREFLIGHT — missing data/bm25_index.json` | Chưa chạy mục 3, hoặc đang chạy verify trên máy không có artifact |
-| `ModuleNotFoundError: paddle` khi chạy test | Cài `backend/requirements.txt` (đầy đủ), không dùng `requirements-ci.txt` cho backend-tests |
-| `401 Unauthorized` | Đặt `SCAN2RAG_API_KEY` trong `.env` và `VITE_API_KEY` khớp trong `frontend/.env.local`; dev local có thể `ALLOW_UNAUTHENTICATED_DEV=true` |
-| Trả lời "không tìm thấy" dù đã ingest | Kiểm tra Qdrant `localhost:6333` và chạy lại `ingest_chunks_to_qdrant.py` |
-| OOM CUDA | Tách pha Ingestion/Serving, giảm model local về 1.5B Q4_K_M |
-| `node scripts/verify.mjs` fail ở `test-truth` trên Linux | Đã sửa: script tự chọn `.venv/bin/python` trên POSIX; cập nhật code mới từ `main` |
+| `PREFLIGHT — missing data/bm25_index.json` | Chưa chạy mục 2, hoặc đang verify trên máy không có corpus |
+| `ModuleNotFoundError: paddle` / `playwright` | Cài lại bằng `backend/requirements.txt`; `pip install playwright pymupdf` cho demo |
+| `401 Unauthorized` | Đặt `SCAN2RAG_API_KEY` trong `.env`, `VITE_API_KEY` khớp trong `frontend/.env.local`; dev local cần `ALLOW_UNAUTHENTICATED_DEV=true` |
+| Hỏi đáp trả "không tìm thấy" | Chưa nạp Qdrant: chạy lại `ingest_chunks_to_qdrant.py`, kiểm tra `localhost:6333` |
+| `CUDA out of memory` | Xem mục 6 |
+| `400102 ... image or video format is not supported` trong OpenCode | Do đọc file `.gif` bằng tool `read`; chỉ xem GIF qua ảnh PNG đã export |
+
+---
+
+## 6. Chạy trên máy 4GB VRAM
+
+- Chạy **từng pha**: ingest/OCR/embedding xong mới bật LLM — đừng chạy cùng lúc.
+- LM Studio: dùng `Qwen2.5-1.5B` hoặc `3B` dạng `Q4_K_M`, bớt GPU offload.
+- Embedding/reranker mặc định chạy CPU (`EMBEDDER_DEVICE=cpu`, `RERANKER_DEVICE=cpu`) để chừa VRAM cho LM Studio.
+- Câu hỏi suy luận nặng chuyển sang Groq / OpenRouter / Gemini (điền key trong `.env`).
+
+---
+
+Xem thêm: [README.md](README.md) (kiến trúc, model, benchmark) · [docs/ai-context/README.md](docs/ai-context/README.md).
