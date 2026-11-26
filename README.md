@@ -7,11 +7,9 @@
 
 ## Demo video
 
-<video src="https://raw.githubusercontent.com/tuilatri/Scan2RAG/main/docs/assets/scan2rag_demo.mp4" controls width="100%"></video>
+![Xem trước demo](docs/assets/demo_preview.gif)
 
-[Tải video demo — 3:00, không âm thanh, caption tiếng Việt](docs/assets/scan2rag_demo.mp4)
-
-Video dùng dữ liệu demo (stub) để đảm bảo tính ổn định khi trình diễn. Các script tạo video nằm tại `scripts/capture_demo_frames.py` và `scripts/build_demo_video.py`.
+[Xem video đầy đủ — 3:00](docs/assets/scan2rag_demo.mp4)
 
 ---
 
