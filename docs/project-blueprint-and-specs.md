@@ -17,11 +17,13 @@ Hệ thống cung cấp:
 - Pipeline tiền xử lý và OCR tài liệu tiếng Việt.
 - Cơ chế đánh giá và hiệu chỉnh lỗi OCR (Human-in-the-loop).
 - Khôi phục cấu trúc văn bản pháp lý (`Chương -> Điều -> Khoản -> Điểm`).
-- Lưu trữ kết hợp: Metadata & Versioning (PostgreSQL) + Vector Embeddings (Qdrant).
+- Lưu trữ kết hợp: Metadata & Versioning (PostgreSQL — planned) + Vector Embeddings (Qdrant — đã implement).
 - Hệ thống Hybrid Retrieval (Dense Vector + BM25) + Reranking.
 - Kiến trúc Hybrid Local–Cloud Routing: Dùng model nhỏ chạy local qua **LM Studio** cho câu hỏi đơn giản/tra cứu; gọi Cloud LLM qua các nhà cung cấp miễn phí (**Groq**, **OpenRouter**) cho câu hỏi suy luận phức tạp.
-- Tách biệt môi trường cơ sở dữ liệu quan hệ (**PostgreSQL Test & Production**) ngay từ tầng cấu hình.
+- Tách biệt môi trường cơ sở dữ liệu quan hệ (**PostgreSQL Test & Production** — planned, chỉ có placeholder trong `.env`) ngay từ tầng cấu hình.
 - Agentic RAG (LangGraph) hỗ trợ tra cứu đa tài liệu, kiểm tra chứng cứ và hạn chế hallucination.
+
+> **Trạng thái triển khai (cập nhật 2026-11-26):** PostgreSQL và LangGraph ở trên là **thiết kế planned, chưa implement**. Hiện tại metadata/versioning nằm trong file JSON + Qdrant; routing chạy bằng `ModelRouter` dạng rule-based. Nguồn truth: `docs/ai-context/ARCHITECTURE.md`.
 - Mọi câu trả lời bắt buộc có **trích dẫn nguồn gốc (Grounded Citations)**: Tên văn bản, số Điều/Khoản, số trang PDF scan.
 
 ### 1.2. Hai mục tiêu chiến lược
@@ -64,7 +66,7 @@ Hệ thống được tách làm 2 pipeline độc lập:
                                                                                │
 [Chunking: Structure-Aware] ◄── [Document Structure Parser] ◄── [OCR Quality Validation]
             │                                                                  │
-            ├──► [PostgreSQL] (Metadata, Versioning, Pages, Logs)      [Human-in-the-loop]
+            ├──► [PostgreSQL — planned] (Metadata, Versioning, Pages, Logs)      [Human-in-the-loop]
             └──► [Embedding] ──► [Qdrant Vector DB]
 
 ========================================================================================
@@ -76,7 +78,7 @@ Hệ thống được tách làm 2 pipeline độc lập:
          ▼                                        ▼
  [Simple / Metadata]                     [Complex / Multi-doc]
          │                                        │
- [Database Lookup / Dense]               [LangGraph Agentic Workflow]
+ [Database Lookup / Dense]               [Model Router (hiện tại) / LangGraph — planned]
          │                                        │
          │                              ┌─────────┴─────────┐
          │                              ▼                   ▼
@@ -132,7 +134,7 @@ Hệ thống được tách làm 2 pipeline độc lập:
   - **Parent-Child**: Lưu chunk nhỏ (Điểm, Khoản) kèm reference trỏ đến Parent ID (Điều/Chương) để khi retrieval bồi đắp đủ ngữ cảnh cho LLM.
 
 ### 4.3. Database & Versioning
-- **PostgreSQL (Dual Environment - Test & Production)**:
+- **PostgreSQL (Dual Environment - Test & Production)** — planned, chưa implement:
   - Cấu hình linh hoạt qua biến môi trường: `DATABASE_URL_TEST` (phát triển, chạy automated tests) và `DATABASE_URL_PRODUCTION` (triển khai thực tế).
   - Bảng `documents`: Lưu tên, số hiệu, ngày ban hành, ngày hiệu lực, trạng thái.
   - Bảng `document_relationships`: Quan hệ sửa đổi (thay thế, sửa đổi, bổ sung, hợp nhất).
@@ -159,7 +161,7 @@ Hệ thống được tách làm 2 pipeline độc lập:
 - **Cơ chế Routing**:
   - Dựa trên độ phức tạp của câu hỏi, số lượng chunks liên quan và loại truy vấn (factual đơn giản -> LM Studio; suy luận so sánh nhiều văn bản -> Groq/OpenRouter).
 
-### 4.6. Agentic Workflow (LangGraph)
+### 4.6. Agentic Workflow (LangGraph — planned, chưa implement)
 - Xử lý các câu hỏi đa bước (Multi-hop), ví dụ: *"Theo Thông tư 106 mới thì quy định về độ cận thị đã thay đổi như thế nào so với Thông tư 105?"*.
 - Agent nodes:
   1. `Query Planner`: Bóc tách thành các câu hỏi con.
@@ -248,6 +250,6 @@ Vietnamese Document Intelligence — Hybrid Local/Cloud Agentic RAG System
 - Engineered a document ingestion pipeline using OpenCV for preprocessing (deskew, denoise) and PaddleOCR for Vietnamese text extraction, coupled with a human-in-the-loop correction workflow.
 - Implemented structure-aware hierarchical chunking (Chapter-Article-Clause-Point) and hybrid retrieval (Dense + BM25) reranked with cross-encoders in Qdrant.
 - Designed a hybrid local/cloud routing architecture: running lightweight quantized models (Qwen2.5 1.5B) locally via LM Studio under 4GB VRAM constraint, falling back to free high-speed Cloud LLMs (Groq, OpenRouter) for complex multi-hop reasoning.
-- Orchestrated an Agentic RAG workflow with LangGraph for cross-statute comparison, temporal versioning resolution, and grounded citation verification down to PDF page numbers.
+- Designed (planned) an Agentic RAG workflow with LangGraph for cross-statute comparison, temporal versioning resolution, and grounded citation verification down to PDF page numbers. Hiện tại: ModelRouter rule-based + hybrid retrieval + trích dẫn trang PDF.
 - Benchmarked OCR (CER/WER) and RAG generation metrics (Faithfulness, Context Recall) using RAGAS across a 50+ ground-truth Q&A dataset.
 ```

@@ -169,8 +169,8 @@ Scan2RAG/
 │   │   ├── embeddings/                 # Embedding service
 │   │   ├── retrieval/                  # Dense, Sparse, Hybrid search & Reranker
 │   │   ├── llm/                        # Local & Cloud model clients, Router
-│   │   ├── agents/                     # LangGraph workflow, nodes, states
-│   │   └── database/                   # PostgreSQL models & Qdrant client
+│   │   ├── agents/                     # LangGraph workflow (planned, chưa tạo)
+│   │   └── database/                   # PostgreSQL models (planned, chưa tạo); Qdrant ở retrieval/
 │   └── tests/
 ├── frontend/                           # React + TypeScript App
 ├── evaluation/

@@ -6,7 +6,7 @@
 
 | Metric | Measured Value |
 |---|---|
-| Collected pytest items | 115 |
+| Collected pytest items | 117 |
 | Backend test files | 24 |
 | Frontend Vitest items | 31 |
 | Frontend test files | 4 |
