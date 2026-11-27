@@ -6,7 +6,7 @@
 
 | Metric | Measured Value |
 |---|---|
-| Collected pytest items | 141 |
+| Collected pytest items | 142 |
 | Backend test files | 32 |
 | Frontend Vitest items | 32 |
 | Frontend test files | 4 |
@@ -63,3 +63,5 @@ backend/.venv/Scripts/python.exe scripts/acceptance_run.py --mode all
 `scripts/acceptance_questions.json` giữ 50 câu + kỳ vọng (`expected_document_ids`, `expected_pages`, `expected_answer_tokens`, `expect_refusal`). `scripts/acceptance_run.py` spawn uvicorn riêng cho `local` (`PREFER_LOCAL=true`) và `cloud` (`PREFER_LOCAL=false`), gọi SSE `/api/v1/query/stream`, gọi `/api/v1/query/compare` cho 5 câu nhóm `compare`, và chạy `check_qdrant.py`. Kết quả: `data/exports/acceptance_report.json` (gitignored).
 
 Chỉ số: `answer_hit`, `citation_doc_hit`, `citation_page_hit`, `refusal_marker`, `secondary_cloud_count`, `local_fallback_count`, `avg_latency_ms`; LangGraph có `verification_passed`, `with_version_notes`, `with_evidence`. Suite chạy thật với Qdrant/LLM nên **không** nằm trong 5 gate CI. Không được dùng 50 query trong `data/benchmarks/ragas_milestone2_report.json` làm input (bị mojibake).
+
+Dùng `--ids AC-46,AC-48` để chạy lại đúng câu lỗi; mốc before/after và hàng đợi cập nhật tài liệu nằm ở [ACCEPTANCE_TIMELINE.md](ACCEPTANCE_TIMELINE.md).

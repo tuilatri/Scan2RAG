@@ -81,11 +81,19 @@ class LegalReranker:
         # Compute cross-encoder scores
         scores = self.model.predict(pairs, batch_size=32)
 
+        # A score table is the authority for "bảng/phụ lục/điểm" questions.
+        # Cross-encoder may rank nearby prose above the table itself.
+        table_intent = any(token in query.lower() for token in ("bảng", "phụ lục", "điểm"))
+
         # Attach scores to candidates
         scored_candidates = []
         for cand, score in zip(candidates, scores, strict=False):
             cand_copy = dict(cand)
-            cand_copy["rerank_score"] = float(score)
+            adjusted = float(score)
+            content = str(cand.get("content", "")).lower()
+            if table_intent and cand.get("is_table") and "điểm" in content:
+                adjusted += 2.0
+            cand_copy["rerank_score"] = adjusted
             scored_candidates.append(cand_copy)
 
         # Sort descending by rerank_score

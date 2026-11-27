@@ -242,7 +242,7 @@ backend\.venv\Scripts\python.exe scripts\acceptance_run.py --mode all --limit 3
 backend\.venv\Scripts\python.exe scripts\acceptance_run.py --mode all
 ```
 
-`--mode` nhận `qdrant|local|cloud|langgraph|all`; `--limit N` chạy N câu đầu (`0` = tất cả); `--out <file>` đổi nơi ghi báo cáo. Mặc định: `data/exports/acceptance_report.json` (gitignored). Script tự spawn uvicorn riêng cho từng mode nên `PREFER_LOCAL` trong `.env` không bị lẫn giữa local/cloud.
+`--mode` nhận `qdrant|local|cloud|langgraph|all`; `--limit N` chạy N câu đầu (`0` = tất cả); `--ids AC-46,AC-48` chạy đúng câu cần kiểm tra; `--out <file>` đổi nơi ghi báo cáo. Mặc định: `data/exports/acceptance_report.json` (gitignored). Script tự spawn uvicorn riêng cho từng mode nên `PREFER_LOCAL` trong `.env` không bị lẫn giữa local/cloud. Nếu đổi wording câu từ chối trong prompt, phải cập nhật `REFUSAL_MARKERS` rồi tính lại metric — answer cũ không đổi, report ghi rõ `regraded_at`. Xem mốc before/after trong `docs/ai-context/ACCEPTANCE_TIMELINE.md`.
 
 Báo cáo gồm: `answer_hit` (đáp án chứa token kỳ vọng, hoặc từ chối đúng với câu ngoài phạm vi), `citation_doc_hit` / `citation_page_hit` (khớp `document_id` / trang PDF), `secondary_cloud_count` (retry sang cloud khác), `local_fallback_count` (fallback LM Studio / offline), `avg_latency_ms`. Riêng LangGraph: `verification_passed`, `with_version_notes`, `with_evidence`. Đây là **đo lường**: script exit 0 dù accuracy thấp; không đưa ngưỡng vào CI (CI không có Qdrant/LLM).
 

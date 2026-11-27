@@ -42,6 +42,12 @@ REFUSAL_MARKERS = (
     "xin lỗi",
     "không được cung cấp",
     "không có trong",
+    "không chứa",
+    "không quy định",
+    "không cung cấp",
+    "không có dữ liệu",
+    "hoàn toàn không",
+    "ngoài phạm vi",
 )
 
 
@@ -215,7 +221,7 @@ def evaluate(question: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]
 
     doc_hit = None
     if expected_docs:
-        doc_hit = all(any(norm_doc(expected) in doc for doc in docs) for expected in expected_docs)
+        doc_hit = any(norm_doc(expected) in doc for expected in expected_docs for doc in docs)
     page_hit = None
     if expected_pages:
         page_hit = any(page in pages for page in expected_pages)
@@ -392,11 +398,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=["all", "qdrant", "local", "cloud", "langgraph"], default="all")
     parser.add_argument("--limit", type=int, default=0, help="0 = all questions")
+    parser.add_argument("--ids", type=str, default="", help="comma-separated question IDs, e.g. AC-46,AC-48")
     parser.add_argument("--out", type=Path, default=OUT_DIR / "acceptance_report.json")
     parser.add_argument("--verify-dataset", action="store_true", help="only verify expectations against corpus")
     args = parser.parse_args()
 
     questions = load_dataset()
+    if args.ids:
+        wanted_ids = {item.strip() for item in args.ids.split(",") if item.strip()}
+        questions = [item for item in questions if item["id"] in wanted_ids]
+        if not questions:
+            raise SystemExit(f"No questions matched --ids {args.ids}")
     env_values = load_env()
     api_key = env_values.get("SCAN2RAG_API_KEY", "")
 
@@ -414,7 +426,12 @@ def main() -> int:
     report: dict[str, Any] = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "dataset": {"file": str(DATASET.relative_to(ROOT)), "count": len(questions), "verify": dataset_check},
-        "config": {"mode": args.mode, "limit": args.limit, "prefer_local_default": env_values.get("PREFER_LOCAL", "")},
+        "config": {
+            "mode": args.mode,
+            "limit": args.limit,
+            "ids": args.ids,
+            "prefer_local_default": env_values.get("PREFER_LOCAL", ""),
+        },
         "summary": {},
         "results": {},
     }

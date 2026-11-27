@@ -17,6 +17,7 @@ SOURCE OF TRUTH for one domain — docs contradict code ⇒ code is right, docs 
 | API_MAP.md | Endpoint map + rate limits + auth |
 | FRONTEND_MAP.md | Routes + components + lib + patterns |
 | TESTING_GUIDE.md | How to run tests + current counts |
+| ACCEPTANCE_TIMELINE.md | 50-question acceptance runs: before/after metrics, fix log, doc update queue |
 | KNOWN_TRAPS.md | Pitfalls already hit — don't repeat them |
 | UI_UX_RULES.md | Component conventions |
 | BEHAVIORAL_GUIDELINES.md | Principles + skill/agent selection |
