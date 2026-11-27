@@ -232,7 +232,25 @@ Lệnh check phải in `frames=7 transitions=6` và exit `0`.
 
 ---
 
-## 5. Lỗi thường gặp
+## 5. Bộ 50 câu nghiệm thu
+
+Bộ 50 câu có đáp án biết trước từ corpus, đo 4 trục: local model, cloud model, Qdrant, LangGraph. Cần Qdrant đang chạy (mục 2) và LM Studio đang bật nếu test local. Từ thư mục gốc repo:
+
+```powershell
+backend\.venv\Scripts\python.exe scripts\acceptance_run.py --verify-dataset
+backend\.venv\Scripts\python.exe scripts\acceptance_run.py --mode all --limit 3
+backend\.venv\Scripts\python.exe scripts\acceptance_run.py --mode all
+```
+
+`--mode` nhận `qdrant|local|cloud|langgraph|all`; `--limit N` chạy N câu đầu (`0` = tất cả); `--out <file>` đổi nơi ghi báo cáo. Mặc định: `data/exports/acceptance_report.json` (gitignored). Script tự spawn uvicorn riêng cho từng mode nên `PREFER_LOCAL` trong `.env` không bị lẫn giữa local/cloud.
+
+Báo cáo gồm: `answer_hit` (đáp án chứa token kỳ vọng, hoặc từ chối đúng với câu ngoài phạm vi), `citation_doc_hit` / `citation_page_hit` (khớp `document_id` / trang PDF), `secondary_cloud_count` (retry sang cloud khác), `local_fallback_count` (fallback LM Studio / offline), `avg_latency_ms`. Riêng LangGraph: `verification_passed`, `with_version_notes`, `with_evidence`. Đây là **đo lường**: script exit 0 dù accuracy thấp; không đưa ngưỡng vào CI (CI không có Qdrant/LLM).
+
+Lưu ý: 50 query trong `data/benchmarks/ragas_milestone2_report.json` bị mojibake, nên bộ này dùng câu tự biên soạn trong `scripts/acceptance_questions.json`.
+
+---
+
+## 6. Lỗi thường gặp
 
 | Bạn thấy | Nguyên nhân / làm gì |
 |---|---|
@@ -245,7 +263,7 @@ Lệnh check phải in `frames=7 transitions=6` và exit `0`.
 
 ---
 
-## 6. Chạy trên máy 4GB VRAM
+## 7. Chạy trên máy 4GB VRAM
 
 - Chạy **từng pha**: ingest/OCR/embedding xong mới bật LLM — đừng chạy cùng lúc.
 - LM Studio: dùng `Qwen2.5-1.5B` hoặc `3B` dạng `Q4_K_M`, bớt GPU offload.
