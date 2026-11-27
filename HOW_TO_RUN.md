@@ -125,7 +125,23 @@ backend/.venv/bin/python scripts/ingest_chunks_to_qdrant.py
 | `rebuild_bm25_index.py` | `data/bm25_index.json` |
 | `ingest_chunks_to_qdrant.py` | Dữ liệu trong Qdrant (cần Qdrant chạy ở `localhost:6333`) |
 
-Chạy Qdrant nếu chưa có: `docker compose up -d qdrant`.
+### Chạy Qdrant server (khuyến nghị)
+
+Nếu chưa có Docker Desktop, bật daemon rồi đợi `docker info` chạy được. Sau đó từ thư mục gốc repo:
+
+```powershell
+docker compose up -d qdrant
+backend\.venv\Scripts\python.exe scripts\ingest_chunks_to_qdrant.py
+backend\.venv\Scripts\python.exe scripts\check_qdrant.py
+```
+
+`check_qdrant.py` phải in `points: 7263 (expected 7263)` và `RESULT: PASS`. Khi đó backend dùng Qdrant remote thay vì chế độ local disk DEGRADED. **Không xoá** `data/qdrant_db` — nó vẫn là fallback nếu server tắt.
+
+**Qdrant chạy thế nào:** đây là container Docker riêng, backend **không tự khởi động** nó mà chỉ kết nối `localhost:6333`. Container có chính sách `restart: unless-stopped` → tự chạy lại khi Docker Desktop khởi động. Docker Desktop hiện **không bật auto-start khi đăng nhập Windows**, nên sau khi tắt máy/bật lại bạn cần mở Docker Desktop một lần; container sẽ tự lên.
+
+**Có cần chạy liên tục không:** nên giữ Qdrant chạy trong lúc dùng chatbot để retrieval đầy đủ. Nếu tắt, backend vẫn chạy nhưng fallback sang `data/qdrant_db`: mỗi request chờ ~2s và dữ liệu có thể cũ (log báo DEGRADED). Dữ liệu nằm trong Docker volume `scan2rag_qdrant_storage` nên **không mất** khi tắt container hay tắt Docker — bật lại là có lại 7.263 point.
+
+Muốn tự bật cùng Windows: Docker Desktop → Settings → General → *Start Docker Desktop when you log in*.
 
 Chỉ muốn thử 1 văn bản / vài trang:
 
