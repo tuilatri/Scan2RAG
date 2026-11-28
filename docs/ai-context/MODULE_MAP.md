@@ -28,6 +28,27 @@
 | `backend/app/agents/verification.py` | 12 | Numeric grounding: reject numbers in answer absent from cited evidence |
 | `backend/app/agents/compare_graph.py` | 211 | Graph: plan → retrieve → evidence_check → retry → resolve_versions → synthesize → verify_answer (opt-in checkpointer) |
 
+### `backend/app/guards/` — Deterministic pre-LLM guards
+
+| File | Lines | Role |
+|---|---:|---|
+| `backend/app/guards/__init__.py` | 1 | Package marker |
+| `backend/app/guards/scope_guard.py` | 74 | Out-of-scope detection; in-scope legal/medical hints win |
+
+### `backend/app/services/` — Grounded QA orchestration
+
+| File | Lines | Role |
+|---|---:|---|
+| `backend/app/services/qa_service.py` | 333 | Hybrid retrieval → rerank → citations → SSE; scope guard; top-k table fallback; statutory version notes |
+
+### `backend/app/retrieval/` — Vector + BM25 + rerank
+
+| File | Lines | Role |
+|---|---:|---|
+| `backend/app/retrieval/hybrid_searcher.py` | 208 | Dense Qdrant + sparse BM25 via RRF; `table_chunks_for(document_id)`; carries `superseded_by`/`effective_date` |
+| `backend/app/retrieval/reranker.py` | 92 | Cross-encoder; boosts score tables, and first-window table on location questions |
+| `backend/app/retrieval/qdrant_client.py` | 125 | Remote Qdrant client with local disk DEGRADED fallback |
+
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).
 - `data/processed/`: 5 structured JSON corpora, 6.786 nodes, 111 Markdown tables (100% rectified).

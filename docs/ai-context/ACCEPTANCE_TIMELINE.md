@@ -69,6 +69,26 @@ Cloud có `local_fallback_count=16` / `secondary_cloud_count=23` trong lần nà
 
 `build_qa_prompt` có impact **HIGH** sau reindex (7 symbols / 4 processes) nên **không đụng**; metadata được nối trong `qa_service._append_version_notes` thay thế (impact LOW). `TESTING_GUIDE` §1: 146 → **147** pytest items.
 
+## Mốc 5 — Full 50 với LM Studio thật (2026-11-28)
+
+- `generated_at`: `2026-11-28T05:50:30.150407+00:00`
+- Môi trường: Qdrant **UP** 7.263; **LM Studio UP** (`qwen2.5-1.5b-instruct` ELOADED, port 1234) → số local thật, không phải Groq fallback.
+- Report mốc 3 lưu ở `data/exports/acceptance_report_m3.json`.
+
+| Trục | answer_hit | citation_doc_hit | citation_page_hit | refusal_marker | avg_latency_ms |
+|---|---|---|---|---|---|
+| Local (LM Studio thật) | **44/50** | 44/45 | **22/22** | 11/50 | 7.147,2 |
+| Cloud | **47/50** | 44/45 | **22/22** | 19/50 | 11.097,1 |
+| LangGraph | verification **4/5** | notes 5/5 | evidence 5/5 | — | 36.155,1 |
+| Qdrant | PASS · 7.263 points | — | — | — | — |
+
+So với mốc 3 (cũng full, local 47/50 · cloud 47/50 · LG 5/5): page/doc giữ nguyên; local answer giảm 3, LangGraph giảm 1 — do **biến động model**, không phải thay đổi code giữa 2 lần chạy.
+
+- Local misses: AC-20, **AC-22, AC-29**, AC-32, AC-33, AC-35. AC-29 dù pass ở mốc 4 (Groq) vẫn trượt với Qwen 1.5B → block hiệu lực có tác dụng với cloud, **chưa đủ với local nhỏ**. Không đổi expectation.
+- Cloud misses: AC-04, AC-32, AC-33.
+- LangGraph: AC-42 `unsupported_numbers={'106'}` (lần trước pass) — biến động sinh số, giữ FAIL thật.
+- Cloud `local_fallback_count=0`; 6/50 vẫn do `lm_studio_local` vì câu simple → local theo routing đã duyệt.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |
@@ -98,8 +118,10 @@ Cloud có `local_fallback_count=16` / `secondary_cloud_count=23` trong lần nà
 | VERIFY-1 | AC-41: số `6` unsupported | ✅ Đã sửa mốc 3: compare graph lấy table chunk → verified 5/5 |
 | LOCAL-1 | AC-48/49 local bịa nội dung ngoài phạm vi | ✅ Đã sửa mốc 3: scope guard deterministic, 5/5 câu ngoài phạm vi |
 | METRIC-1 | Cloud answer phụ thuộc marker từ chối | ✅ Ổn định mốc 3; vẫn phải re-grade nếu đổi prompt |
-| MODEL-1 | AC-20/32 vẫn trượt ở cả local lẫn cloud (2/50); **AC-29 đã sửa mốc 4** | ⬜ Hạn chế mô hình/grounding — không nới expectation |
-| NET-1 | Cloud mốc 3 có 16/50 local fallback do cloud fail | ⬜ Quan sát mạng; hành vi fallback đúng thiết kế |
+| MODEL-1 | Mốc 5: local miss AC-20/22/29/32/33/35; cloud miss AC-04/32/33 | ⬜ Hạn chế mô hình/grounding — không nới expectation |
+| LOCAL-VAR-1 | AC-29 pass với Groq (mốc 4) nhưng vẫn miss với Qwen 1.5B (mốc 5) | ⬜ Cần guard chắc hơn cho local nhỏ nếu muốn 50/50 |
+| LG-VAR-1 | AC-42 unsupported `106` ở mốc 5 (mốc 3/4 pass) | ⬜ Biến động sinh số; giữ FAIL thật, không ép passed |
+| NET-1 | Cloud mốc 3 có 16/50 local fallback; mốc 5 về 0 | ✅ Không còn dấu hiệu bất thường ở mốc 5 |
 
 ## Hàng đợi cập nhật tài liệu
 
@@ -108,5 +130,5 @@ Cloud có `local_fallback_count=16` / `secondary_cloud_count=23` trong lần nà
 - [x] `KNOWN_TRAPS.md` — trap 9–12 (mốc 2) + 13–15 (mốc 3) + **16** (mốc 4: payload `superseded_by` rỗng)
 - [x] `HOW_TO_RUN.md` mục 5 — cập nhật `--ids` và cách re-grade
 - [x] `docs/ai-context/README.md` — thêm dòng index
-- [ ] `MODULE_MAP.md` — chỉ cập nhật nếu gate `module-map` báo lệch số dòng sau khi thêm test
+- [x] `MODULE_MAP.md` — bổ sung `guards/`, `services/qa_service.py`, `retrieval/` với số dòng đo được (P0 mốc 5)
 - [ ] Sau lần chạy tiếp theo: thêm mốc 3 với số đo mới, đừng xóa mốc 1/2
