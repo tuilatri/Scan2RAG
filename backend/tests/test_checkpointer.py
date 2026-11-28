@@ -27,6 +27,7 @@ QUERY_2 = "Còn quy định cận thị thì sao?"
 def _graph(checkpointer=None):
     searcher = Mock()
     searcher.search.return_value = []
+    searcher.table_chunks_for.return_value = []
 
     def rerank(query, candidates, top_k):
         return [CHUNK_105] if "105" in query else [CHUNK_106]

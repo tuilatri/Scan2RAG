@@ -34,6 +34,46 @@ class LegalHybridSearcher:
         self.embedder = embedder or LegalEmbedder(model_name="intfloat/multilingual-e5-small")
         self.rrf_k = rrf_k
 
+    def table_chunks_for(self, document_id: str, limit: int = 20) -> list[dict[str, Any]]:
+        """Fetch table chunks of one document directly, bypassing embedding ranking."""
+        query_filter = Filter(must=[
+            FieldCondition(key="document_id", match=MatchValue(value=document_id)),
+            FieldCondition(key="is_table", match=MatchValue(value=True)),
+            FieldCondition(key="is_superseded", match=MatchValue(value=False)),
+        ])
+        try:
+            points, _ = self.vector_store.client.scroll(
+                collection_name=self.vector_store.collection_name,
+                scroll_filter=query_filter,
+                limit=limit,
+                with_payload=True,
+            )
+        except Exception:
+            logger.warning("Cannot fetch table chunks for %s", document_id, exc_info=True)
+            return []
+
+        results: list[dict[str, Any]] = []
+        for point in points:
+            payload = point.payload or {}
+            chunk_id = payload.get("chunk_id") or payload.get("id") or str(point.id)
+            page_num = payload.get("page_number")
+            if page_num is None:
+                page_nums = payload.get("page_numbers", []) or []
+                page_num = page_nums[0] if page_nums else 0
+            results.append({
+                "id": str(chunk_id),
+                "point_id": point.id,
+                "breadcrumb": payload.get("breadcrumb", ""),
+                "content": payload.get("content", ""),
+                "document_id": payload.get("document_id", ""),
+                "document_name": payload.get("document_name", ""),
+                "page_number": int(page_num),
+                "is_table": True,
+                "is_superseded": False,
+                "score": None,
+            })
+        return results
+
     def search(
         self,
         query: str,

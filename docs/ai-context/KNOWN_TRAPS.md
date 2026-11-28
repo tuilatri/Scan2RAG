@@ -63,4 +63,20 @@
 - **Symptom**: Dù `STRICT_LEGAL_SYSTEM_PROMPT` rule 5 liệt kê rõ "đặt vé máy bay, chỉ số IQ", Qwen2.5-1.5B vẫn bịa quy trình đặt vé và công thức IQ gán cho TT88 (AC-48/49).
 - **Root cause**: Model 1.5B không tuân system prompt dài; không có guard deterministic trước khi gọi LLM.
 - **Fix**: Giữ rule (cloud tuân và trả đúng câu từ chối), ghi defer cho local; đề xuất guard deterministic hoặc nâng local model. Không đổi expectation để che lỗi.
+- **Cập nhật mốc 3**: đã có `app/guards/scope_guard.py` — chặn trước retrieval, trả SSE `scope_guard` (~5–17ms), 5/5 câu ngoài phạm vi; in-scope không bị chặn nhờ `IN_SCOPE_HINTS` ưu tiên.
+
+## 13. detect_documents Đệm Văn Bản Gây Lọc Nhầm
+- **Symptom**: Khi hỏi "Bảng phụ lục ... của VBHN 88?", table fallback lấy cả chunk của TT105 rồi lọc ra trang 23 → sai document.
+- **Root cause**: `detect_documents()` thêm `FALLBACK_DOCS = (TT105, TT106)` để đủ 2 văn bản; không phải token có trong câu hỏi.
+- **Fix**: Khi cần filter theo văn bản, dùng trực tiếp `DOCUMENT_TOKENS` khớp với query, không dùng detect_documents đã đệm.
+
+## 14. Compare Graph Thiếu Chunk Bảng → Verifier Flag Số Thật
+- **Symptom**: AC-41 `unsupported_numbers={'6'}` dù answer chỉ nói thang điểm 1–6; evidence toàn chunk prose.
+- **Root cause**: `retrieve_for()` lấy 15 chunk rồi rerank, chunk bảng bị đẩy; `verify_answer` chỉ thấy chunk đó nên coi `6` là hallucination.
+- **Fix**: `retrieve_for()` nối `table_chunks_for(document_id)` khi sub_query có `bảng/điểm/cận thị/thị lực` → AC-41 verified, LangGraph 5/5. Không ép `passed=true`.
+
+## 15. Bảng Nhiều Trang — Model Chọn Trang Tiếp Theo
+- **Symptom**: AC-25 sau khi có đúng chunk vẫn trả "trang 34" dù bảng bắt đầu ở trang 29.
+- **Root cause**: Bảng phụ lục trải 29–34+; reranker đưa nhiều `_w1` của các trang tiếp theo vào top-5, model chọn sai.
+- **Fix**: Với câu hỏi "trang nào", lọc candidates về **trang nhỏ nhất của đúng văn bản** trước khi rerank → AC-25 trả 29. Không nới expectation cho mọi trang.
 

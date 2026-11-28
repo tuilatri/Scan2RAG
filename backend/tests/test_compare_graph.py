@@ -10,6 +10,7 @@ GENERATION = {"content": "So sánh...", "provider": "lm_studio_local", "model": 
 def _mocks(rerank_results):
     searcher = Mock()
     searcher.search.return_value = []
+    searcher.table_chunks_for.return_value = []
     reranker = Mock()
     reranker.rerank.side_effect = list(rerank_results)
     router = Mock()
