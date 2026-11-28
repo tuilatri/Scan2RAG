@@ -34,6 +34,16 @@ def test_graph_candidates_normalize_payload():
     qa.corpus_graph.supporting_chunks.assert_called_once()
 
 
+def test_chain_summary_appends_canonical_docx_graph():
+    qa = _service()
+    qa.corpus_graph.summaries_for.return_value = []
+    qa.eligibility_graph = Mock()
+    qa.eligibility_graph.summary.return_value = "CANONICAL RULE CHAIN (DOCX source): - rule"
+    result = qa._with_chain_summary("BASE", "viễn thị có phải đi không")
+    assert "CANONICAL RULE CHAIN (DOCX source)" in result
+    assert result.startswith("BASE")
+
+
 def test_merge_graph_chunks_dedups():
     top = [{"id": "a"}, {"id": "b"}]
     graph = [{"id": "b"}, {"id": "c"}]

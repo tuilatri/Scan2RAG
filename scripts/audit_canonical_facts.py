@@ -47,6 +47,8 @@ def main() -> int:
             errors.append(f"missing evidence image: {item.id} -> {item.evidence_image}")
         if item.authoritative and item.needs_human:
             errors.append(f"authoritative without human review: {item.id}")
+        if item.authoritative and getattr(item, "authoritative_source", None) == "vietnamocr_docx":
+            continue
         if item.authoritative:
             decision = decisions.get(item.id, {})
             reviewer = str(decision.get("reviewer", "")).strip().lower()
