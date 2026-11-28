@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "backend"))
 
 import pymupdf
 
+from app.ingestion.table_structure import extract_score_rows
 from app.models.canonical_fact import CanonicalFact, CanonicalRule
 
 RAW = ROOT / "data" / "raw"
@@ -60,27 +61,17 @@ def parse_score_rows(
     evidence_image: str,
 ) -> list[CanonicalFact]:
     facts: list[CanonicalFact] = []
-    for line in content.splitlines():
-        if not line.strip().startswith("|"):
-            continue
-        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-        scores = [cell for cell in cells if SCORE_RE.match(cell)]
-        if not scores:
-            continue
-        label_cells = [cell for cell in cells if cell and not SCORE_RE.match(cell)]
-        condition = ", ".join(label_cells)
-        if len(condition) < 6:
-            continue
+    for condition, score in extract_score_rows(content):
         facts.append(CanonicalFact.model_validate({
             "id": f"{document_id}_p{page}_score_{len(facts) + 1:03d}",
             "document_id": document_id,
             "page": page,
             "condition": condition,
-            "value": float(scores[0]),
+            "value": float(score),
             "value_type": "score",
             "source_kind": "ocr",
             "evidence_image": evidence_image,
-            "raw_row": line.strip()[:300],
+            "raw_row": condition[:300],
             "reviewer": "agent",
             "needs_human": True,
             "authoritative": False,
