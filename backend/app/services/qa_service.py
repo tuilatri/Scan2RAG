@@ -11,6 +11,8 @@ import time
 from typing import Any
 
 from app.agents.planner import DOCUMENT_TOKENS
+from app.graph.corpus_graph import CorpusGraph
+from app.grounding.claim_verifier import verify_claims
 from app.guards.scope_guard import SCOPE_REFUSAL_MESSAGE, is_out_of_scope
 from app.llm.prompt_templates import STRICT_LEGAL_SYSTEM_PROMPT, GroundedPromptBuilder
 from app.llm.router import ModelRouter
@@ -65,10 +67,22 @@ class GroundedQAService:
         hybrid_searcher: LegalHybridSearcher,
         reranker: LegalReranker,
         model_router: ModelRouter | None = None,
+        corpus_graph: CorpusGraph | None = None,
     ):
         self.hybrid_searcher = hybrid_searcher
         self.reranker = reranker
         self.model_router = model_router or ModelRouter()
+        self.corpus_graph = corpus_graph or CorpusGraph.build()
+
+    def _with_chain_summary(self, prompt: str, query: str) -> str:
+        if not self._has_eligibility_intent(query):
+            return prompt
+        summaries = self.corpus_graph.summaries_for(query)
+        if not summaries:
+            return prompt
+        return prompt + "\n\nCHAIN RULE (grounded in cited chunks):\n" + "\n".join(
+            f"- {summary}" for summary in summaries
+        )
 
     @staticmethod
     def _append_version_notes(prompt: str, chunks: list[dict[str, Any]]) -> str:
@@ -99,6 +113,57 @@ class GroundedQAService:
             token in lowered
             for token in ("bảng", "phụ lục", "trang nào", "mấy điểm", "bao nhiêu điểm")
         )
+
+    @staticmethod
+    def _has_eligibility_intent(query: str) -> bool:
+        lowered = query.lower()
+        return any(
+            token in lowered
+            for token in (
+                "có phải đi",
+                "có được đi",
+                "phải đi",
+                "tạm hoãn",
+                "miễn gọi",
+                "được tuyển",
+                "điều kiện",
+            )
+        )
+
+    def _graph_candidates(self, query: str) -> list[dict[str, Any]]:
+        if not self._has_eligibility_intent(query):
+            return []
+        chunks: list[dict[str, Any]] = []
+        for payload in self.corpus_graph.supporting_chunks(
+            self.hybrid_searcher.vector_store, query
+        ):
+            page_numbers = payload.get("page_numbers") or []
+            chunks.append({
+                "id": payload.get("chunk_id") or payload.get("id"),
+                "breadcrumb": payload.get("breadcrumb", ""),
+                "content": payload.get("content", ""),
+                "document_id": payload.get("document_id", ""),
+                "document_name": payload.get("document_name", ""),
+                "page_number": page_numbers[0] if page_numbers else 0,
+                "page_numbers": page_numbers,
+                "is_table": bool(payload.get("is_table", False)),
+                "is_superseded": False,
+                "rerank_score": 0.0,
+            })
+        return chunks
+
+    @staticmethod
+    def _merge_graph_chunks(
+        top_chunks: list[dict[str, Any]], graph_chunks: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        seen = {str(chunk.get("id")) for chunk in top_chunks}
+        merged = list(top_chunks)
+        for chunk in graph_chunks:
+            chunk_id = str(chunk.get("id"))
+            if chunk_id and chunk_id not in seen:
+                merged.append(chunk)
+                seen.add(chunk_id)
+        return merged
 
     def _prepare_candidates(
         self,
@@ -220,6 +285,7 @@ class GroundedQAService:
             top_k=top_k_rerank,
         )
         latency_rerank_ms = (time.time() - t_rerank_start) * 1000
+        top_chunks = self._merge_graph_chunks(top_chunks, self._graph_candidates(query))
         normalized_query = normalize_medical_query(query)
         top_chunks = self._augment_with_normalized_query(
             query, normalized_query, top_chunks, top_k_retrieval, top_k_rerank
@@ -243,8 +309,11 @@ class GroundedQAService:
 
         # 4. Determine Query Complexity & Generate Answer
         complexity = self.model_router.classify_complexity(query, top_chunks)
-        user_prompt = self._append_version_notes(
-            GroundedPromptBuilder.build_qa_prompt(query, top_chunks), top_chunks
+        user_prompt = self._with_chain_summary(
+            self._append_version_notes(
+                GroundedPromptBuilder.build_qa_prompt(query, top_chunks), top_chunks
+            ),
+            query,
         )
         llm_result = self.model_router.generate(
             prompt=user_prompt,
@@ -263,6 +332,23 @@ class GroundedQAService:
                 complexity=complexity,
                 temperature=0.0,
             )
+
+        if self._has_eligibility_intent(query):
+            check = verify_claims(
+                llm_result.get("content", ""),
+                self.corpus_graph.required_claims_for(query),
+            )
+            if not check["passed"] and check["checked"]:
+                retry_prompt = user_prompt + (
+                    "\n\nBổ sung các nội dung bắt buộc đã có trong dữ liệu trích dẫn: "
+                    + ", ".join(str(item) for item in check["missing"])
+                )
+                llm_result = self.model_router.generate(
+                    prompt=retry_prompt,
+                    system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
+                    complexity=complexity,
+                    temperature=0.0,
+                )
 
         latency_total_ms = (time.time() - t_start) * 1000
 
@@ -317,6 +403,7 @@ class GroundedQAService:
             top_k=top_k_rerank,
         )
         latency_rerank_ms = (time.time() - t_rerank_start) * 1000
+        top_chunks = self._merge_graph_chunks(top_chunks, self._graph_candidates(query))
         normalized_query = normalize_medical_query(query)
         top_chunks = self._augment_with_normalized_query(
             query, normalized_query, top_chunks, top_k_retrieval, top_k_rerank
@@ -343,12 +430,16 @@ class GroundedQAService:
 
         # 4. Stream LLM Generation
         complexity = self.model_router.classify_complexity(query, top_chunks)
-        user_prompt = self._append_version_notes(
-            GroundedPromptBuilder.build_qa_prompt(query, top_chunks), top_chunks
+        user_prompt = self._with_chain_summary(
+            self._append_version_notes(
+                GroundedPromptBuilder.build_qa_prompt(query, top_chunks), top_chunks
+            ),
+            query,
         )
 
         last_meta = {}
         emitted_stages: set[str] = set()
+        emitted_tokens: list[str] = []
         try:
             for tok, meta in self.model_router.generate_stream(
                 prompt=user_prompt,
@@ -361,10 +452,23 @@ class GroundedQAService:
                 if stage and stage not in emitted_stages:
                     emitted_stages.add(stage)
                     yield f"data: {json.dumps({'event': 'status', 'status': stage}, ensure_ascii=False)}\n\n"
+                emitted_tokens.append(tok)
                 yield f"data: {json.dumps({'event': 'token', 'token': tok}, ensure_ascii=False)}\n\n"
         except Exception:
             yield f"data: {json.dumps({'event': 'error', 'message': 'Đã xảy ra lỗi khi sinh câu trả lời.'}, ensure_ascii=False)}\n\n"
             return
+
+        if self._has_eligibility_intent(query):
+            check = verify_claims(
+                "".join(emitted_tokens),
+                self.corpus_graph.required_claims_for(query),
+            )
+            if not check["passed"] and check["checked"]:
+                correction = "Bổ sung theo dữ liệu đã trích: " + " ".join(
+                    self.corpus_graph.summaries_for(query)
+                )
+                emitted_tokens.append(correction)
+                yield f"data: {json.dumps({'event': 'token', 'token': correction}, ensure_ascii=False)}\n\n"
 
         latency_total_ms = (time.time() - t_start) * 1000
 

@@ -85,3 +85,13 @@
 - **Root cause**: `effective_date` có trong payload Qdrant nhưng `superseded_by=None` cho mọi chunk; compare graph có map tĩnh, prompt chat thì chỉ nhận nội dung chunk.
 - **Fix**: `hybrid_searcher` chuyển `superseded_by`/`effective_date` vào chunk; `qa_service._append_version_notes()` nối block hiệu lực sau `build_qa_prompt` (giữ nguyên function dùng chung có impact HIGH) với map tĩnh `TT105 → TT106`. Không sửa expectation; AC-29 pass cả 2 mode.
 
+## 17. Milestone 1 "Pass" Là Tự Nhất Quán, Không Phải Đúng Ảnh Scan
+- **Symptom**: Audit báo 111/111 tables, 0 number-lock breach, score 100.0; nhưng 2 câu hỏi thực tế bị từ chối dù corpus có rule.
+- **Root cause**: `111/111` là flag `vlm_rectified` tự gán khi number-lock qua; Gemini report tự nhận "numeric only, no visual comparison"; 24 ô điểm lệch cột được "review" bởi `reviewer=agent`, 19/24 dùng `raw_backup_match`, và re-baseline `9→6` sửa cả backup → number-lock tự chứng. Rule trọng yếu bị tách thành 2–3 fragment/page (hướng dẫn `text_48/49`, `text_142/143/144`).
+- **Fix**: `scripts/rebuild_critical_rules.py` trích trọn rule từ PDF text layer, upsert 3 point có `rule_anchor`; mọi fact phải có `evidence_source`, `needs_human`. Không tin flag VLM làm bằng chứng y khoa.
+
+## 18. Không Có Graph Dữ Liệu — Chỉ Có LangGraph Control-Flow
+- **Symptom**: Có rule + bảng điểm + rule loại 1–3 trong corpus nhưng LLM vẫn từ chối; `/query/compare` có verify còn chat thì không.
+- **Root cause**: `LegalChunk` không giữ `node_id`/`parent_id`; payload Qdrant không có parent; retrieval chỉ filter `document_id/is_superseded/is_table`; LangGraph graph là control-flow và chỉ chạy ở `/query/compare` — chat đi `/query/stream → GroundedQAService`.
+- **Fix**: `backend/app/graph/corpus_graph.py` + `scripts/legal_rule_edges.json` resolve typed chain (rule → exception → score row → eligibility) vào đúng chat path; `claim_verifier` check required claims. **Không sửa `chunk_document` (CRITICAL) hay `_has_table_intent` (HIGH)** — thêm method mới thay thế.
+

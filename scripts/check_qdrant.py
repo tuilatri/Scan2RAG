@@ -5,7 +5,7 @@ import urllib.request
 
 from qdrant_client import QdrantClient
 
-EXPECTED_POINTS = 7263
+EXPECTED_POINTS = 7266
 
 
 def main() -> int:
