@@ -56,6 +56,16 @@
       "optional": false
     },
     {
+      "id": "canonical-audit",
+      "cmd": "backend/.venv/Scripts/python.exe",
+      "args": ["scripts/audit_canonical_facts.py"],
+      "cwd": ".",
+      "tags": ["audit", "data"],
+      "requires": ["data/canonical"],
+      "env": { "PYTHONUTF8": "1" },
+      "optional": false
+    },
+    {
       "id": "backend-lint",
       "cmd": ".venv/Scripts/ruff.exe",
       "args": ["check", "app/"],

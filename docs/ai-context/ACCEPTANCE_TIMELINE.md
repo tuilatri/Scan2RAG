@@ -113,6 +113,15 @@ Thay đổi kiến trúc (impact CRITICAL/HIGH của `chunk_document`/`_has_tabl
 
 Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **reviewer=agent**, 19/24 evidence=`raw_backup_match` — không phải HITL thật. Chi tiết trong KNOWN_TRAP 17–18.
 
+## Layer A pilot — Canonical facts (2026-11-28)
+
+- Không chạy acceptance mới; đây là nền input cho graph, chưa thay đổi hành vi chatbot.
+- `scripts/build_canonical_facts.py`: render TT105 p23 + TT88 p29 + Hướng dẫn p1/p2/p4 ở 200 DPI vào `data/exports/review/canonical/`.
+- `data/canonical/medical_scores.json`: **30 fact + 3 rule**; tất cả `needs_human:true`, `authoritative:false`.
+- `scripts/audit_canonical_facts.py` (gate local, CI skip): PASS với 33/33 chưa có human sign-off — tức là **chưa được phép dùng làm nguồn quyết định**.
+- Chỉ là pilot 2 trang bảng + 3 rule; không phải "trích xuất tuyệt đối 111 bảng / 287 trang".
+- Gates: `verify --fast` 12/12, doc-truth 1/1.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |

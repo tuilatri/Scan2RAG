@@ -6,8 +6,8 @@
 
 | Metric | Measured Value |
 |---|---|
-| Collected pytest items | 156 |
-| Backend test files | 36 |
+| Collected pytest items | 163 |
+| Backend test files | 39 |
 | Frontend Vitest items | 32 |
 | Frontend test files | 4 |
 | Lines in test_vlm_rectifier.py | 59 (non-empty) |
@@ -30,8 +30,9 @@ node scripts/verify.mjs            # full gate set — use before claiming done
 GitHub Actions (`.github/workflows/ci.yml`) chạy 5 gate không cần artifact tạo ở máy local:
 `doc-truth`, `backend-lint`, `frontend-tests`, `security-audit`, `test-truth`.
 
-6 gate bị skip trên CI vì cần artifact bị gitignore (`data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json`):
+7 gate bị skip trên CI vì cần artifact bị gitignore (`data/raw/*.pdf`, `data/processed/*.json`, `data/bm25_index.json`, `data/canonical/*.json`):
 
+- `canonical-audit`
 - `corpus-audit`
 - `score-review`
 - `vector-audit`
@@ -39,7 +40,7 @@ GitHub Actions (`.github/workflows/ci.yml`) chạy 5 gate không cần artifact 
 - `benchmark-truth`
 - `backend-tests` — 101/113 test chạy được, nhưng 12 test đọc PDF/corpus (`test_document_endpoints`, `test_ocr_endpoints`, `test_security`, `test_backend_audit_hardening`, `test_semantic_chunker`) nên chỉ chạy đủ ở local.
 
-Chạy đủ **11 gate** trên máy có artifact — đây là gate bắt buộc trước khi tuyên bố hoàn thành milestone:
+Chạy đủ **12 gate** trên máy có artifact — đây là gate bắt buộc trước khi tuyên bố hoàn thành milestone:
 
 ```bash
 node scripts/verify.mjs
