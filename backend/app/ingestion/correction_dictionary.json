@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "source": "curated from live PaddleOCR preview and derived proposal counts; domain phrases only",
+  "version": 3,
+  "source": "curated from live PaddleOCR preview; identity pairs prevent repeated phrase repair",
   "pairs": {
     "bnh tt": "bệnh tật",
     "bnh": "bệnh",
@@ -11,6 +11,7 @@
     "phan loai": "phân loại",
     "s uc khoe": "sức khỏe",
     "suc khoe": "sức khỏe",
+    "sc khe": "sức khỏe",
     "th lc": "thị lực",
     "th thn kinh": "thần kinh",
     "vin th": "viễn thị",
@@ -20,6 +21,18 @@
     "khong co": "không có",
     "khong": "không",
     "loai": "loại",
-    "mức đ": "mức độ"
+    "loi 1": "loại 1",
+    "loi 2": "loại 2",
+    "loi 3": "loại 3",
+    "loại 1,\nloại 2": "loại 1, loại 2",
+    "loại 1, loại 2": "loại 1, loại 2",
+    "loại 1, loại 2, loại 3": "loại 1, loại 2, loại 3",
+    "mục đ": "mức độ",
+    "mức đ": "mức độ",
+    "mức độ": "mức độ",
+    "đ phân loi": "để phân loại",
+    "để phân loại": "để phân loại",
+    "không cho điểm đ phân loi sc khe": "không cho điểm để phân loại sức khỏe",
+    "không cho điểm để phân loại sức khỏe": "không cho điểm để phân loại sức khỏe"
   }
 }
