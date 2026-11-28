@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": "curated from live PaddleOCR preview and derived proposal counts; domain phrases only",
+  "pairs": {
+    "bnh tt": "bệnh tật",
+    "bnh": "bệnh",
+    "đim": "điểm",
+    "cho im": "cho điểm",
+    "phu luc": "phụ lục",
+    "phu luc i": "phụ lục I",
+    "phan loai": "phân loại",
+    "s uc khoe": "sức khỏe",
+    "suc khoe": "sức khỏe",
+    "th lc": "thị lực",
+    "th thn kinh": "thần kinh",
+    "vin th": "viễn thị",
+    "cn th": "cận thị",
+    "mc": "mục",
+    "các mc": "các mục",
+    "khong co": "không có",
+    "khong": "không",
+    "loai": "loại",
+    "mức đ": "mức độ"
+  }
+}

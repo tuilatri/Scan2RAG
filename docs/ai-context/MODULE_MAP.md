@@ -17,8 +17,8 @@
 | `backend/app/ingestion/table_extractor.py` | 185 | OCR bounding-box clustering to Markdown table |
 | `backend/app/ingestion/text_normalizer.py` | 128 | Unicode NFC normalization & Vietnamese diacritics |
 | `backend/app/ingestion/vlm_rectifier.py` | 149 | Multi-modal VLM table rectification with Counter safeguard |
-| `backend/app/ingestion/table_structure.py` | 50 | Header-aware score-column parsing (inspired by SLANet layer, open replacement) |
-| `backend/app/ingestion/vietnamese_corrector.py` | 56 | Deterministic OCR typo correction (inspired by ProtonX, not the model) |
+| `backend/app/ingestion/table_structure.py` | 69 | Header-aware score-column parsing + standalone OCR score rows (inspired by SLANet layer) |
+| `backend/app/ingestion/vietnamese_corrector.py` | 65 | Deterministic OCR correction with curated domain dictionary (inspired by ProtonX, not the model) |
 | `backend/app/ingestion/ocr_pipeline.py` | 45 | Adapter: preprocess → OCR → correct → structure; engine swappable |
 
 ### `backend/app/agents/` — LangGraph compare workflow (additive)
@@ -68,7 +68,8 @@
 | `scripts/ingest_docx_facts.py` | 166 | Read external VietNamOCR DOCX grid, map tables to doc/page with used-context de-dup, emit DOCX-sourced facts |
 | `scripts/audit_canonical_facts.py` | 61 | Local gate over both stores: evidence exists, no authoritative without human decision |
 | `scripts/review_canonical_fact.py` | 79 | Human review CLI: agent cannot approve; writes review_decisions.json |
-| `scripts/benchmark_ocr_engines.py` | 275 | Phase-0 OCR benchmark: live PaddleOCR or ingested corpus vs DOCX reference; CER/WER, score-cell, number retention |
+| `scripts/benchmark_ocr_engines.py` | 278 | Phase-0 OCR benchmark: live PaddleOCR or ingested corpus vs DOCX reference; CER/WER, score-cell, number retention |
+| `scripts/derive_corrections.py` | 109 | Derive correction proposals from OCR↔DOCX fact pairs; --apply writes tracked dictionary |
 
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).

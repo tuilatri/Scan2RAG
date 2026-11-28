@@ -115,3 +115,8 @@
 - **Root cause**: Token `__NUM1__` là tiền tố của `__NUM10__`; `find_table_context` lấy canonical fact đầu tiên khớp, không loại context đã dùng.
 - **Fix**: Dùng `__SCAN2RAG_NUMBER_{n}_END__` + restore ngược; `find_table_context` nhận `used_contexts` và cộng điểm theo `(doc,page)`. Pre-import `torch` trước `paddleocr` để tránh `shm.dll WinError 127`.
 
+## 23. Từ điển sửa lỗi bị gõ nhiễu chính output OCR
+- **Symptom**: `correction_dictionary.json` ban đầu chứa `thềElực`, `viềE thềE`, `mức đềE` — chính là lỗi PaddleOCR cần sửa; benchmark protected vẫn 0/3.
+- **Root cause**: Viết dictionary bằng cách copy preview OCR thay vì gõ giá trị đúng; `correct()` cũng lookup key hoa/thường nên `Bnh tt` không khớp `bnh tt`.
+- **Fix**: Viết lại dictionary UTF-8 sạch, `_LOOKUP` lowercase, fallback `extract_score_rows_from_text` cho điểm đứng dòng riêng. Score-cell tăng 0→22/77; protected vẫn là gap do PaddleOCR băm dấu.
+

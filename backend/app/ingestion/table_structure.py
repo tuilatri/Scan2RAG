@@ -58,3 +58,24 @@ def extract_score_rows(content: str) -> list[tuple[str, int]]:
             continue
         rows.append((condition, int(score_cell)))
     return rows
+
+
+def extract_score_rows_from_text(text: str) -> list[tuple[str, int]]:
+    """Handle OCR output where a score lands on its own line after the label."""
+    rows: list[tuple[str, int]] = []
+    condition: str | None = None
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        if SCORE_RE.match(line):
+            if condition and len(condition) >= 6:
+                rows.append((condition, int(line)))
+            condition = None
+            continue
+        if line.startswith("|"):
+            continue
+        letters = sum(char.isalpha() for char in line)
+        if letters >= 4 and len(line) >= 6:
+            condition = line
+    return rows
