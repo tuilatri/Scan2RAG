@@ -45,9 +45,9 @@ class OCRPipeline:
 
     @staticmethod
     def _default_structure(text: str) -> list[tuple[str, int]]:
-        from app.ingestion.table_structure import extract_score_rows
+        from app.ingestion.table_structure import extract_score_rows, extract_score_rows_from_text
 
-        return extract_score_rows(text)
+        return extract_score_rows(text) or extract_score_rows_from_text(text)
 
     def run(self, image: Any) -> dict[str, Any]:
         processed = self.preprocess(image)

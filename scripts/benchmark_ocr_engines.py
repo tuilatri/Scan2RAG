@@ -122,7 +122,7 @@ def benchmark_page(
 ) -> dict[str, Any]:
     from app.ingestion.image_preprocessor import ImagePreprocessor
     from app.ingestion.table_extractor import TableExtractor
-    from app.ingestion.table_structure import extract_score_rows
+    from app.ingestion.table_structure import extract_score_rows, extract_score_rows_from_text
     from app.ingestion.vietnamese_corrector import correct
 
     image = render_page(pdf_name, page_no)
@@ -131,6 +131,8 @@ def benchmark_page(
     corrected = correct(ocr_result.full_text)
     table = TableExtractor().extract_table(ocr_result.blocks, page_number=page_no)
     extracted = extract_score_rows(table.markdown_table)
+    if not extracted:
+        extracted = extract_score_rows_from_text(corrected)
 
     hits = 0
     numbers_ok = 0
@@ -162,6 +164,7 @@ def benchmark_page(
         "page": page_no,
         "preprocess": preprocess_result.model_dump(),
         "ocr_avg_confidence": ocr_result.avg_confidence,
+        "ocr_text": corrected,
         "ocr_text_preview": corrected[:300],
         "table_markdown_preview": table.markdown_table[:300],
         "reference_facts": len(reference_facts),
