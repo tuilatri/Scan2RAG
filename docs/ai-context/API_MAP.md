@@ -84,7 +84,7 @@
   ```json
   {
     "status": "ok",
-    "milestone": "2",
+    "milestone": "4",
     "features": [
       "Dense Vector Search (Qdrant)",
       "Sparse Keyword Search (BM25)",
