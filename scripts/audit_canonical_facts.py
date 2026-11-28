@@ -13,6 +13,7 @@ from app.canonical.store import assert_invariants
 from app.models.canonical_fact import CanonicalFact, CanonicalRule
 
 STORE = ROOT / "data" / "canonical" / "medical_scores.json"
+DECISIONS = ROOT / "data" / "canonical" / "review_decisions.json"
 
 
 def main() -> int:
@@ -25,12 +26,26 @@ def main() -> int:
     rules = [CanonicalRule.model_validate(item) for item in payload.get("rules", [])]
 
     errors = assert_invariants(facts)
+    decisions: dict[str, dict[str, object]] = {}
+    if DECISIONS.exists():
+        decisions = json.loads(DECISIONS.read_text(encoding="utf-8"))
+
     for item in facts + rules:
         evidence = ROOT / item.evidence_image
         if not evidence.exists():
             errors.append(f"missing evidence image: {item.id} -> {item.evidence_image}")
         if item.authoritative and item.needs_human:
             errors.append(f"authoritative without human review: {item.id}")
+        if item.authoritative:
+            decision = decisions.get(item.id, {})
+            reviewer = str(decision.get("reviewer", "")).strip().lower()
+            if (
+                not decision
+                or reviewer == "agent"
+                or not decision.get("approved")
+                or not decision.get("evidence_checked")
+            ):
+                errors.append(f"authoritative without valid decision: {item.id}")
 
     needs_human = sum(1 for item in facts + rules if item.needs_human)
     authoritative = sum(1 for item in facts + rules if item.authoritative)
@@ -41,7 +56,7 @@ def main() -> int:
     if errors:
         print("RESULT: FAIL")
         return 1
-    print("RESULT: PASS (pilot only - no claim of full-corpus completion)")
+    print("RESULT: PASS (full score-row extraction - all entries still need human sign-off)")
     return 0
 
 

@@ -122,6 +122,14 @@ Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **review
 - Chỉ là pilot 2 trang bảng + 3 rule; không phải "trích xuất tuyệt đối 111 bảng / 287 trang".
 - Gates: `verify --fast` 12/12, doc-truth 1/1.
 
+## Layer A2 — Full extraction + review workflow (2026-11-28, v0.5.0)
+
+- `scripts/build_canonical_facts.py` quét **111/111 bảng**, render 114 ảnh evidence 200 DPI, parse **88 bảng có dòng điểm** → **1.163 fact + 3 rule**.
+- `scripts/review_canonical_fact.py`: CLI duyệt của người; `reviewer:"agent"` bị từ chối khi `--approved`; bắt `--evidence-checked`.
+- `audit_canonical_facts.py`: authoritative chỉ hợp lệ nếu có decision người thật + evidence checked. Hiện **1.166/1.166 entry vẫn `needs_human:true`, 0 authoritative**.
+- Không đổi hành vi chatbot; chưa chạy acceptance mới. Đây là nền cho graph/decision engine (đợt B2/C2).
+- Gates: `verify --fast` 12/12, doc-truth 1/1.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |
