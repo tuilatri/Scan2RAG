@@ -44,3 +44,39 @@
 - **Root cause**: artifact được viết tay/kế thừa schema cũ; script ghi file trước khi assert; auto-hit làm metric phình; thiếu gate đối chiếu artifact↔corpus↔code.
 - **Fix**: script sinh report từ corpus (`check_number_lock`, đếm theo `rectified_model`), Gemini report chỉ nói numeric audit, RAGAS assert trước write + `refusal_hit`, migration giữ measurement cũ nhưng đánh dấu `schema_version:2/migrated_from_legacy`, M3 `overall_passed` tính cả citations latency. Gate `benchmark-truth` check schema/status/metric/count/claim — có negative test chống xanh giả.
 
+## 9. Acceptance Metric Lệch Wording Từ Chối
+- **Symptom**: Cloud AC-46/50 báo MISS dù answer đã từ chối ("không chứa...", "không quy định..."); sau khi thêm rule 5 vào prompt, AC-47/48/49 lại MISS vì model dùng câu "nằm ngoài phạm vi...". `doc_hit` từng dùng `all()` nên hiểu allowlist là bắt buộc mọi doc.
+- **Root cause**: `REFUSAL_MARKERS` là danh sách cụm cố định, không theo kịp wording của system prompt; phép so sánh allowlist sai thành `all`.
+- **Fix**: marker gồm `không chứa`, `không quy định`, `ngoài phạm vi`,...; `doc_hit` dùng `any()`; khi đổi câu từ chối trong prompt phải đổi marker + re-grade report cũ (`regraded_at`). Không dùng marker để cho qua câu có số liệu thật.
+
+## 10. LangGraph Verifier Coi Số Trang Là Hallucination
+- **Symptom**: 4/5 câu compare verify FAIL, `unsupported_numbers` gồm `16/18/50/72/74` — toàn số trang trong citation.
+- **Root cause**: `evidence_text` chỉ gồm `content` của chunk, thiếu `page_number`/`breadcrumb` mà LLM thực sự thấy trong prompt.
+- **Fix**: `verify_answer` đưa metadata chunk vào `evidence_text`; regression test `test_citation_page_number_is_not_flagged_as_unsupported`. Số `6` còn lại của AC-41 là unsupported thật → giữ FAIL, không ép passed.
+
+## 11. Cross-Encoder Đẩy Bảng Điểm Ra Khỏi Top-K
+- **Symptom**: `citation_page_hit` 17/22; AC-11/20 có đúng chunk bảng (`is_table=True`, trang 23/29) ở top-15 nhưng bị đẩy khỏi top-5.
+- **Root cause**: cross-encoder chấm prose cao hơn bảng đã linearize, dù bảng là nguồn điểm số authority.
+- **Fix**: `rerank` cộng `+2.0` cho chunk `is_table` có "điểm" khi query chứa `bảng`/`phụ lục`/`điểm`; subset page 3/8 → 5/8, full 17/22 → 19/22. AC-25/35 vẫn miss vì chunk đúng không nằm top-15 → defer, **không nới expectation trang**.
+
+## 12. Rule Prompt Không Chặn Được Local Model Nhỏ
+- **Symptom**: Dù `STRICT_LEGAL_SYSTEM_PROMPT` rule 5 liệt kê rõ "đặt vé máy bay, chỉ số IQ", Qwen2.5-1.5B vẫn bịa quy trình đặt vé và công thức IQ gán cho TT88 (AC-48/49).
+- **Root cause**: Model 1.5B không tuân system prompt dài; không có guard deterministic trước khi gọi LLM.
+- **Fix**: Giữ rule (cloud tuân và trả đúng câu từ chối), ghi defer cho local; đề xuất guard deterministic hoặc nâng local model. Không đổi expectation để che lỗi.
+- **Cập nhật mốc 3**: đã có `app/guards/scope_guard.py` — chặn trước retrieval, trả SSE `scope_guard` (~5–17ms), 5/5 câu ngoài phạm vi; in-scope không bị chặn nhờ `IN_SCOPE_HINTS` ưu tiên.
+
+## 13. detect_documents Đệm Văn Bản Gây Lọc Nhầm
+- **Symptom**: Khi hỏi "Bảng phụ lục ... của VBHN 88?", table fallback lấy cả chunk của TT105 rồi lọc ra trang 23 → sai document.
+- **Root cause**: `detect_documents()` thêm `FALLBACK_DOCS = (TT105, TT106)` để đủ 2 văn bản; không phải token có trong câu hỏi.
+- **Fix**: Khi cần filter theo văn bản, dùng trực tiếp `DOCUMENT_TOKENS` khớp với query, không dùng detect_documents đã đệm.
+
+## 14. Compare Graph Thiếu Chunk Bảng → Verifier Flag Số Thật
+- **Symptom**: AC-41 `unsupported_numbers={'6'}` dù answer chỉ nói thang điểm 1–6; evidence toàn chunk prose.
+- **Root cause**: `retrieve_for()` lấy 15 chunk rồi rerank, chunk bảng bị đẩy; `verify_answer` chỉ thấy chunk đó nên coi `6` là hallucination.
+- **Fix**: `retrieve_for()` nối `table_chunks_for(document_id)` khi sub_query có `bảng/điểm/cận thị/thị lực` → AC-41 verified, LangGraph 5/5. Không ép `passed=true`.
+
+## 15. Bảng Nhiều Trang — Model Chọn Trang Tiếp Theo
+- **Symptom**: AC-25 sau khi có đúng chunk vẫn trả "trang 34" dù bảng bắt đầu ở trang 29.
+- **Root cause**: Bảng phụ lục trải 29–34+; reranker đưa nhiều `_w1` của các trang tiếp theo vào top-5, model chọn sai.
+- **Fix**: Với câu hỏi "trang nào", lọc candidates về **trang nhỏ nhất của đúng văn bản** trước khi rerank → AC-25 trả 29. Không nới expectation cho mọi trang.
+

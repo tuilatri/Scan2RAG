@@ -10,6 +10,8 @@ import re
 import time
 from typing import Any
 
+from app.agents.planner import DOCUMENT_TOKENS
+from app.guards.scope_guard import SCOPE_REFUSAL_MESSAGE, is_out_of_scope
 from app.llm.prompt_templates import STRICT_LEGAL_SYSTEM_PROMPT, GroundedPromptBuilder
 from app.llm.router import ModelRouter
 from app.retrieval.hybrid_searcher import LegalHybridSearcher
@@ -63,6 +65,62 @@ class GroundedQAService:
         self.reranker = reranker
         self.model_router = model_router or ModelRouter()
 
+    @staticmethod
+    def _has_table_intent(query: str) -> bool:
+        lowered = query.lower()
+        return any(
+            token in lowered
+            for token in ("bảng", "phụ lục", "trang nào", "mấy điểm", "bao nhiêu điểm")
+        )
+
+    def _prepare_candidates(
+        self,
+        query: str,
+        top_k_retrieval: int,
+        filter_superseded: bool,
+    ) -> list[dict[str, Any]]:
+        table_intent = self._has_table_intent(query)
+        effective_k = 50 if table_intent else top_k_retrieval
+        candidates = self.hybrid_searcher.search(
+            query=query,
+            top_k=effective_k,
+            filter_superseded=filter_superseded,
+        )
+        lowered_query = query.lower()
+        table_document_ids = list(dict.fromkeys(
+            document_id
+            for token, document_id in DOCUMENT_TOKENS
+            if token in lowered_query
+        ))
+        if table_intent:
+            for document_id in table_document_ids:
+                candidates.extend(self.hybrid_searcher.table_chunks_for(document_id))
+            if "trang nào" in query.lower() and table_document_ids:
+                scoped_tables = [
+                    chunk for chunk in candidates
+                    if chunk.get("is_table") and chunk.get("document_id") in table_document_ids
+                ]
+                if scoped_tables:
+                    first_page = min(
+                        int(chunk.get("page_number") or 0)
+                        for chunk in scoped_tables
+                        if chunk.get("page_number")
+                    )
+                    candidates = [
+                        chunk for chunk in scoped_tables
+                        if int(chunk.get("page_number") or 0) == first_page
+                    ]
+            seen: set[str] = set()
+            deduped: list[dict[str, Any]] = []
+            for chunk in candidates:
+                chunk_id = str(chunk.get("id", ""))
+                if chunk_id and chunk_id in seen:
+                    continue
+                seen.add(chunk_id)
+                deduped.append(chunk)
+            candidates = deduped
+        return candidates
+
     def _augment_with_normalized_query(
         self,
         query: str,
@@ -109,13 +167,22 @@ class GroundedQAService:
         """
         t_start = time.time()
 
+        if is_out_of_scope(query):
+            return {
+                "query": query,
+                "answer": SCOPE_REFUSAL_MESSAGE,
+                "citations": [],
+                "provider": "scope_guard",
+                "model": "rule-based",
+                "complexity": "simple",
+                "latency_retrieval_ms": 0.0,
+                "latency_rerank_ms": 0.0,
+                "latency_total_ms": round((time.time() - t_start) * 1000, 1),
+            }
+
         # 1. Hybrid Retrieval (Dense Qdrant + Sparse BM25 fused via RRF)
         t_ret_start = time.time()
-        candidates = self.hybrid_searcher.search(
-            query=query,
-            top_k=top_k_retrieval,
-            filter_superseded=filter_superseded,
-        )
+        candidates = self._prepare_candidates(query, top_k_retrieval, filter_superseded)
         latency_retrieval_ms = (time.time() - t_ret_start) * 1000
 
         # 2. Cross-Encoder Rerank (Top 5)
@@ -182,6 +249,14 @@ class GroundedQAService:
             "latency_total_ms": round(latency_total_ms, 1),
         }
 
+    def _scope_refusal_stream(self) -> Any:
+        import json
+
+        yield f"data: {json.dumps({'event': 'status', 'status': 'scope_refusal'}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({'event': 'citations', 'citations': []}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({'event': 'token', 'token': SCOPE_REFUSAL_MESSAGE}, ensure_ascii=False)}\n\n"
+        yield f"data: {json.dumps({'event': 'done', 'provider': 'scope_guard', 'model': 'rule-based', 'complexity': 'simple', 'latency_total_ms': 0.0}, ensure_ascii=False)}\n\n"
+
     def stream_answer_query(
         self,
         query: str,
@@ -194,15 +269,15 @@ class GroundedQAService:
 
         t_start = time.time()
 
+        if is_out_of_scope(query):
+            yield from self._scope_refusal_stream()
+            return
+
         # Emit immediate status event for <1.0s SSE TTFT
         yield f"data: {json.dumps({'event': 'status', 'status': 'retrieving'}, ensure_ascii=False)}\n\n"
 
         # 1. Hybrid Search
-        candidates = self.hybrid_searcher.search(
-            query=query,
-            top_k=top_k_retrieval,
-            filter_superseded=filter_superseded,
-        )
+        candidates = self._prepare_candidates(query, top_k_retrieval, filter_superseded)
         latency_retrieval_ms = (time.time() - t_start) * 1000
 
         # 2. Cross-Encoder Rerank

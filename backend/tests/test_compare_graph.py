@@ -10,6 +10,7 @@ GENERATION = {"content": "So sánh...", "provider": "lm_studio_local", "model": 
 def _mocks(rerank_results):
     searcher = Mock()
     searcher.search.return_value = []
+    searcher.table_chunks_for.return_value = []
     reranker = Mock()
     reranker.rerank.side_effect = list(rerank_results)
     router = Mock()
@@ -47,3 +48,24 @@ def test_retry_is_bounded():
     assert result["retry_count"] == 1
     assert reranker.rerank.call_count == 3
     assert result["answer"] == GENERATION["content"]
+
+
+def test_citation_page_number_is_not_flagged_as_unsupported():
+    chunk_with_page = {
+        "id": "c50",
+        "document_id": "thông_tư_105",
+        "content": "Cận thị -3D đến -4D: 4 điểm",
+        "breadcrumb": "TT105 > Bảng phụ lục",
+        "page_number": 50,
+    }
+    searcher, reranker, router = _mocks([[chunk_with_page], [CHUNK_106]])
+    router.generate.return_value = {
+        "content": "Cận thị -3D đến -4D: 4 điểm [Thông tư 105, Trang 50]",
+        "provider": "lm_studio_local",
+        "model": "qwen2.5-1.5b-instruct",
+    }
+    result = build_compare_graph(searcher, reranker, router).invoke(
+        {"query": "So sánh Thông tư 105 và Thông tư 106"}
+    )
+    assert result["verification"]["passed"] is True
+    assert result["verification"]["unsupported_numbers"] == {}

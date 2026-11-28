@@ -44,6 +44,13 @@ def build_compare_graph(
             filter_superseded=True,
             document_id=document_id,
         )
+        if document_id and any(
+            token in sub_query.lower() for token in ("bảng", "điểm", "cận thị", "thị lực")
+        ):
+            seen = {str(item.get("id")) for item in candidates}
+            for table_chunk in hybrid_searcher.table_chunks_for(document_id):
+                if str(table_chunk.get("id")) not in seen:
+                    candidates.append(table_chunk)
         chunks = reranker.rerank(
             query=sub_query, candidates=candidates, top_k=top_k_rerank
         )
@@ -184,11 +191,16 @@ def build_compare_graph(
             f"{note.get('effective_date') or ''} {note.get('superseded_by') or ''}"
             for note in state.get("version_notes", [])
         )
-        evidence_text = state["query"] + " " + version_text + " " + " ".join(
-            str(chunk.get("content", ""))
-            for item in state["evidence"]
-            for chunk in item["chunks"]
-        )
+        chunk_texts = []
+        for item in state["evidence"]:
+            for chunk in item["chunks"]:
+                header = " ".join(
+                    str(chunk[key])
+                    for key in ("document_name", "document_id", "breadcrumb", "page_number")
+                    if chunk.get(key)
+                )
+                chunk_texts.append(f"{header} {chunk.get('content', '')}")
+        evidence_text = state["query"] + " " + version_text + " " + " ".join(chunk_texts)
         unsupported = unsupported_numbers(state["answer"], evidence_text)
         return {
             "verification": {
