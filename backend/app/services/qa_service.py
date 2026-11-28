@@ -33,6 +33,11 @@ def resolve_page_number(chunk: dict[str, Any]) -> int:
 
 REFUSAL_PHRASE = "Văn bản hiện tại không quy định về trường hợp này."
 
+# Qdrant payload has effective_date but leaves superseded_by empty; keep the
+# same statutory map the compare graph uses so chat answers cannot call a
+# superseded document "current".
+SUPERSEDED_BY = {"thông_tư_105": "thông_tư_106"}
+
 
 def needs_grounded_retry(answer: str, chunks: list[dict[str, Any]]) -> bool:
     """A blanket refusal is wrong when relevant chunks were actually retrieved."""
@@ -64,6 +69,28 @@ class GroundedQAService:
         self.hybrid_searcher = hybrid_searcher
         self.reranker = reranker
         self.model_router = model_router or ModelRouter()
+
+    @staticmethod
+    def _append_version_notes(prompt: str, chunks: list[dict[str, Any]]) -> str:
+        lines: list[str] = []
+        seen: set[str] = set()
+        for chunk in chunks:
+            document_id = str(chunk.get("document_id") or "")
+            if not document_id or document_id in seen:
+                continue
+            seen.add(document_id)
+            notes: list[str] = []
+            superseded_by = chunk.get("superseded_by") or SUPERSEDED_BY.get(document_id)
+            if superseded_by:
+                notes.append(f"bị thay thế bởi {superseded_by}")
+            effective_date = chunk.get("effective_date")
+            if effective_date:
+                notes.append(f"hiệu lực từ {effective_date}")
+            if notes:
+                lines.append(f"- {document_id}: " + ", ".join(notes))
+        if not lines:
+            return prompt
+        return prompt + "\n\nTHÔNG TIN HIỆU LỰC CỦA VĂN BẢN:\n" + "\n".join(lines)
 
     @staticmethod
     def _has_table_intent(query: str) -> bool:
@@ -216,7 +243,9 @@ class GroundedQAService:
 
         # 4. Determine Query Complexity & Generate Answer
         complexity = self.model_router.classify_complexity(query, top_chunks)
-        user_prompt = GroundedPromptBuilder.build_qa_prompt(query, top_chunks)
+        user_prompt = self._append_version_notes(
+            GroundedPromptBuilder.build_qa_prompt(query, top_chunks), top_chunks
+        )
         llm_result = self.model_router.generate(
             prompt=user_prompt,
             system_prompt=STRICT_LEGAL_SYSTEM_PROMPT,
@@ -314,7 +343,9 @@ class GroundedQAService:
 
         # 4. Stream LLM Generation
         complexity = self.model_router.classify_complexity(query, top_chunks)
-        user_prompt = GroundedPromptBuilder.build_qa_prompt(query, top_chunks)
+        user_prompt = self._append_version_notes(
+            GroundedPromptBuilder.build_qa_prompt(query, top_chunks), top_chunks
+        )
 
         last_meta = {}
         emitted_stages: set[str] = set()

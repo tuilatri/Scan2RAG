@@ -50,6 +50,25 @@
 So với mốc 2: local answer 43→47, page 19→22; cloud answer 45→47, page 19→22; LangGraph 4/5→5/5.
 Cloud có `local_fallback_count=16` / `secondary_cloud_count=23` trong lần này — cloud fail nên local nhận thay, đúng thiết kế fallback (ROUTE-1 giữ nguyên theo owner).
 
+## Mốc 4 — Version metadata trong prompt chat (2026-11-28)
+
+- Phạm vi: **verification có chọn lọc**, không phải full 50.
+- Môi trường: Qdrant **UP** (`check_qdrant.py` PASS · 7.263 points, Docker Desktop + container tự bật lại sau reboot); **LM Studio DOWN** (không tìm thấy executable) → `--mode local` thực chất fallback Groq. Vì vậy mốc 3 vẫn là số full gần nhất cho local model.
+- Lệnh:
+  ```
+  backend\.venv\Scripts\python.exe scripts\acceptance_run.py --mode local --ids AC-01,AC-02,AC-03,AC-29
+  backend\.venv\Scripts\python.exe scripts\acceptance_run.py --mode cloud --ids AC-29
+  ```
+
+| Kiểm tra | Kết quả |
+|---|---|
+| AC-29 local | **OK** — "TT105 đã bị thay thế bởi TT106, không còn là văn bản hiện hành" |
+| AC-29 cloud | **OK** — cùng nội dung |
+| AC-01/02/03 | 3/3 OK, citation doc 4/4, page 3/3 |
+| Unit test `test_prompt_marks_superseded_document` | PASS |
+
+`build_qa_prompt` có impact **HIGH** sau reindex (7 symbols / 4 processes) nên **không đụng**; metadata được nối trong `qa_service._append_version_notes` thay thế (impact LOW). `TESTING_GUIDE` §1: 146 → **147** pytest items.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |
@@ -79,14 +98,14 @@ Cloud có `local_fallback_count=16` / `secondary_cloud_count=23` trong lần nà
 | VERIFY-1 | AC-41: số `6` unsupported | ✅ Đã sửa mốc 3: compare graph lấy table chunk → verified 5/5 |
 | LOCAL-1 | AC-48/49 local bịa nội dung ngoài phạm vi | ✅ Đã sửa mốc 3: scope guard deterministic, 5/5 câu ngoài phạm vi |
 | METRIC-1 | Cloud answer phụ thuộc marker từ chối | ✅ Ổn định mốc 3; vẫn phải re-grade nếu đổi prompt |
-| MODEL-1 | AC-20/29/32 vẫn trượt ở cả local lẫn cloud (3/50) | ⬜ Hạn chế mô hình/grounding — chưa sửa trong mốc này |
+| MODEL-1 | AC-20/32 vẫn trượt ở cả local lẫn cloud (2/50); **AC-29 đã sửa mốc 4** | ⬜ Hạn chế mô hình/grounding — không nới expectation |
 | NET-1 | Cloud mốc 3 có 16/50 local fallback do cloud fail | ⬜ Quan sát mạng; hành vi fallback đúng thiết kế |
 
 ## Hàng đợi cập nhật tài liệu
 
-- [x] `TESTING_GUIDE.md` §1 — collected pytest items 141 → 142 → **146**; backend files 32 → **33** (thêm `test_scope_guard.py`)
+- [x] `TESTING_GUIDE.md` §1 — collected pytest items 141 → 142 → 146 → **147**; backend files 32 → **33**
 - [x] `TESTING_GUIDE.md` §4 — link tới file timeline này
-- [x] `KNOWN_TRAPS.md` — trap 9–12 (mốc 2) + trap 13–15 (mốc 3: detect_documents đệm, compare thiếu bảng, bảng nhiều trang)
+- [x] `KNOWN_TRAPS.md` — trap 9–12 (mốc 2) + 13–15 (mốc 3) + **16** (mốc 4: payload `superseded_by` rỗng)
 - [x] `HOW_TO_RUN.md` mục 5 — cập nhật `--ids` và cách re-grade
 - [x] `docs/ai-context/README.md` — thêm dòng index
 - [ ] `MODULE_MAP.md` — chỉ cập nhật nếu gate `module-map` báo lệch số dòng sau khi thêm test

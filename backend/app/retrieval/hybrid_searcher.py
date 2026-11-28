@@ -70,6 +70,8 @@ class LegalHybridSearcher:
                 "page_number": int(page_num),
                 "is_table": True,
                 "is_superseded": False,
+                "superseded_by": payload.get("superseded_by"),
+                "effective_date": payload.get("effective_date"),
                 "score": None,
             })
         return results
@@ -137,6 +139,8 @@ class LegalHybridSearcher:
                 "page_number": int(page_num),
                 "is_table": payload.get("is_table", False),
                 "is_superseded": payload.get("is_superseded", False),
+                "superseded_by": payload.get("superseded_by"),
+                "effective_date": payload.get("effective_date"),
                 "score": p.get("score"),
             })
 
@@ -163,6 +167,8 @@ class LegalHybridSearcher:
                     "page_number": dense_item.get("page_number", 0),
                     "is_table": dense_item.get("is_table", False),
                     "is_superseded": dense_item.get("is_superseded", False),
+                    "superseded_by": dense_item.get("superseded_by"),
+                    "effective_date": dense_item.get("effective_date"),
                     "dense_rank": rank,
                     "sparse_rank": None,
                     "dense_score": dense_item.get("score"),
@@ -197,6 +203,8 @@ class LegalHybridSearcher:
                     "page_number": int(page_num),
                     "is_table": chunk.get("is_table", False),
                     "is_superseded": chunk.get("is_superseded", False),
+                    "superseded_by": chunk.get("superseded_by"),
+                    "effective_date": chunk.get("effective_date"),
                     "dense_rank": None,
                     "sparse_rank": rank,
                     "dense_score": None,

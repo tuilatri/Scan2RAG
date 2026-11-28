@@ -80,3 +80,8 @@
 - **Root cause**: Bảng phụ lục trải 29–34+; reranker đưa nhiều `_w1` của các trang tiếp theo vào top-5, model chọn sai.
 - **Fix**: Với câu hỏi "trang nào", lọc candidates về **trang nhỏ nhất của đúng văn bản** trước khi rerank → AC-25 trả 29. Không nới expectation cho mọi trang.
 
+## 16. Payload `superseded_by` Rỗng — Chat Nhầm Văn Bản Cũ
+- **Symptom**: AC-29 hỏi "TT105 còn hiện hành hay đã bị sửa đổi?" → cả local lẫn cloud trả "TT105 là văn bản hiện hành", bỏ qua TT106.
+- **Root cause**: `effective_date` có trong payload Qdrant nhưng `superseded_by=None` cho mọi chunk; compare graph có map tĩnh, prompt chat thì chỉ nhận nội dung chunk.
+- **Fix**: `hybrid_searcher` chuyển `superseded_by`/`effective_date` vào chunk; `qa_service._append_version_notes()` nối block hiệu lực sau `build_qa_prompt` (giữ nguyên function dùng chung có impact HIGH) với map tĩnh `TT105 → TT106`. Không sửa expectation; AC-29 pass cả 2 mode.
+
