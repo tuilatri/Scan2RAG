@@ -201,4 +201,4 @@ Scan2RAG/
 ## Tài liệu kỹ thuật chi tiết
 
 Kiến trúc, bảng phân tích rủi ro và thông số metric được lưu tại:  
-**[Tài liệu Đặc tả Kỹ thuật Toàn diện (Project Blueprint & Specs)](docs/project-blueprint-and-specs.md)** · **[docs/ai-context/](docs/ai-context/README.md)**
+**[Tài liệu Đặc tả Kỹ thuật Toàn diện (Project Blueprint & Specs)](docs/project-blueprint-and-specs.md)** · **[docs/ai-context/](docs/ai-context/README.md)** · **[Third-party attribution](docs/THIRD_PARTY_ATTRIBUTION.md)**

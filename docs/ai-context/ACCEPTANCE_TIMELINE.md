@@ -130,6 +130,15 @@ Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **review
 - Không đổi hành vi chatbot; chưa chạy acceptance mới. Đây là nền cho graph/decision engine (đợt B2/C2).
 - Gates: `verify --fast` 12/12, doc-truth 1/1.
 
+## DOCX ingestion + inspired OCR layers (2026-11-28)
+
+- Nguồn: `drafts/outsource/ocr-result.docx` do **VietNamOCR 3.3.1** tạo (Google ScreenAI + SLANet/Paddle ONNX + ProtonX v1.4-NC). Attribution: [`../THIRD_PARTY_ATTRIBUTION.md`](../THIRD_PARTY_ATTRIBUTION.md). **Không copy binary/model vào repo.**
+- `scripts/ingest_docx_facts.py`: đọc lưới ô DOCX, chọn cột `Điểm` theo header, map 13 bảng vào doc/page → **678 fact** (`source_kind:"docx"`).
+- 3 lớp inspiration open: `table_structure.py` (header-aware), `vietnamese_corrector.py` (từ điển deterministic), `ocr_pipeline.py` (adapter engine-swappable). Không nhân bản ProtonX/ScreenAI.
+- `build_canonical_facts.py` dùng `table_structure` → bỏ dòng header: fact giảm **1163 → 884**, bảng có điểm **88 → 48**.
+- `audit_canonical_facts.py` đọc cả 2 store: **884 + 678 = 1562 fact + 3 rule**, tất cả `needs_human:true`, 0 authoritative.
+- Không đổi hành vi chatbot; chưa chạy acceptance mới.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |

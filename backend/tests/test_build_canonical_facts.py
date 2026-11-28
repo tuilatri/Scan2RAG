@@ -24,7 +24,11 @@ def test_parse_score_rows_extracts_score_from_third_column():
 
 
 def test_parse_score_rows_accepts_second_column_layout():
-    table = "| - viễn thị từ + 3D đến dưới + 4D | 5 |  |\n"
+    table = (
+        "| Bệnh tật | Điểm | Ghi chú |\n"
+        "| --- | --- | --- |\n"
+        "| - viễn thị từ + 3D đến dưới + 4D | 5 |  |\n"
+    )
     facts = parse_score_rows(table, "thông_tư_88", 29, "evidence.png")
     assert len(facts) == 1
     assert facts[0].value == 5

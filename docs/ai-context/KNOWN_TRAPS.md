@@ -105,3 +105,8 @@
 - **Root cause**: Không có phân biệt giữa người tạo artifact và người phê duyệt; gate cũ chỉ check evidence file tồn tại.
 - **Fix**: `review_canonical_fact.py` từ chối `reviewer == "agent"` khi `--approved`, bắt `--evidence-checked`, ghi `review_decisions.json`; `audit_canonical_facts.py` fail mọi authoritative thiếu decision hợp lệ. A2: 1.166 entry, 0 authoritative.
 
+## 21. Parser Lấy Số TT Làm Điểm
+- **Symptom**: Fact `_001`, `_008`, `_012`, `_016` ở TT105 p23 lấy giá trị `1/2/3/4` từ cột `TT` của dòng tiêu đề, tạo ra "Thị lực = 1", "Viễn thị = 3", "Loạn thị = 4".
+- **Root cause**: Parser cũ lấy **ô số đầu tiên trong dòng**, không đọc header `Điểm`.
+- **Fix**: `table_structure.py` tìm cột có header `Điểm/Diểm/Dim`, bỏ dòng có ô điểm rỗng. Số fact giảm 1163→884, bảng có điểm 88→48 — ít hơn nhưng sạch hơn. DOCX importer dùng cùng nguyên tắc.
+

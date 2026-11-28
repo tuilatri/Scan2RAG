@@ -13,6 +13,7 @@ from app.canonical.store import assert_invariants
 from app.models.canonical_fact import CanonicalFact, CanonicalRule
 
 STORE = ROOT / "data" / "canonical" / "medical_scores.json"
+STORE_DOCX = ROOT / "data" / "canonical" / "medical_scores_docx.json"
 DECISIONS = ROOT / "data" / "canonical" / "review_decisions.json"
 
 
@@ -24,6 +25,16 @@ def main() -> int:
     payload = json.loads(STORE.read_text(encoding="utf-8"))
     facts = [CanonicalFact.model_validate(item) for item in payload.get("facts", [])]
     rules = [CanonicalRule.model_validate(item) for item in payload.get("rules", [])]
+
+    docx_sources = 0
+    if STORE_DOCX.exists():
+        docx_payload = json.loads(STORE_DOCX.read_text(encoding="utf-8"))
+        docx_facts = [
+            CanonicalFact.model_validate(item)
+            for item in docx_payload.get("facts", [])
+        ]
+        docx_sources = len(docx_facts)
+        facts.extend(docx_facts)
 
     errors = assert_invariants(facts)
     decisions: dict[str, dict[str, object]] = {}
@@ -49,7 +60,7 @@ def main() -> int:
 
     needs_human = sum(1 for item in facts + rules if item.needs_human)
     authoritative = sum(1 for item in facts + rules if item.authoritative)
-    print(f"canonical facts: {len(facts)} | rules: {len(rules)}")
+    print(f"canonical facts: {len(facts)} (docx: {docx_sources}) | rules: {len(rules)}")
     print(f"needs_human: {needs_human} | authoritative: {authoritative}")
     for error in errors[:20]:
         print("  !", error)
