@@ -1,17 +1,12 @@
 import React from "react"
-import { ShieldCheck, FileText, Bot } from "lucide-react"
+import { ShieldCheck } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 
 interface NavbarProps {
-  activeTab: "chat" | "ocr"
-  onTabChange: (tab: "chat" | "ocr") => void
   backendStatus?: "connected" | "connecting" | "offline"
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activeTab,
-  onTabChange,
   backendStatus = "connected",
 }) => {
   return (
@@ -35,38 +30,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               Trợ lý Tra cứu Văn bản Pháp luật & Tiêu chuẩn Sức khỏe Quân sự
             </p>
           </div>
-        </div>
-
-        {/* View Switcher Tabs */}
-        <div
-          className="flex items-center space-x-1 bg-muted p-0.5 rounded-lg border"
-          role="tablist"
-          aria-label="Chế độ xem"
-        >
-          <Button
-            size="sm"
-            variant={activeTab === "chat" ? "default" : "ghost"}
-            role="tab"
-            aria-selected={activeTab === "chat"}
-            aria-current={activeTab === "chat" ? "page" : undefined}
-            className="h-8 text-xs font-medium px-3"
-            onClick={() => onTabChange("chat")}
-          >
-            <Bot className="h-3.5 w-3.5 mr-1.5" />
-            Trợ lý Tra cứu RAG
-          </Button>
-          <Button
-            size="sm"
-            variant={activeTab === "ocr" ? "default" : "ghost"}
-            role="tab"
-            aria-selected={activeTab === "ocr"}
-            aria-current={activeTab === "ocr" ? "page" : undefined}
-            className="h-8 text-xs font-medium px-3"
-            onClick={() => onTabChange("ocr")}
-          >
-            <FileText className="h-3.5 w-3.5 mr-1.5" />
-            Đối soát OCR (HITL)
-          </Button>
         </div>
 
         {/* System Health Status */}

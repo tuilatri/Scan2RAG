@@ -39,31 +39,22 @@ describe('Atomic shadcn/ui components', () => {
 });
 
 describe('Layout Components', () => {
-  it('renders Navbar with title and view tabs', () => {
-    render(
-      <Navbar
-        activeTab="chat"
-        onTabChange={() => {}}
-        backendStatus="connected"
-      />
-    );
+  it('renders Navbar with title, version and backend status', () => {
+    render(<Navbar backendStatus="connected" />);
     expect(screen.getByText('Scan2RAG')).toBeInTheDocument();
     expect(screen.getByText(/Trợ lý Tra cứu Văn bản Pháp luật/i)).toBeInTheDocument();
-    expect(screen.getByText('Trợ lý Tra cứu RAG')).toBeInTheDocument();
-    expect(screen.getByText('Đối soát OCR (HITL)')).toBeInTheDocument();
+    expect(screen.getByText(/v\d+\.\d+\.\d+/)).toBeInTheDocument();
     expect(screen.getByText('Hệ thống chạy')).toBeInTheDocument();
+    expect(screen.queryByText('Đối soát OCR (HITL)')).not.toBeInTheDocument();
   });
 });
 
 describe('Accessibility', () => {
-  it('marks the active navbar view as the current tab', () => {
-    render(<Navbar activeTab="chat" onTabChange={() => {}} backendStatus="connected" />);
+  it('keeps the navbar free of tab controls', () => {
+    render(<Navbar backendStatus="connected" />);
 
-    const tabs = screen.getAllByRole('tab');
-    expect(tabs).toHaveLength(2);
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
-    expect(tabs[0]).toHaveAttribute('aria-current', 'page');
-    expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+    expect(screen.queryAllByRole('tab')).toHaveLength(0);
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('lets keyboard users edit a table cell with Enter', () => {

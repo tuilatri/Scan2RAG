@@ -6,12 +6,12 @@
 ## 1. Views & Layout Architecture
 | View / Tab | Component File | Description |
 |---|---|---|
-| Main App Shell | `frontend/src/App.tsx` | App root with view switcher, chat stream, and pdf viewer integration |
-| Header Navigation | `frontend/src/components/layout/navbar.tsx` | Top header with logo, version tag, backend status, and tab switcher |
+| Main App Shell | `frontend/src/App.tsx` | App root with chat stream and PDF viewer integration (single view) |
+| Header Navigation | `frontend/src/components/layout/navbar.tsx` | Top header with logo, version tag, and backend status |
 | Dual-Pane Splitter | `frontend/src/components/layout/split-pane.tsx` | Responsive 2-column flex pane (Chat left, PDF right) with collapse trigger |
 | RAG Chat Interface | `frontend/src/components/chat/chat-container.tsx` | Chat stream container with message list, suggestions, and auto-scroll |
 | Synchronized PDF Viewer | `frontend/src/components/pdf/pdf-viewer-panel.tsx` | PDF toolbar, canvas iframe, and document metadata summary |
-| OCR HITL Review | `frontend/src/components/ocr/ocr-review-container.tsx` | Table sidebar (111 tables), interactive grid editor, diff view, and PDF page preview |
+| OCR HITL utilities (internal QA only) | `frontend/src/components/ocr/ocr-review-container.tsx` | Kept for OCR tests and backend workflows; **not exposed as a UI tab** |
 
 ## 2. Key Components Directory
 - **`src/components/ui/` (Atomic shadcn/ui primitives - 1 file per component):**
@@ -39,7 +39,7 @@
   - `pdf-open-tab-button.tsx`: Opens the PDF in a new Chrome tab for the full native toolbar (zoom, fit, rotate, download, print).
   - `document-meta-card.tsx`: Legal validity summary (VBHN 88 priority, TT 105 superseded note).
 
-- **`src/components/ocr/` (Human-in-the-Loop Rectification):**
+- **`src/components/ocr/` (Human-in-the-Loop Rectification — internal QA, no navigation tab):**
   - `ocr-review-container.tsx`: Master workbench uniting sidebar, editor, and PDF preview.
   - `table-sidebar.tsx` & `table-sidebar-item.tsx`: Filterable list of 111 extracted medical tables.
   - `table-editor-panel.tsx` & `table-cell-editor.tsx`: Editable data table with military score (1-6) validation.
