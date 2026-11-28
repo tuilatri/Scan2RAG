@@ -95,3 +95,8 @@
 - **Root cause**: `LegalChunk` không giữ `node_id`/`parent_id`; payload Qdrant không có parent; retrieval chỉ filter `document_id/is_superseded/is_table`; LangGraph graph là control-flow và chỉ chạy ở `/query/compare` — chat đi `/query/stream → GroundedQAService`.
 - **Fix**: `backend/app/graph/corpus_graph.py` + `scripts/legal_rule_edges.json` resolve typed chain (rule → exception → score row → eligibility) vào đúng chat path; `claim_verifier` check required claims. **Không sửa `chunk_document` (CRITICAL) hay `_has_table_intent` (HIGH)** — thêm method mới thay thế.
 
+## 19. Backup Tự Chứng Không Phải Bằng Chứng Ảnh
+- **Symptom**: `score_collision_decisions.json` có 24 entry nhưng `reviewer:"agent"`, 19/24 `evidence:"raw_backup_match"`; re-baseline `9→6` sửa cả `raw_content_backup` → number-lock PASS dù không đối chiếu scan.
+- **Root cause**: Gate chỉ so `content` với `raw_content_backup` (cùng nguồn tự gán), không so với ảnh PDF gốc.
+- **Fix**: Layer A (`scripts/build_canonical_facts.py`) render ảnh 200 DPI làm `evidence_image`; `CanonicalFact` có `needs_human:true`, `authoritative:false` mặc định; `audit_canonical_facts.py` FAIL nếu thiếu ảnh hoặc authoritative khi chưa có người duyệt. Pilot 30 fact + 3 rule, **không có fact nào authoritative**.
+

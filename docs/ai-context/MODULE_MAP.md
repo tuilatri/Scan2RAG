@@ -49,6 +49,21 @@
 | `backend/app/retrieval/reranker.py` | 92 | Cross-encoder; boosts score tables, and first-window table on location questions |
 | `backend/app/retrieval/qdrant_client.py` | 125 | Remote Qdrant client with local disk DEGRADED fallback |
 
+### `backend/app/canonical/` — Layer-A fact store (pilot)
+
+| File | Lines | Role |
+|---|---:|---|
+| `backend/app/models/canonical_fact.py` | 37 | `CanonicalFact` / `CanonicalRule` schema with `evidence_image`, `needs_human`, `authoritative` |
+| `backend/app/canonical/__init__.py` | 1 | Package marker |
+| `backend/app/canonical/store.py` | 24 | Load + invariants: no fake authoritative, no duplicate id |
+
+### `scripts/canonical` — Pilot fact extraction & audit
+
+| File | Lines | Role |
+|---|---:|---|
+| `scripts/build_canonical_facts.py` | 118 | Render 200 DPI evidence, parse TT105 p23 / TT88 p29 score rows + 3 guidance rules |
+| `scripts/audit_canonical_facts.py` | 37 | Local gate: evidence files exist, no authoritative without human review |
+
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).
 - `data/processed/`: 5 structured JSON corpora, 6.786 nodes, 111 Markdown tables (100% rectified).

@@ -34,9 +34,10 @@ jobs:
       - name: Run verify gates (code-only)
         # These gates need gitignored artifacts (data/raw PDFs,
         # data/processed JSON, bm25_index.json) that a fresh checkout cannot
-        # produce. All 11 still run locally via: node scripts/verify.mjs
+        # produce. All 12 still run locally via: node scripts/verify.mjs
         run: |
           node scripts/verify.mjs \
+            --skip canonical-audit \
             --skip corpus-audit \
             --skip score-review \
             --skip vector-audit \
