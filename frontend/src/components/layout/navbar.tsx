@@ -28,7 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Scan2RAG
               </span>
               <Badge variant="outline" className="text-[10px] font-mono px-1.5 py-0 h-4">
-                v0.2.0
+                v0.4.0
               </Badge>
             </div>
             <p className="text-[11px] text-muted-foreground hidden sm:block">
