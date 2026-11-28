@@ -140,3 +140,19 @@ def test_hard_constraint_fastapi_query_endpoint():
     assert '"event": "done"' in stream_text
 
     app.dependency_overrides.clear()
+
+
+def test_prompt_marks_superseded_document():
+    """Câu hỏi hiện hành không được trả lời bằng văn bản đã bị TT106 thay thế."""
+    prompt = GroundedQAService._append_version_notes(
+        "BASE PROMPT",
+        [{"document_id": "thông_tư_105", "effective_date": "2024-01-01"}],
+    )
+    assert "THÔNG TIN HIỆU LỰC" in prompt
+    assert "bị thay thế bởi thông_tư_106" in prompt
+    assert "hiệu lực từ 2024-01-01" in prompt
+
+    unchanged = GroundedQAService._append_version_notes(
+        "BASE PROMPT", [{"document_id": "thông_tư_88"}]
+    )
+    assert unchanged == "BASE PROMPT"
