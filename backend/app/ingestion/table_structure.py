@@ -12,7 +12,7 @@ import re
 import unicodedata
 
 SCORE_RE = re.compile(r"^[1-6]$")
-HEADER_HINTS = ("diem", "điem", "iem", "dim", "ieam")
+HEADER_HINTS = ("diem", "điem", "iem", "dim", "đim", "ieam")
 
 
 def normalize(text: str) -> str:

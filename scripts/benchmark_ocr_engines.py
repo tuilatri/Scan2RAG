@@ -29,7 +29,7 @@ OUT = ROOT / "data" / "benchmarks" / "ocr_engine_comparison.json"
 
 SAMPLES = [
     ("thông_tư_105", 23, "Thông_tư_105.pdf"),
-    ("thông_tư_88", 29, "Thông_tư_88.pdf"),
+    ("thông_tư_88", 31, "Thông_tư_88.pdf"),
     ("hướng_dẫn_cục_quân_y", 1, "Hướng_dẫn_Cục_quân_y.pdf"),
     ("hướng_dẫn_cục_quân_y", 2, "Hướng_dẫn_Cục_quân_y.pdf"),
     ("hướng_dẫn_cục_quân_y", 4, "Hướng_dẫn_Cục_quân_y.pdf"),
@@ -162,6 +162,8 @@ def benchmark_page(
         "page": page_no,
         "preprocess": preprocess_result.model_dump(),
         "ocr_avg_confidence": ocr_result.avg_confidence,
+        "ocr_text_preview": corrected[:300],
+        "table_markdown_preview": table.markdown_table[:300],
         "reference_facts": len(reference_facts),
         "extracted_rows": len(extracted),
         "matched_reference_facts": compared,
@@ -240,6 +242,10 @@ def main() -> int:
     pages: list[dict[str, Any]] = []
 
     if args.live:
+        # Preload torch before paddlex/modelscope pulls it in; otherwise the
+        # Windows shm.dll load order fails with WinError 127 in this venv.
+        import torch  # noqa: F401
+
         from app.ingestion.ocr_engine import OCREngine
 
         engine = OCREngine(use_gpu=False)

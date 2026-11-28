@@ -86,42 +86,57 @@ def parse_score_table(rows: list[list[str]]) -> list[tuple[str, int]]:
 def find_table_context(
     parsed: list[tuple[str, int]],
     canonical: list[dict[str, Any]],
+    used_contexts: set[tuple[str, int]] | None = None,
 ) -> dict[str, Any] | None:
-    """Map a DOCX table to a document/page via fuzzy match against canonical facts."""
+    """Map a DOCX table to a document/page via fuzzy match.
+
+    Identical tables occur in TT105 and TT88, so contexts already assigned to
+    an earlier DOCX table are skipped. That lets the later table map to TT88.
+    """
+    used = used_contexts or set()
+    scores: dict[tuple[str, int], float] = {}
+    evidence: dict[tuple[str, int], str] = {}
+
     for condition, _ in parsed:
         needle = normalize(condition)
         if len(needle) < 12:
             continue
-        best: dict[str, Any] | None = None
-        best_score = 0.0
         for fact in canonical:
+            key = (str(fact.get("document_id", "")), int(fact.get("page", 0)))
+            if key in used:
+                continue
             haystack = normalize(str(fact.get("condition", "")))
             if not haystack:
                 continue
             ratio = difflib.SequenceMatcher(None, needle[:80], haystack[:80]).ratio()
-            if ratio > best_score:
-                best_score, best = ratio, fact
-        if best and best_score >= 0.62:
-            return {
-                "document_id": best["document_id"],
-                "page": best["page"],
-                "evidence_image": best["evidence_image"],
-            }
-    return None
+            if ratio >= 0.62:
+                scores[key] = scores.get(key, 0.0) + ratio
+                evidence.setdefault(key, str(fact.get("evidence_image", "")))
+
+    if not scores:
+        return None
+    best_key = max(scores, key=scores.get)
+    return {
+        "document_id": best_key[0],
+        "page": best_key[1],
+        "evidence_image": evidence[best_key],
+    }
 
 
 def build_facts(tables: list[list[list[str]]], canonical: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
     facts: list[dict[str, Any]] = []
     mapped_tables = 0
     per_page: dict[tuple[str, int], int] = {}
+    used_contexts: set[tuple[str, int]] = set()
 
     for rows in tables:
         parsed = parse_score_table(rows)
         if not parsed:
             continue
-        context = find_table_context(parsed, canonical)
+        context = find_table_context(parsed, canonical, used_contexts)
         if not context:
             continue
+        used_contexts.add((context["document_id"], context["page"]))
         mapped_tables += 1
         key = (context["document_id"], context["page"])
         for condition, score in parsed:

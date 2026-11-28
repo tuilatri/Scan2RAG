@@ -110,3 +110,8 @@
 - **Root cause**: Parser cũ lấy **ô số đầu tiên trong dòng**, không đọc header `Điểm`.
 - **Fix**: `table_structure.py` tìm cột có header `Điểm/Diểm/Dim`, bỏ dòng có ô điểm rỗng. Số fact giảm 1163→884, bảng có điểm 88→48 — ít hơn nhưng sạch hơn. DOCX importer dùng cùng nguyên tắc.
 
+## 22. Placeholder Số Va Chạm & Bảng Giống Hệt Map Nhầm
+- **Symptom**: Corrector biến `105/2023` thành `__NUM__NUM__...`; importer map bảng viễn thị của TT88 vào TT105 p23 vì hai bảng giống hệt.
+- **Root cause**: Token `__NUM1__` là tiền tố của `__NUM10__`; `find_table_context` lấy canonical fact đầu tiên khớp, không loại context đã dùng.
+- **Fix**: Dùng `__SCAN2RAG_NUMBER_{n}_END__` + restore ngược; `find_table_context` nhận `used_contexts` và cộng điểm theo `(doc,page)`. Pre-import `torch` trước `paddleocr` để tránh `shm.dll WinError 127`.
+

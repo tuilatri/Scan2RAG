@@ -1,51 +1,93 @@
 {
-  "generated_at": "2026-11-28T15:08:50.599963+00:00",
+  "generated_at": "2026-11-28T15:24:18.738325+00:00",
   "provisional_reference": true,
   "reference_source": "drafts/outsource/ocr-result.docx via scripts/ingest_docx_facts.py",
-  "engine": "corpus OCR output already ingested (live OCR unavailable in this venv)",
+  "engine": "OpenCV preprocess + PaddleOCR vi + TableExtractor + corrector",
   "summary": {
     "pages": 5,
-    "reference_facts": 38,
-    "matched_reference_facts": 13,
-    "score_cell_hits": 8,
-    "score_cell_accuracy": 0.2105,
-    "number_retention": 0.1385,
+    "reference_facts": 77,
+    "matched_reference_facts": 0,
+    "score_cell_hits": 0,
+    "score_cell_accuracy": 0.0,
+    "number_retention": 0.0,
     "protected_phrase_pages": 3,
-    "protected_phrase_hits": 3
+    "protected_phrase_hits": 0
   },
   "pages": [
     {
       "document_id": "thông_tư_105",
       "page": 23,
-      "source": "corpus (already ingested OCR output)",
+      "preprocess": {
+        "skew_angle": 0.95,
+        "is_deskewed": true,
+        "original_shape": [
+          3517,
+          2513
+        ],
+        "processed_shape": [
+          3558,
+          2571
+        ]
+      },
+      "ocr_avg_confidence": 0.9714,
+      "ocr_text_preview": "Phu luc I\nPHÂN LOAI SÚC KHÓE THEO THÉ LUC, BĘNH, TT\nVÀ CÁC VÁN DÊ SÚC KHÕE\n(Kèm theo Thông tu só 105/2023/TT-BQP ngày 06tháng 12năm 2023\ncúa B trưng B Quc phòng)\nI. TIÊU CHUÂN PHÂN LOAI THEO THÉ LUC\nLOAI\nNU\nNAM\nNAM và NÜ\nSÚC\nCao đúng\nCân nng\nVòng ngc\nCao đúng\nCân nng\nBMI\nKHÓE\n(kg)\n(cm)\n(cm)\n(kg)\n(câ",
+      "table_markdown_preview": "| Phu luc I |  |  |  |  |  |  |\n| --- | --- | --- | --- | --- | --- | --- |\n| PHÂN LOAI SÚC KHÓE THEO THÉ LUC, BĘNH, TT |  |  |  |  |  |  |\n| VÀ CÁC VÁN DÊ SÚC KHÕE |  |  |  |  |  |  |\n| (Kèm theo Thông tu só 105/2023/TT-BQP ngày 06tháng 12năm 2023 |  |  |  |  |  |  |\n| cúa B trưng B Quc phòng) |  |",
       "reference_facts": 38,
-      "extracted_rows": 12,
-      "matched_reference_facts": 13,
-      "score_cell_hits": 8,
-      "score_cell_accuracy": 0.2105,
-      "number_retention": 0.6923,
-      "cer_vs_docx_conditions": 0.6859,
-      "wer_vs_docx_conditions": 0.7075,
-      "protected_phrase_hit": true
-    },
-    {
-      "document_id": "thông_tư_88",
-      "page": 29,
-      "source": "corpus (already ingested OCR output)",
-      "reference_facts": 0,
-      "extracted_rows": 6,
+      "extracted_rows": 0,
       "matched_reference_facts": 0,
       "score_cell_hits": 0,
       "score_cell_accuracy": 0.0,
       "number_retention": 0.0,
-      "cer_vs_docx_conditions": 0.0,
-      "wer_vs_docx_conditions": 0.0,
+      "cer_vs_docx_conditions": 0.9042,
+      "wer_vs_docx_conditions": 0.937,
+      "protected_phrase_hit": true
+    },
+    {
+      "document_id": "thông_tư_88",
+      "page": 31,
+      "preprocess": {
+        "skew_angle": 0.0,
+        "is_deskewed": false,
+        "original_shape": [
+          3513,
+          2480
+        ],
+        "processed_shape": [
+          3513,
+          2480
+        ]
+      },
+      "ocr_avg_confidence": 0.9786,
+      "ocr_text_preview": "TT\nĐim\nBnh tt\n- Viêm màng b đào toàn b (dính bt đng t)\n- Bong võng mc\n- Bnh lý th thn kinh\n- Các tn hi võng mc do bnh l:\n+ Bnh võng mc do đái tháo đuòng\n6\n+ Tn thưong vng mc do bnh tăng huyt áp\n2. Các bnh v Răng - Hàm - Măt\nĐim\nTT\nBnh tt\n17\nRăng sâu:\n- Chi có răng sâu đ 1 - 2 (không có rǎng sâu đ 3)",
+      "table_markdown_preview": "| TT | Bnh tt | Đim |\n| --- | --- | --- |\n| - Viêm màng b đào toàn b (dính bt đng t) |  |  |\n| - Bong võng mc |  |  |\n| - Bnh lý th thn kinh |  |  |\n| - Các tn hi võng mc do bnh l: |  |  |\n| + Bnh võng mc do đái tháo đuòng | 6 |  |\n| + Tn thưong vng mc do bnh tăng huyt áp |  |  |\n| 2. Các bnh v Răng",
+      "reference_facts": 39,
+      "extracted_rows": 0,
+      "matched_reference_facts": 0,
+      "score_cell_hits": 0,
+      "score_cell_accuracy": 0.0,
+      "number_retention": 0.0,
+      "cer_vs_docx_conditions": 0.9384,
+      "wer_vs_docx_conditions": 0.9595,
       "protected_phrase_hit": true
     },
     {
       "document_id": "hướng_dẫn_cục_quân_y",
       "page": 1,
-      "source": "corpus (already ingested OCR output)",
+      "preprocess": {
+        "skew_angle": 0.0,
+        "is_deskewed": false,
+        "original_shape": [
+          3509,
+          2481
+        ],
+        "processed_shape": [
+          3509,
+          2481
+        ]
+      },
+      "ocr_avg_confidence": 0.9709,
+      "ocr_text_preview": "TÔNG CC HU CÀN - KÝ THUT\nCONG HÒA XÃ HOI CHÙ NGHÃA VIĘT NAM\nCĘC QUÂN Y\nĐc lp - Tr do - Hnh phúc\nSó: 8428 /QY-DTr\nHà Ni, ngày 04\ntháng 11 năm 2026\nV/v so tuyn, khám sc khe thc\nhin nghĩa v quân s năm 2027\nKính gi:\n- Phòng Quân y các quân khu và B Tu lnh Th đô Hà Ni.\n- S Y t các tnh, thành ph.\nThc hin ",
+      "table_markdown_preview": "| TÔNG CC HU CÀN - KÝ THUT | CONG HÒA XÃ HOI CHÙ NGHÃA VIĘT NAM |  |\n| --- | --- | --- |\n| CĘC QUÂN Y | Đc lp - Tr do - Hnh phúc |  |\n| Só: 8428 /QY-DTr | Hà Ni, ngày 04 | tháng 11 năm 2026 |\n| V/v so tuyn, khám sc khe thc |  |  |\n| hin nghĩa v quân s năm 2027 |  |  |\n| Kính gi: |  |  |\n| - Phòng Qu",
       "reference_facts": 0,
       "extracted_rows": 0,
       "matched_reference_facts": 0,
@@ -54,12 +96,26 @@
       "number_retention": 0.0,
       "cer_vs_docx_conditions": 0.0,
       "wer_vs_docx_conditions": 0.0,
-      "protected_phrase_hit": true
+      "protected_phrase_hit": false
     },
     {
       "document_id": "hướng_dẫn_cục_quân_y",
       "page": 2,
-      "source": "corpus (already ingested OCR output)",
+      "preprocess": {
+        "skew_angle": 0.0,
+        "is_deskewed": false,
+        "original_shape": [
+          3509,
+          2481
+        ],
+        "processed_shape": [
+          3509,
+          2481
+        ]
+      },
+      "ocr_avg_confidence": 0.9221,
+      "ocr_text_preview": "7\nna\ny\nÉy      at\nin\ni       (ED\nvin th các mc đ; chi s BMI nh hon 18,0 hoc lón hon 29,9.\n- Đi vi các cơ quan, đơn v và v trí trng yu, co mt trong Quân đi; lc\nlưng Tiêu binh, Nghi l; lc lưng V binh và Kim soát quân s chuyn nghip,\nthc hin tuyn chn bo đm tiêu chun riêng theo quy định ca B Quc phòng.\nI",
+      "table_markdown_preview": "| 7 |\n| --- |\n| na |\n| y |\n| Éy      at |\n| in |\n| i       (ED |\n| vin th các mc đ; chi s BMI nh hon 18,0 hoc lón hon 29,9. |\n| - Đi vi các cơ quan, đơn v và v trí trng yu, co mt trong Quân đi; lc |\n| lưng Tiêu binh, Nghi l; lc lưng V binh và Kim soát quân s chuyn nghip, |\n| thc hin tuyn chn bo đm t",
       "reference_facts": 0,
       "extracted_rows": 0,
       "matched_reference_facts": 0,
@@ -68,12 +124,26 @@
       "number_retention": 0.0,
       "cer_vs_docx_conditions": 0.0,
       "wer_vs_docx_conditions": 0.0,
-      "protected_phrase_hit": true
+      "protected_phrase_hit": false
     },
     {
       "document_id": "hướng_dẫn_cục_quân_y",
       "page": 4,
-      "source": "corpus (already ingested OCR output)",
+      "preprocess": {
+        "skew_angle": 0.0,
+        "is_deskewed": false,
+        "original_shape": [
+          3509,
+          2481
+        ],
+        "processed_shape": [
+          3509,
+          2481
+        ]
+      },
+      "ocr_avg_confidence": 0.9761,
+      "ocr_text_preview": "- Xét nghim, chp X-quang b trí khu vc riêng, bo đm a toàn sinh hc\nvà an toàn phóng x; phi có kt qu trưc khi Ch tch Hi đng kt lun.\n9 Văn bn hp nht s 88/VBHN-BQP.\nc) Báo cáo, thng kê\nTng hp, thng kê, báo cáo kt qu khám sc khe nghĩa v quân s; tình\nhình giao nhn chin sĩ mi theo Mu s 2c, 2g, 21, Ph lc VI",
+      "table_markdown_preview": "| - Xét nghim, chp X-quang b trí khu vc riêng, bo đm a toàn sinh hc |\n| --- |\n| và an toàn phóng x; phi có kt qu trưc khi Ch tch Hi đng kt lun. |\n| 9 Văn bn hp nht s 88/VBHN-BQP. |\n| c) Báo cáo, thng kê |\n| Tng hp, thng kê, báo cáo kt qu khám sc khe nghĩa v quân s; tình |\n| hình giao nhn chin sĩ mi ",
       "reference_facts": 0,
       "extracted_rows": 0,
       "matched_reference_facts": 0,
@@ -82,7 +152,7 @@
       "number_retention": 0.0,
       "cer_vs_docx_conditions": 0.0,
       "wer_vs_docx_conditions": 0.0,
-      "protected_phrase_hit": true
+      "protected_phrase_hit": false
     }
   ]
 }

@@ -65,10 +65,10 @@
 | File | Lines | Role |
 |---|---:|---|
 | `scripts/build_canonical_facts.py` | 141 | Scan all 111 tables, render 200 DPI evidence, parse score rows via `table_structure` + 3 guidance rules |
-| `scripts/ingest_docx_facts.py` | 154 | Read external VietNamOCR DOCX grid, map tables to doc/page, emit DOCX-sourced facts |
+| `scripts/ingest_docx_facts.py` | 166 | Read external VietNamOCR DOCX grid, map tables to doc/page with used-context de-dup, emit DOCX-sourced facts |
 | `scripts/audit_canonical_facts.py` | 61 | Local gate over both stores: evidence exists, no authoritative without human decision |
 | `scripts/review_canonical_fact.py` | 79 | Human review CLI: agent cannot approve; writes review_decisions.json |
-| `scripts/benchmark_ocr_engines.py` | 270 | Phase-0 OCR benchmark: live PaddleOCR or ingested corpus vs DOCX reference; CER/WER, score-cell, number retention |
+| `scripts/benchmark_ocr_engines.py` | 275 | Phase-0 OCR benchmark: live PaddleOCR or ingested corpus vs DOCX reference; CER/WER, score-cell, number retention |
 
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).

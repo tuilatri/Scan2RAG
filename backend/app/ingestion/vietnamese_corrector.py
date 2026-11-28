@@ -44,10 +44,10 @@ def correct(text: str) -> str:
         return text
 
     numbers = _NUMBER_RE.findall(text)
-    placeholders: dict[str, str] = {}
+    placeholders: list[tuple[str, str]] = []
     for index, number in enumerate(numbers):
-        token = f"__NUM{index}__"
-        placeholders[token] = number
+        token = f"__SCAN2RAG_NUMBER_{index}_END__"
+        placeholders.append((token, number))
         text = text.replace(number, token, 1)
 
     preserved: list[str] = []
@@ -63,6 +63,6 @@ def correct(text: str) -> str:
     for index, original in enumerate(preserved):
         text = text.replace(f"__PROTECTED{index}__", original)
 
-    for token, number in placeholders.items():
+    for token, number in reversed(placeholders):
         text = text.replace(token, number)
     return text

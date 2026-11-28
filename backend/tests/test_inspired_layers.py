@@ -11,6 +11,9 @@ def test_table_structure_uses_score_header_and_skips_header_row():
         "|  | - Cận thị từ - 3D đến dưới - 4D | 4 |\n"
     )
     assert extract_score_rows(table) == [("- Cận thị từ - 3D đến dưới - 4D", 4)]
+    assert extract_score_rows(
+        "| TT | Bệnh tật | Đim |\n|  | - Viễn thị +3D đến +4D | 5 |"
+    ) == [("- Viễn thị +3D đến +4D", 5)]
 
 
 def test_corrector_fixes_noise_without_touching_numbers():
@@ -18,6 +21,11 @@ def test_corrector_fixes_noise_without_touching_numbers():
     assert "Cận thị" in result
     assert "- 3D" in result
     assert "4 điểm" in result
+
+
+def test_corrector_preserves_many_numbers_without_placeholder_collision():
+    text = "Thông tư 105/2023/TT-BQP trang 105 và 10"
+    assert correct(text) == text
 
 
 def test_corrector_preserves_protected_legal_phrase():

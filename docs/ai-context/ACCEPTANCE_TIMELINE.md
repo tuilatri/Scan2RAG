@@ -142,10 +142,10 @@ Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **review
 ## OCR Benchmark Phase 0 (2026-11-28)
 
 - `scripts/benchmark_ocr_engines.py` chạy được; report: `data/benchmarks/ocr_engine_comparison.json` (`provisional_reference:true`).
-- **Live PaddleOCR không chạy được** trong venv này: `torch/lib/shm.dll` lỗi `[WinError 127]` khi import `paddleocr → paddlex → modelscope`. Script có cờ `--live` để chạy khi môi trường sửa xong; mặc định so **output OCR đã ingest trong corpus** — tức thứ RAG đang dùng.
-- Baseline 5 trang: 38 reference fact (DOCX), chỉ **13 khớp** được với chunk corpus; **8 score-cell đúng** → `score_cell_accuracy 0.2105`; `number_retention 0.1385`; protected phrase **3/3**.
-- Đọc thẳng: đây **không phải điểm cuối của engine PaddleOCR**, mà là khoảng cách giữa **dữ liệu đang dùng** và bản DOCX. TT88 p29 có 0 reference fact do importer map nhầm bảng giống hệt sang TT105 p23 — cần sửa mapping trước khi kết luận.
-- Không đổi corpus/serving; chưa re-ingest.
+- **Đã sửa lỗi live OCR**: pre-import `torch` trước `paddleocr` để tránh `shm.dll [WinError 127]`; `--live` chạy được (PaddleOCR 3.7 / PP-OCRv6, GPU). Cũng sửa placeholder `__NUM1__`↔`__NUM10__` trong `vietnamese_corrector` và thêm hint header `Đim`.
+- **Corpus mode (baseline cũ)**: 38 ref fact, 13 khớp, 8 đúng → accuracy `0.2105`, number retention `0.1385`, protected 3/3. Đây là khoảng cách giữa **dữ liệu đang dùng** và DOCX.
+- **Live mode (sau sửa)**: 77 ref fact (đã đổi TT88 sang p31 có reference), **0 khớp**, accuracy `0.0`, protected **0/3**. Nguyên nhân nhìn trực tiếp từ preview: PaddleOCR mất dấu (`Bnh tt`, `Đim`, `Phu luc I`) và để điểm ở dòng riêng nên `TableExtractor` không đổ được vào cột `Điểm`.
+- Đọc thẳng: đây là bằng chứng OCR hiện tại **chưa tương đương** bản Word — đúng mục đích Giai đoạn 0. Không đổi corpus/serving; chưa re-ingest.
 
 ## Nhật ký fix mốc 3
 
