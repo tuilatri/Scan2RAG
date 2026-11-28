@@ -61,8 +61,9 @@
 
 | File | Lines | Role |
 |---|---:|---|
-| `scripts/build_canonical_facts.py` | 118 | Render 200 DPI evidence, parse TT105 p23 / TT88 p29 score rows + 3 guidance rules |
-| `scripts/audit_canonical_facts.py` | 37 | Local gate: evidence files exist, no authoritative without human review |
+| `scripts/build_canonical_facts.py` | 150 | Scan all 111 tables, render 200 DPI evidence, parse score rows + 3 guidance rules |
+| `scripts/audit_canonical_facts.py` | 51 | Local gate: evidence files exist, no authoritative without valid human decision |
+| `scripts/review_canonical_fact.py` | 79 | Human review CLI: agent cannot approve; writes review_decisions.json |
 
 ## Data & Benchmarks State (Milestone 1)
 - `data/raw/`: 5 original legal PDFs (287 pages).

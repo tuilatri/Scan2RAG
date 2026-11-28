@@ -13,7 +13,7 @@ from app.core.rate_limit import RateLimitMiddleware
 app = FastAPI(
     title="Scan2RAG Legal Intelligence API",
     description="Vietnamese Legal & Military Medical Document Intelligence RAG API",
-    version="0.4.1",
+    version="0.5.0",
 )
 
 # CORS Middleware configured via CORS_ORIGINS env (no wildcard with credentials)

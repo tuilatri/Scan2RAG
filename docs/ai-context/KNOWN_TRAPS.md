@@ -100,3 +100,8 @@
 - **Root cause**: Gate chỉ so `content` với `raw_content_backup` (cùng nguồn tự gán), không so với ảnh PDF gốc.
 - **Fix**: Layer A (`scripts/build_canonical_facts.py`) render ảnh 200 DPI làm `evidence_image`; `CanonicalFact` có `needs_human:true`, `authoritative:false` mặc định; `audit_canonical_facts.py` FAIL nếu thiếu ảnh hoặc authoritative khi chưa có người duyệt. Pilot 30 fact + 3 rule, **không có fact nào authoritative**.
 
+## 20. Agent Tự Duyệt Là Giả
+- **Symptom**: Muốn "có người duyệt" nhưng script sinh fact lại tự gán `reviewer:"agent"`, `authoritative:true` — tức tự chứng.
+- **Root cause**: Không có phân biệt giữa người tạo artifact và người phê duyệt; gate cũ chỉ check evidence file tồn tại.
+- **Fix**: `review_canonical_fact.py` từ chối `reviewer == "agent"` khi `--approved`, bắt `--evidence-checked`, ghi `review_decisions.json`; `audit_canonical_facts.py` fail mọi authoritative thiếu decision hợp lệ. A2: 1.166 entry, 0 authoritative.
+
