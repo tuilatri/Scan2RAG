@@ -147,7 +147,8 @@ Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **review
 - **Live mode baseline**: 77 ref fact (đổi TT88 sang p31), 0 khớp, accuracy `0.0`, protected 0/3.
 - **Sau Giai đoạn 1-2** (`derive_corrections.py` + dictionary curated + `extract_score_rows_from_text` fallback): **26 khớp, 22 đúng → accuracy `0.2857`**, number retention `0.3556`, protected vẫn **0/3**.
 - **Sau protected-phrase pass**: 3 rule trọng yếu được phục hồi trọn cụm → protected **3/3** (page1 `loại 1, loại 2, loại 3`; page2 `viễn thị các mức độ` — OCR ghi `mục đ`; page4 `không cho điểm để phân loại sức khỏe`). Score-cell vẫn 22/77, accuracy `0.2857`.
-- Kết luận thẳng: protected đã đạt nhưng độ chính xác số liệu vẫn **chưa tương đương** bản Word. Không đổi corpus/serving; chưa re-ingest.
+- **Score-scope fix**: `reference_for_page()` lọc DOCX fact theo phạm vi trang thật bằng canonical corpus làm page map (không dùng live OCR); `match_reference_row` thêm number-signature guard. Reference 77 → **44 đúng trang**, khớp 42, đúng 21 → `score_cell_accuracy 0.4773`. Protected vẫn **3/3**.
+- Kết luận thẳng: protected đã đạt, score accuracy tăng nhưng vẫn **chưa tương đương** bản Word. Con số 0.2857 trước đó bị phình mẫu do reference gồm cả dòng ngoài trang. Không đổi corpus/serving; chưa re-ingest.
 
 ## Nhật ký fix mốc 3
 

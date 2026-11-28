@@ -125,3 +125,8 @@
 - **Root cause**: PaddleOCR gõ **mục** (`u+1EE5`), không phải **mức** (`u+1EE9`); soi bằng codepoint mới thấy. Ngoài ra phrase có số (`loại 1, loại 2`) bị mask số trước khi sửa.
 - **Fix**: Thêm `mục đ → mức độ`, chạy toàn bộ dictionary ở phrase pass trước khi mask số, thêm identity pair để không áp lặp (`độộộ`). Protected phrase đạt **3/3**.
 
+## 25. Benchmark Đếm Cả Dòng Ngoài Trang
+- **Symptom**: `score_cell_accuracy` báo 0.2857 dù phần lớn reference fact không hề nằm trên trang OCR mẫu (DOCX exporter nối bảng đa trang).
+- **Root cause**: Benchmark lấy mọi DOCX fact theo `(doc,page)` của context exporter, không kiểm tra fact đó có thật sự thuộc trang PDF đang đo.
+- **Fix**: `reference_for_page()` dùng canonical corpus chỉ làm page map để lọc reference; `match_reference_row` thêm number-signature guard. Reference 77→44, accuracy 0.2857→0.4773. Không nới expectation/check.
+
