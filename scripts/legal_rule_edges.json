@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "note": "Typed chains for eligibility questions. Anchors resolve to Qdrant chunks; summary is a verbatim-grounded composition of those chunks.",
+  "chains": [
+    {
+      "id": "VIEN_THI_ELIGIBILITY",
+      "triggers": ["viễn thị", "vien thi"],
+      "anchors": [
+        {"type": "rule_anchor", "value": "KHONG_GOI_NHAP_NGU_VIEN_THI"},
+        {"type": "rule_anchor", "value": "REFRACTION_NOT_SCORED"},
+        {"type": "rule_anchor", "value": "ELIGIBILITY_LOAI_1_2_3"}
+      ],
+      "summary": "Hướng dẫn Cục quân y trang 2: 'Không gọi nhập ngũ đối với công dân có tật khúc xạ cận thị lớn hơn 1,5 diop (D), viễn thị các mức độ; chỉ số BMI nhỏ hơn 18,0 hoặc lớn hơn 29,9'. Trang 4: cận thị, viễn thị, BMI là tiêu chuẩn riêng, không cho điểm để phân loại sức khỏe.",
+      "required_claims": ["không gọi nhập ngũ", "viễn thị các mức độ"]
+    },
+    {
+      "id": "LOAN_THI_ELIGIBILITY",
+      "triggers": ["loạn thị", "loan thi"],
+      "anchors": [
+        {"type": "content_prefix", "document_id": "thông_tư_105", "value": "| 4 | Loạn thị:"},
+        {"type": "content_prefix", "document_id": "thông_tư_105", "value": "Sinh lý hoặc < 1D"},
+        {"type": "rule_anchor", "value": "ELIGIBILITY_LOAI_1_2_3"}
+      ],
+      "summary": "Thông tư 105 bảng trang 23 mục 4: Loạn thị sinh lý hoặc dưới 1D = 2 điểm; từ 1D trở lên = 3 điểm. Hướng dẫn Cục quân y trang 1: tuyển chọn công dân có sức khỏe loại 1, loại 2, loại 3. Trang 4: chỉ cận thị, viễn thị, BMI là tiêu chuẩn riêng không cho điểm; loạn thị không nằm trong danh sách đó.",
+      "required_claims": ["2 điểm", "3 điểm", "loại 1"]
+    },
+    {
+      "id": "CAN_THI_ELIGIBILITY",
+      "triggers": ["cận thị", "can thi"],
+      "anchors": [
+        {"type": "rule_anchor", "value": "KHONG_GOI_NHAP_NGU_VIEN_THI"},
+        {"type": "rule_anchor", "value": "ELIGIBILITY_LOAI_1_2_3"}
+      ],
+      "summary": "Hướng dẫn Cục quân y trang 2: không gọi nhập ngũ khi cận thị lớn hơn 1,5 diop (D). Trang 1: tuyển chọn sức khỏe loại 1, loại 2, loại 3.",
+      "required_claims": ["1,5", "loại 1"]
+    }
+  ]
+}

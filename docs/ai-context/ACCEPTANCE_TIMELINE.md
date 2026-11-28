@@ -89,6 +89,30 @@ So với mốc 3 (cũng full, local 47/50 · cloud 47/50 · LG 5/5): page/doc gi
 - LangGraph: AC-42 `unsupported_numbers={'106'}` (lần trước pass) — biến động sinh số, giữ FAIL thật.
 - Cloud `local_fallback_count=0`; 6/50 vẫn do `lm_studio_local` vì câu simple → local theo routing đã duyệt.
 
+## Mốc 6 — Truth + Corpus Graph + eligibility chain (2026-11-28)
+
+- `generated_at`: `2026-11-28T11:41:31.605657+00:00`
+- Dataset **52 câu** (thêm AC-51/52 từ 2 ảnh thực tế). Report mốc 5 lưu ở `data/exports/acceptance_report_m5.json`.
+- Qdrant **7266 points** (3 rule node mới từ PDF text layer, `scripts/rebuild_critical_rules.py`).
+
+| Trục | answer_hit | citation_doc_hit | citation_page_hit | avg_latency_ms |
+|---|---|---|---|---|
+| Local | **47/52** | 46/47 | **24/24** | 7.439,9 |
+| Cloud | **45/52** | 46/47 | **24/24** | 8.038,7 |
+| LangGraph | **5/5** | notes 5/5 | evidence 5/5 | 26.796,2 |
+| Qdrant | PASS · 7.266 points | — | — | — |
+
+**AC-51** (viễn thị): local + cloud đều OK, citation có trang **2** (rule "Không gọi nhập ngũ... viễn thị các mức độ") và trang **4** (không cho điểm). **AC-52** (loạn thị): OK, citation có trang **23** (2/3 điểm) và trang **1** (loại 1–3).
+
+Thay đổi kiến trúc (impact CRITICAL/HIGH của `chunk_document`/`_has_table_intent` đã báo owner nên **không đụng**):
+- `scripts/rebuild_critical_rules.py` + 3 point mới; rule trọn câu, không còn fragment 2–3 dòng.
+- `backend/app/graph/corpus_graph.py` + `scripts/legal_rule_edges.json`: edge typed, resolve anchor → chunk.
+- `qa_service`: method `_has_eligibility_intent`/`_graph_candidates` **mới**, không sửa intent cũ.
+- `backend/app/grounding/claim_verifier.py`: check claim trong chat path.
+- Dataset đánh dấu `weak:true` cho **33 expectation cũ** (token chung) — 47/52 không còn được hiểu là accuracy người dùng.
+
+Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **reviewer=agent**, 19/24 evidence=`raw_backup_match` — không phải HITL thật. Chi tiết trong KNOWN_TRAP 17–18.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |
