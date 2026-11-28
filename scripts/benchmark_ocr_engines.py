@@ -42,6 +42,43 @@ PROTECTED_BY_PAGE = {
 NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
 
+def number_signature(text: str) -> tuple[str, ...]:
+    return tuple(NUMBER_RE.findall(str(text)))
+
+
+def reference_for_page(
+    document_id: str,
+    page_no: int,
+    reference_facts: list[dict[str, Any]],
+    corpus_facts: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Keep DOCX facts that actually belong to this PDF page.
+
+    The DOCX exporter stitches multi-page tables, so a single DOCX table can
+    hold rows from several pages. Canonical corpus facts carry the page number;
+    we use them only as a page map, never as the expected value.
+    """
+    page_facts = [
+        fact for fact in corpus_facts
+        if fact["document_id"] == document_id and fact["page"] == page_no
+    ]
+    selected: list[dict[str, Any]] = []
+    for fact in reference_facts:
+        condition = str(fact.get("condition", ""))
+        signature = number_signature(condition)
+        needle = normalize(condition)
+        for page_fact in page_facts:
+            if number_signature(str(page_fact.get("condition", ""))) != signature:
+                continue
+            ratio = difflib.SequenceMatcher(
+                None, needle[:90], normalize(str(page_fact.get("condition", "")))[:90]
+            ).ratio()
+            if ratio >= 0.55:
+                selected.append(fact)
+                break
+    return selected
+
+
 def normalize(text: str) -> str:
     decomposed = unicodedata.normalize("NFKD", str(text).lower())
     stripped = "".join(
@@ -83,13 +120,16 @@ def match_reference_row(
     extracted: list[tuple[str, int]],
 ) -> tuple[str, int] | None:
     needle = normalize(condition)
+    signature = number_signature(condition)
     best: tuple[str, int] | None = None
     best_ratio = 0.0
     for row in extracted:
+        if number_signature(row[0]) != signature:
+            continue
         ratio = difflib.SequenceMatcher(None, needle[:90], normalize(row[0])[:90]).ratio()
         if ratio > best_ratio:
             best_ratio, best = ratio, row
-    return best if best_ratio >= 0.55 else None
+    return best if best_ratio >= 0.45 else None
 
 
 def number_retention(reference: str, candidate: str) -> bool:
@@ -242,6 +282,7 @@ def main() -> int:
     args = parser.parse_args()
 
     reference = json.loads(CANONICAL.read_text(encoding="utf-8"))["facts"]
+    corpus_facts = json.loads(CORPUS_FACTS.read_text(encoding="utf-8"))["facts"]
     pages: list[dict[str, Any]] = []
 
     if args.live:
@@ -253,24 +294,19 @@ def main() -> int:
 
         engine = OCREngine(use_gpu=False)
         for document_id, page_no, pdf_name in SAMPLES:
-            facts = [
-                fact for fact in reference
-                if fact["document_id"] == document_id and fact["page"] == page_no
-            ]
-            pages.append(benchmark_page(document_id, page_no, pdf_name, facts, engine))
+            page_reference = reference_for_page(
+                document_id, page_no, reference, corpus_facts
+            )
+            pages.append(benchmark_page(document_id, page_no, pdf_name, page_reference, engine))
         engine_name = "OpenCV preprocess + PaddleOCR vi + TableExtractor + corrector"
     else:
-        corpus_facts = json.loads(CORPUS_FACTS.read_text(encoding="utf-8"))["facts"]
         guidance_nodes = json.loads(CORPUS_GUIDANCE.read_text(encoding="utf-8"))["nodes"]
         guidance_by_page: dict[int, str] = {}
         for node in guidance_nodes:
             page = int(node.get("page_number") or 0)
             guidance_by_page[page] = guidance_by_page.get(page, "") + str(node.get("content", ""))
         for document_id, page_no, _ in SAMPLES:
-            facts = [
-                fact for fact in reference
-                if fact["document_id"] == document_id and fact["page"] == page_no
-            ]
+            facts = reference_for_page(document_id, page_no, reference, corpus_facts)
             guidance_text = (
                 guidance_by_page.get(page_no, "")
                 if document_id == "hướng_dẫn_cục_quân_y" else ""
