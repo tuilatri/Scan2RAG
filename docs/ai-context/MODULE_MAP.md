@@ -32,6 +32,13 @@
 | `backend/app/agents/verification.py` | 12 | Numeric grounding: reject numbers in answer absent from cited evidence |
 | `backend/app/agents/compare_graph.py` | 211 | Graph: plan → retrieve → evidence_check → retry → resolve_versions → synthesize → verify_answer (opt-in checkpointer) |
 
+### `backend/app/graph/` — Corpus rule graphs (not LangGraph control flow)
+
+| File | Lines | Role |
+|---|---:|---|
+| `backend/app/graph/corpus_graph.py` | 116 | Resolve typed rule chains from Qdrant anchors |
+| `backend/app/graph/eligibility_graph.py` | 73 | DOCX-sourced canonical fact/rule chain for eligibility questions |
+
 ### `backend/app/guards/` — Deterministic pre-LLM guards
 
 | File | Lines | Role |
@@ -57,7 +64,7 @@
 
 | File | Lines | Role |
 |---|---:|---|
-| `backend/app/models/canonical_fact.py` | 37 | `CanonicalFact` / `CanonicalRule` schema with `evidence_image`, `needs_human`, `authoritative` |
+| `backend/app/models/canonical_fact.py` | 41 | Schema with `evidence_image`, `authoritative_source`, `review_needed`, `needs_human` |
 | `backend/app/canonical/__init__.py` | 1 | Package marker |
 | `backend/app/canonical/store.py` | 24 | Load + invariants: no fake authoritative, no duplicate id |
 
@@ -67,8 +74,9 @@
 |---|---:|---|
 | `scripts/build_canonical_facts.py` | 141 | Scan all 111 tables, render 200 DPI evidence, parse score rows via `table_structure` + 3 guidance rules |
 | `scripts/ingest_docx_facts.py` | 166 | Read external VietNamOCR DOCX grid, map tables to doc/page with used-context de-dup, emit DOCX-sourced facts |
-| `scripts/audit_canonical_facts.py` | 61 | Local gate over both stores: evidence exists, no authoritative without human decision |
-| `scripts/review_canonical_fact.py` | 79 | Human review CLI: agent cannot approve; writes review_decisions.json |
+| `scripts/audit_canonical_facts.py` | 63 | Local gate over both stores: evidence exists, authoritative needs human decision or trusted DOCX source |
+| `scripts/review_canonical_fact.py` | 79 | Human review CLI for flagged rows: agent cannot approve; writes review_decisions.json |
+| `scripts/build_docx_review.py` | 83 | DOCX-first review-by-exception: auto-accept invariant-passing rows, flag the rest |
 | `scripts/benchmark_ocr_engines.py` | 309 | Phase-0 OCR benchmark: page-scoped DOCX reference, number-signature fuzzy match, CER/WER, score-cell, number retention |
 | `scripts/derive_corrections.py` | 109 | Derive correction proposals from OCR↔DOCX fact pairs; --apply writes tracked dictionary |
 

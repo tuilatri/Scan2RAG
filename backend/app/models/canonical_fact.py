@@ -24,6 +24,8 @@ class CanonicalFact(BaseModel):
     reviewer: str = "agent"
     needs_human: bool = True
     authoritative: bool = False
+    authoritative_source: str | None = None
+    review_needed: bool = False
     valid_from: str | None = None
     superseded_by: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -41,5 +43,7 @@ class CanonicalRule(BaseModel):
     reviewer: str = "agent"
     needs_human: bool = True
     authoritative: bool = False
+    authoritative_source: str | None = None
+    review_needed: bool = False
     valid_from: str | None = None
     superseded_by: str | None = None

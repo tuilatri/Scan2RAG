@@ -12,6 +12,7 @@ from typing import Any
 
 from app.agents.planner import DOCUMENT_TOKENS
 from app.graph.corpus_graph import CorpusGraph
+from app.graph.eligibility_graph import EligibilityGraph
 from app.grounding.claim_verifier import verify_claims
 from app.guards.scope_guard import SCOPE_REFUSAL_MESSAGE, is_out_of_scope
 from app.llm.prompt_templates import STRICT_LEGAL_SYSTEM_PROMPT, GroundedPromptBuilder
@@ -68,21 +69,34 @@ class GroundedQAService:
         reranker: LegalReranker,
         model_router: ModelRouter | None = None,
         corpus_graph: CorpusGraph | None = None,
+        eligibility_graph: EligibilityGraph | None = None,
     ):
         self.hybrid_searcher = hybrid_searcher
         self.reranker = reranker
         self.model_router = model_router or ModelRouter()
         self.corpus_graph = corpus_graph or CorpusGraph.build()
+        self.eligibility_graph = eligibility_graph
 
     def _with_chain_summary(self, prompt: str, query: str) -> str:
         if not self._has_eligibility_intent(query):
             return prompt
+
+        sections: list[str] = []
         summaries = self.corpus_graph.summaries_for(query)
-        if not summaries:
+        if summaries:
+            sections.append(
+                "CHAIN RULE (grounded in cited chunks):\n"
+                + "\n".join(f"- {summary}" for summary in summaries)
+            )
+
+        graph = self.eligibility_graph or EligibilityGraph.build()
+        canonical = graph.summary(query)
+        if canonical:
+            sections.append(canonical)
+
+        if not sections:
             return prompt
-        return prompt + "\n\nCHAIN RULE (grounded in cited chunks):\n" + "\n".join(
-            f"- {summary}" for summary in summaries
-        )
+        return prompt + "\n\n" + "\n\n".join(sections)
 
     @staticmethod
     def _append_version_notes(prompt: str, chunks: list[dict[str, Any]]) -> str:

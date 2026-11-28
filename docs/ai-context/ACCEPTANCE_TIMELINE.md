@@ -150,6 +150,13 @@ Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **review
 - **Score-scope fix**: `reference_for_page()` lọc DOCX fact theo phạm vi trang thật bằng canonical corpus làm page map (không dùng live OCR); `match_reference_row` thêm number-signature guard. Reference 77 → **44 đúng trang**, khớp 42, đúng 21 → `score_cell_accuracy 0.4773`. Protected vẫn **3/3**.
 - Kết luận thẳng: protected đã đạt, score accuracy tăng nhưng vẫn **chưa tương đương** bản Word. Con số 0.2857 trước đó bị phình mẫu do reference gồm cả dòng ngoài trang. Không đổi corpus/serving; chưa re-ingest.
 
+## DOCX-first graph wiring (2026-11-29)
+
+- Review đổi từ "so ảnh PDF" sang **DOCX-first + review-by-exception**: `scripts/build_docx_review.py` tự nhận **673/678** dòng qua invariant, chỉ **5 dòng flagged** vào `review_queue_docx.json` (ảnh PDF chỉ làm bằng chứng khi có tranh chấp).
+- Dòng auto-accept có `authoritative_source:"vietnamocr_docx"`, `authoritative:true`; **không** tự gán `reviewer:human`. Audit chấp nhận nguồn chuẩn này, vẫn chặn agent tự phong human.
+- `backend/app/graph/eligibility_graph.py` build chain `condition → điểm → loại → eligibility` từ DOCX fact + 3 rule; wire vào `qa_service._with_chain_summary` cho câu eligibility (giữ fallback graph cũ).
+- Verify: AC-51/52 local **2/2**, cloud **2/2**, answer/doc/page đều đúng. Không đổi corpus/BM25/Qdrant; chưa chạy full 52.
+
 ## Nhật ký fix mốc 3
 
 | ID | Fix | Kết quả |

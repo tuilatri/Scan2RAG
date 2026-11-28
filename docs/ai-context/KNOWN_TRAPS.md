@@ -130,3 +130,8 @@
 - **Root cause**: Benchmark lấy mọi DOCX fact theo `(doc,page)` của context exporter, không kiểm tra fact đó có thật sự thuộc trang PDF đang đo.
 - **Fix**: `reference_for_page()` dùng canonical corpus chỉ làm page map để lọc reference; `match_reference_row` thêm number-signature guard. Reference 77→44, accuracy 0.2857→0.4773. Không nới expectation/check.
 
+## 26. Review Bằng Ảnh PDF Là Sai Chỗ
+- **Symptom**: `review_queue.md` bắt người so dòng trong ảnh render cả trang từ `data/raw`, dù DOCX VietNamOCR đã có lưới ô dễ đọc hơn.
+- **Root cause**: Nhầm "evidence image" thành "review surface"; image chỉ nên là bằng chứng khi có tranh chấp.
+- **Fix**: `build_docx_review.py` review-by-exception trên **DOCX cell grid**: 673/678 auto-accept qua invariant với `authoritative_source:"vietnamocr_docx"`, 5 dòng flagged cần người vào ảnh. Không gán `reviewer:human` cho dòng tự nhận.
+
