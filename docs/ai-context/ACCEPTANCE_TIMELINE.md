@@ -146,7 +146,8 @@ Các phát hiện mới: `score_collision_decisions.json` có 24 entry, **review
 - **Corpus mode (baseline cũ)**: 38 ref fact, 13 khớp, 8 đúng → accuracy `0.2105`, number retention `0.1385`, protected 3/3. Đây là khoảng cách giữa **dữ liệu đang dùng** và DOCX.
 - **Live mode baseline**: 77 ref fact (đổi TT88 sang p31), 0 khớp, accuracy `0.0`, protected 0/3.
 - **Sau Giai đoạn 1-2** (`derive_corrections.py` + dictionary curated + `extract_score_rows_from_text` fallback): **26 khớp, 22 đúng → accuracy `0.2857`**, number retention `0.3556`, protected vẫn **0/3**.
-- Kết luận thẳng: tiến bộ rõ nhưng OCR hiện tại **vẫn chưa tương đương** bản Word; protected phrase hỏng do PaddleOCR băm dấu (`viễn thị các mức đ`, `loại 1` không xuất hiện trọn cụm). Không đổi corpus/serving; chưa re-ingest.
+- **Sau protected-phrase pass**: 3 rule trọng yếu được phục hồi trọn cụm → protected **3/3** (page1 `loại 1, loại 2, loại 3`; page2 `viễn thị các mức độ` — OCR ghi `mục đ`; page4 `không cho điểm để phân loại sức khỏe`). Score-cell vẫn 22/77, accuracy `0.2857`.
+- Kết luận thẳng: protected đã đạt nhưng độ chính xác số liệu vẫn **chưa tương đương** bản Word. Không đổi corpus/serving; chưa re-ingest.
 
 ## Nhật ký fix mốc 3
 

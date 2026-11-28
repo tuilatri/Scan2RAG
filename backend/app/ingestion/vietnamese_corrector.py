@@ -38,18 +38,38 @@ PROTECTED_PHRASES = (
     "không cho điểm để phân loại sức khỏe",
 )
 
+_NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)?")
+
+# Apply the whole dictionary before numbers are masked; digit-bearing phrase
+# keys and short domain fragments both need the unmasked text.
+_PHRASE_KEYS = list(TYPO_MAP.keys())
+_PHRASE_PATTERN = (
+    re.compile(
+        "|".join(re.escape(key) for key in sorted(_PHRASE_KEYS, key=len, reverse=True)),
+        re.IGNORECASE,
+    )
+    if _PHRASE_KEYS else None
+)
 _PATTERN = re.compile(
     "|".join(re.escape(key) for key in sorted(TYPO_MAP, key=len, reverse=True)),
     re.IGNORECASE,
 )
 _LOOKUP = {key.lower(): value for key, value in TYPO_MAP.items()}
-_NUMBER_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
 
 def correct(text: str) -> str:
     """Correct known OCR damage without touching numbers or protected phrases."""
     if not text:
         return text
+
+    if _PHRASE_PATTERN:
+        for _ in range(3):
+            updated = _PHRASE_PATTERN.sub(
+                lambda match: _LOOKUP.get(match.group(0).lower(), match.group(0)), text
+            )
+            if updated == text:
+                break
+            text = updated
 
     numbers = _NUMBER_RE.findall(text)
     placeholders: list[tuple[str, str]] = []
@@ -67,9 +87,14 @@ def correct(text: str) -> str:
             token = f"__PROTECTED{len(preserved) - 1}__"
             text = text[:start] + token + text[start + len(phrase):]
 
-    text = _PATTERN.sub(
-        lambda match: _LOOKUP.get(match.group(0).lower(), match.group(0)), text
-    )
+    # Multiple passes let phrase-level fixes chain after word-level ones.
+    for _ in range(3):
+        updated = _PATTERN.sub(
+            lambda match: _LOOKUP.get(match.group(0).lower(), match.group(0)), text
+        )
+        if updated == text:
+            break
+        text = updated
     for index, original in enumerate(preserved):
         text = text.replace(f"__PROTECTED{index}__", original)
 

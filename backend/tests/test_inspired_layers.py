@@ -36,6 +36,20 @@ def test_plain_text_score_rows_attach_standalone_score():
     ]
 
 
+def test_corrector_restores_three_protected_phrases():
+    assert correct("có sc khe loi 1,\nloi 2, loi 3 theo") == (
+        "có sức khỏe loại 1, loại 2, loại 3 theo"
+    )
+    assert correct("viễn thị các mức đ;") == "viễn thị các mức độ;"
+    assert correct("viễn thị các mục đ;") == "viễn thị các mức độ;"
+    assert correct("không cho điểm đ phân loi sc khe.") == (
+        "không cho điểm để phân loại sức khỏe."
+    )
+    assert correct("không cho điểm đ phân loi sức khỏe.") == (
+        "không cho điểm để phân loại sức khỏe."
+    )
+
+
 def test_corrector_preserves_many_numbers_without_placeholder_collision():
     text = "Thông tư 105/2023/TT-BQP trang 105 và 10"
     assert correct(text) == text

@@ -18,7 +18,8 @@
 | `backend/app/ingestion/text_normalizer.py` | 128 | Unicode NFC normalization & Vietnamese diacritics |
 | `backend/app/ingestion/vlm_rectifier.py` | 149 | Multi-modal VLM table rectification with Counter safeguard |
 | `backend/app/ingestion/table_structure.py` | 69 | Header-aware score-column parsing + standalone OCR score rows (inspired by SLANet layer) |
-| `backend/app/ingestion/vietnamese_corrector.py` | 65 | Deterministic OCR correction with curated domain dictionary (inspired by ProtonX, not the model) |
+| `backend/app/ingestion/vietnamese_corrector.py` | 88 | Deterministic OCR correction with phrase-level passes and curated dictionary (inspired by ProtonX, not the model) |
+| `backend/app/ingestion/correction_dictionary.json` | 38 | Tracked domain pairs + identity locks for protected legal phrases |
 | `backend/app/ingestion/ocr_pipeline.py` | 45 | Adapter: preprocess → OCR → correct → structure; engine swappable |
 
 ### `backend/app/agents/` — LangGraph compare workflow (additive)

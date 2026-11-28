@@ -120,3 +120,8 @@
 - **Root cause**: Viết dictionary bằng cách copy preview OCR thay vì gõ giá trị đúng; `correct()` cũng lookup key hoa/thường nên `Bnh tt` không khớp `bnh tt`.
 - **Fix**: Viết lại dictionary UTF-8 sạch, `_LOOKUP` lowercase, fallback `extract_score_rows_from_text` cho điểm đứng dòng riêng. Score-cell tăng 0→22/77; protected vẫn là gap do PaddleOCR băm dấu.
 
+## 24. OCR "mục đ" Không Phải "mức đ"
+- **Symptom**: Rule "viễn thị các mức độ" không phục hồi dù đã có cặp `mức đ → mức độ`.
+- **Root cause**: PaddleOCR gõ **mục** (`u+1EE5`), không phải **mức** (`u+1EE9`); soi bằng codepoint mới thấy. Ngoài ra phrase có số (`loại 1, loại 2`) bị mask số trước khi sửa.
+- **Fix**: Thêm `mục đ → mức độ`, chạy toàn bộ dictionary ở phrase pass trước khi mask số, thêm identity pair để không áp lặp (`độộộ`). Protected phrase đạt **3/3**.
+
