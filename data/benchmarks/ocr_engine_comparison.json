@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-11-28T15:08:50.599963+00:00",
+  "provisional_reference": true,
+  "reference_source": "drafts/outsource/ocr-result.docx via scripts/ingest_docx_facts.py",
+  "engine": "corpus OCR output already ingested (live OCR unavailable in this venv)",
+  "summary": {
+    "pages": 5,
+    "reference_facts": 38,
+    "matched_reference_facts": 13,
+    "score_cell_hits": 8,
+    "score_cell_accuracy": 0.2105,
+    "number_retention": 0.1385,
+    "protected_phrase_pages": 3,
+    "protected_phrase_hits": 3
+  },
+  "pages": [
+    {
+      "document_id": "thông_tư_105",
+      "page": 23,
+      "source": "corpus (already ingested OCR output)",
+      "reference_facts": 38,
+      "extracted_rows": 12,
+      "matched_reference_facts": 13,
+      "score_cell_hits": 8,
+      "score_cell_accuracy": 0.2105,
+      "number_retention": 0.6923,
+      "cer_vs_docx_conditions": 0.6859,
+      "wer_vs_docx_conditions": 0.7075,
+      "protected_phrase_hit": true
+    },
+    {
+      "document_id": "thông_tư_88",
+      "page": 29,
+      "source": "corpus (already ingested OCR output)",
+      "reference_facts": 0,
+      "extracted_rows": 6,
+      "matched_reference_facts": 0,
+      "score_cell_hits": 0,
+      "score_cell_accuracy": 0.0,
+      "number_retention": 0.0,
+      "cer_vs_docx_conditions": 0.0,
+      "wer_vs_docx_conditions": 0.0,
+      "protected_phrase_hit": true
+    },
+    {
+      "document_id": "hướng_dẫn_cục_quân_y",
+      "page": 1,
+      "source": "corpus (already ingested OCR output)",
+      "reference_facts": 0,
+      "extracted_rows": 0,
+      "matched_reference_facts": 0,
+      "score_cell_hits": 0,
+      "score_cell_accuracy": 0.0,
+      "number_retention": 0.0,
+      "cer_vs_docx_conditions": 0.0,
+      "wer_vs_docx_conditions": 0.0,
+      "protected_phrase_hit": true
+    },
+    {
+      "document_id": "hướng_dẫn_cục_quân_y",
+      "page": 2,
+      "source": "corpus (already ingested OCR output)",
+      "reference_facts": 0,
+      "extracted_rows": 0,
+      "matched_reference_facts": 0,
+      "score_cell_hits": 0,
+      "score_cell_accuracy": 0.0,
+      "number_retention": 0.0,
+      "cer_vs_docx_conditions": 0.0,
+      "wer_vs_docx_conditions": 0.0,
+      "protected_phrase_hit": true
+    },
+    {
+      "document_id": "hướng_dẫn_cục_quân_y",
+      "page": 4,
+      "source": "corpus (already ingested OCR output)",
+      "reference_facts": 0,
+      "extracted_rows": 0,
+      "matched_reference_facts": 0,
+      "score_cell_hits": 0,
+      "score_cell_accuracy": 0.0,
+      "number_retention": 0.0,
+      "cer_vs_docx_conditions": 0.0,
+      "wer_vs_docx_conditions": 0.0,
+      "protected_phrase_hit": true
+    }
+  ]
+}
